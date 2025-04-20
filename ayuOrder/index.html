@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>阿玉點餐機</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'Taipei Sans TC';
+      src: url('fonts/台北黑體-粗-TaipeiSansTCBeta-Bold.ttf') format('truetype');
+      font-weight: bold;
+    }
+    @font-face {
+      font-family: 'Iansui';
+      src: url('fonts/芫荽體-Iansui-Regular.ttf') format('truetype');
+      font-weight: normal;
+    }
+    body {
+      background-color: #F9EBD7;
+      font-family: 'Iansui', sans-serif;
+      color: #222222;
+    }
+    .app-header {
+      background-color: #F9EBD7;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #DDDDDD;
+    }
+    .app-header img {
+      height: 180px;
+      margin-right: 1rem;
+    }
+    .app-title {
+      font-size: 2rem;
+      font-family: 'Taipei Sans TC', sans-serif;
+      font-weight: bold;
+    }
+    .menu-category {
+      background-color: #FFF7ED;
+      border: 1px solid #DDDDDD;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    .menu-item label {
+      margin-left: 0.5rem;
+    }
+    .order-summary {
+      background-color: #FFF7ED;
+      border: 1px solid #DDDDDD;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-top: 2rem;
+    }
+    .order-summary h5 {
+      margin-bottom: 1rem;
+      font-family: 'Taipei Sans TC', sans-serif;
+    }
+    .btn-update {
+      background-color: #D95B43;
+      color: white;
+      border: none;
+      font-family: 'Taipei Sans TC', sans-serif;
+    }
+    .btn-update:hover {
+      background-color: #F4A259;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-header container">
+    <img src="images/70D3EAD7-A02D-4026-B539-0C01BF213493.png" alt="阿玉 Q 版圖像">
+    <div class="app-title">阿玉點餐機</div>
+  </div>
+  <div class="container py-4">
+    <div class="mb-4">
+      <label for="userSelector" class="form-label fw-bold" ><h5>點餐人：</h5></label>
+      <select class="form-select" id="userSelector">
+        <option selected>阿玉</option>
+        <option>Apple</option>
+        <option>Ting</option>
+        <option>Howz</option>
+      </select>
+    </div>
+    <div id="menuArea"></div>
+    <div class="text-center mt-4">
+      <button class="btn btn-update" id="updateBtn">更新點菜單</button>
+    </div>
+    <div class="order-summary mt-4">
+      <h5>目前已點菜色</h5>
+      <ul id="orderedList" class="list-unstyled">
+        <li>尚未點任何菜色喔～</li>
+      </ul>
+    </div>
+  </div>
+  <script>
+    const apiUrl = "https://script.google.com/macros/s/AKfycbyDvG8GUZaqDO_W-q0lKY57VHM1RzZiFEJgogcO8xjXpTir1eEiW0n_d7NjsQzlMs-j/exec";
+    const users = ["阿玉", "Apple", "Ting", "Howz"];
+    const menuArea = document.getElementById("menuArea");
+    const userSelector = document.getElementById("userSelector");
+    const orderedList = document.getElementById("orderedList");
+    let menuData = [];
+
+    async function fetchMenuData() {
+      const res = await fetch(apiUrl);
+      const data = await res.json();
+      menuData = data;
+      renderMenu();
+      updateOrderedList();
+    }
+
+    function renderMenu() {
+      menuArea.innerHTML = "";
+      const currentUser = userSelector.value;
+      const grouped = {};
+      menuData.forEach(item => {
+        if (!grouped[item["菜色類別"]]) grouped[item["菜色類別"]] = [];
+        grouped[item["菜色類別"]].push(item);
+      });
+      Object.entries(grouped).forEach(([category, items]) => {
+        const sectionDiv = document.createElement("div");
+        sectionDiv.className = "menu-category";
+        const title = document.createElement("h5");
+        title.textContent = category;
+        sectionDiv.appendChild(title);
+        items.forEach((item, idx) => {
+          const id = `${category}-${item["菜名（價格）"]}`;
+          const itemDiv = document.createElement("div");
+          itemDiv.className = "menu-item";
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.id = id;
+          checkbox.checked = item[currentUser] === true;
+          checkbox.addEventListener("change", () => {
+            sendUpdate(currentUser, item["菜名（價格）"], checkbox.checked);
+            item[currentUser] = checkbox.checked;
+            updateOrderedList();
+          });
+          const label = document.createElement("label");
+          label.setAttribute("for", id);
+          label.textContent = item["菜名（價格）"];
+          itemDiv.appendChild(checkbox);
+          itemDiv.appendChild(label);
+          sectionDiv.appendChild(itemDiv);
+        });
+        menuArea.appendChild(sectionDiv);
+      });
+    }
+
+    async function sendUpdate(person, menuName, selected) {
+      try {
+        const res = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ person, menuName, selected })
+        });
+        const result = await res.json();
+        if (result.status !== "updated") {
+          console.warn("後端未成功更新：", result);
+          alert("⚠️ 資料未寫入成功：" + result.message);
+        }
+      } catch (err) {
+        console.error("POST 傳送失敗：", err);
+        alert("❌ 資料寫入失敗，請檢查網路或後台服務。"+ result.message);
+      }
+    }
+
+    function updateOrderedList() {
+      const summary = {};
+      menuData.forEach(item => {
+        users.forEach(user => {
+          if (item[user] === true) {
+            if (!summary[item["菜名（價格）"]]) summary[item["菜名（價格）"]] = [];
+            summary[item["菜名（價格）"]].push(user);
+          }
+        });
+      });
+      orderedList.innerHTML = "";
+      const entries = Object.entries(summary);
+      if (entries.length === 0) {
+        orderedList.innerHTML = '<li>尚未點任何菜色喔～</li>';
+      } else {
+        entries.forEach(([menu, who]) => {
+          const li = document.createElement("li");
+          li.textContent = `${menu}【${who.join("、")}】`;
+          orderedList.appendChild(li);
+        });
+      }
+    }
+
+    userSelector.addEventListener("change", () => renderMenu());
+    document.getElementById("updateBtn").addEventListener("click", () => updateOrderedList());
+    fetchMenuData();
+  </script>
+</body>
+</html>

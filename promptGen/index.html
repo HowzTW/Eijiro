@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Eijirōの造夢機</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'Iansui';
+      src: url('芫荽體-Iansui-Regular.ttf') format('truetype');
+    }
+    body {
+      font-family: 'Iansui', sans-serif;
+      background: #f8f9fa;
+    }
+    .logo { width: 60px; vertical-align: middle; }
+    .header h1 { font-size: 1.5rem; margin-left: 1rem; }
+    .section-title { font-weight: bold; margin-top: 2rem; font-size: 1.2rem; }
+    textarea, .output-box, select {
+      font-family: 'Iansui', sans-serif;
+    }
+    .output-box {
+      white-space: pre-wrap;
+      background-color: #fff;
+      padding: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container py-4">
+  <!-- Header -->
+  <div class="d-flex align-items-center mb-4">
+    <img src="robot_logo_techblue_transparent.png" alt="Logo" class="logo me-3">
+    <h1 class="h4 mb-0">Eijirōの造夢機</h1>
+  </div>
+
+  <!-- 圖片風格 -->
+  <div>
+    <p class="section-title">圖片風格</p>
+    <select id="style" class="form-select mb-3">
+      <option value="仿真攝影風（Realistic / AI Photography Style）">仿真攝影風（Realistic / AI Photography Style）</option>
+      <option value="電影感寫實（Cinematic Realism）">電影感寫實（Cinematic Realism）</option>
+      <option value="日系插畫風（Anime / Manga Style）">日系插畫風（Anime / Manga Style）</option>
+      <option value="歐美卡通風（Western Cartoon）">歐美卡通風（Western Cartoon）</option>
+      <option value="Q版可愛風（Chibi / Super Deformed）">Q版可愛風（Chibi / Super Deformed）</option>
+      <option value="扁平插畫（Flat Design）">扁平插畫（Flat Design）</option>
+      <option value="極簡線條插畫（Minimal Line Art）">極簡線條插畫（Minimal Line Art）</option>
+      <option value="鉛筆素描風（Pencil Sketch）">鉛筆素描風（Pencil Sketch）</option>
+      <option value="水彩畫風（Watercolor）">水彩畫風（Watercolor）</option>
+      <option value="油畫風（Oil Painting）">油畫風（Oil Painting）</option>
+      <option value="粉蠟筆風（Pastel）">粉蠟筆風（Pastel）</option>
+      <option value="中國水墨畫風">中國水墨畫風（Chinese Ink Painting Style）</option>
+      <option value="像素風格（Pixel Art）">像素風格（Pixel Art）</option>
+      <option value="低多邊形風格（Low Poly）">低多邊形風格（Low Poly）</option>
+      <option value="霓虹賽博龐克風（Cyberpunk Neon）">霓虹賽博龐克風（Cyberpunk Neon）</option>
+      <option value="復古照片風（Retro Film / Vintage）">復古照片風（Retro Film / Vintage）</option>
+      <option value="微距攝影風（Macro Photography）">微距攝影風（Macro Photography）</option>
+      <option value="航拍風格（Aerial / Drone View）">航拍風格（Aerial / Drone View）</option>
+      <option value="底片感攝影（Film Photography）">底片感攝影（Film Photography）</option>
+    </select>
+  </div>
+
+  <!-- 輸入區塊 -->
+  <div class="row">
+    <div class="col-md-6">
+      <p class="section-title">場景描述</p>
+      <textarea class="form-control mb-2" id="sceneLocation" placeholder="場景地點"></textarea>
+      <textarea class="form-control mb-2" id="weather" placeholder="時間／天氣"></textarea>
+      <textarea class="form-control mb-2" id="mood" placeholder="氛圍描述"></textarea>
+
+      <p class="section-title">主角人物</p>
+      <textarea class="form-control mb-2" id="character" placeholder="主角屬性"></textarea>
+      <textarea class="form-control mb-2" id="face" placeholder="臉部特徵"></textarea>
+      <textarea class="form-control mb-2" id="clothing" placeholder="服裝風格"></textarea>
+    </div>
+    <div class="col-md-6">
+      <p class="section-title">姿勢與情緒</p>
+      <textarea class="form-control mb-2" id="pose" placeholder="姿勢／動作"></textarea>
+      <textarea class="form-control mb-2" id="expression" placeholder="表情／情緒"></textarea>
+
+      <p class="section-title">照片構圖</p>
+      <div class="form-check"><input class="form-check-input" type="radio" name="ratio" value="橫式（16:9）" checked><label class="form-check-label">橫式（16:9）</label></div>
+      <div class="form-check"><input class="form-check-input" type="radio" name="ratio" value="直式（9:16）"><label class="form-check-label">直式（9:16）</label></div>
+      <div class="form-check"><input class="form-check-input" type="radio" name="ratio" value="正方形"><label class="form-check-label">正方形</label></div>
+      <textarea class="form-control mb-2" id="angle" placeholder="攝影角度與距離"></textarea>
+      <textarea class="form-control mb-2" id="eye" placeholder="鏡頭方向與眼神"></textarea>
+
+      <p class="section-title">補充說明</p>
+      <textarea class="form-control mb-2" id="note" placeholder="任何補充風格或語氣"></textarea>
+    </div>
+  </div>
+
+  <!-- 按鈕 -->
+  <div class="text-center mt-4">
+    <button class="btn btn-primary" onclick="generatePrompt()">執行 Go</button>
+  </div>
+
+  <!-- 輸出 -->
+  <div class="mt-4">
+    <p class="section-title">生成結果</p>
+    <div id="output" class="output-box"></div>
+  </div>
+</div>
+
+<script>
+function generatePrompt() {
+  const fields = [
+    { label: "圖片風格", value: document.getElementById('style')?.value },
+    { label: "場景地點", value: sceneLocation.value },
+    { label: "時間／天氣", value: weather.value },
+    { label: "氛圍描述", value: mood.value },
+    { label: "主角屬性", value: character.value },
+    { label: "臉部特徵", value: face.value },
+    { label: "服裝風格", value: clothing.value },
+    { label: "姿勢／動作", value: pose.value },
+    { label: "表情／情緒", value: expression.value },
+    { label: "照片比例", value: document.querySelector('input[name="ratio"]:checked')?.value },
+    { label: "攝影角度與距離", value: angle.value },
+    { label: "鏡頭方向與眼神", value: eye.value },
+    { label: "補充說明", value: note.value },
+  ];
+
+  let output = fields
+    .filter(field => field.value && field.value.trim() !== "")
+    .map(field => `【${field.label}】\n${field.value.trim()}`)
+    .join("\n\n");
+
+  document.getElementById('output').textContent = output;
+}
+</script>
+
+</body>
+</html>
