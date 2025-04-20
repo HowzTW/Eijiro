@@ -156,19 +156,28 @@
 
     async function sendUpdate(person, menuName, selected) {
       try {
+        const formData = new URLSearchParams();
+        formData.append("person", person);
+        formData.append("menuName", menuName);
+        formData.append("selected", selected);
+
         const res = await fetch(apiUrl, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ person, menuName, selected })
+          body: formData // 不加 headers 就會用預設 form 格式，避免預檢
         });
-        const result = await res.json();
+
+        const result = await res.json(); // Apps Script 請確保回傳 JSON 格式
         if (result.status !== "updated") {
-          console.warn("後端未成功更新：", result);
-          alert("⚠️ 資料未寫入成功：" + result.message);
+          debugOutput.classList.remove("d-none");
+          debugOutput.textContent = JSON.stringify(result.debug, null, 2);
+          alert("⚠️ 後台錯誤：" + (result.debug?.message || "未知錯誤"));
+        } else {
+          debugOutput.classList.add("d-none");
         }
       } catch (err) {
-        console.error("POST 傳送失敗：", err);
-        alert("❌ 資料寫入失敗，請檢查網路或後台服務。"+ result.message);
+        debugOutput.classList.remove("d-none");
+        debugOutput.textContent = `❌ 錯誤：\\n${err}`;
+        alert("❌ 資料寫入失敗，請檢查網路或後台服務。");
       }
     }
 
