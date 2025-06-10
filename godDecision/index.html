@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>選擇障礙小幫手</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Bootstrap Icons for theme switcher -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <style>
+        /* --- 色彩變數定義 --- */
+        :root, [data-theme="light"] {
+            --bg-color: #F8F9FA;         /* 背景色 */
+            --surface-color: #FFFFFF;    /* 容器背景色 */
+            --text-color: #212529;       /* 主要文字顏色 */
+            --text-muted-color: #6C757D; /* 輔助文字顏色 */
+            --primary-color: #0D6EFD;    /* 主色 (按鈕) */
+            --info-color: #0DCAF0;       /* 輔色 (上一步按鈕) */
+            --secondary-color: #6C757D;  /* 次要按鈕 */
+            --border-color: #DEE2E6;     /* 分隔線/邊框 */
+            --success-bg-color: #D1E7DD; /* 結果區塊背景 */
+            --success-text-color: #0F5132;/* 結果區塊文字 */
+            --input-bg: #FFFFFF;         /* 輸入框背景 */
+            --box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0F172A;
+            --surface-color: #1E293B;
+            --text-color: #E2E8F0;
+            --text-muted-color: #94A3B8;
+            --primary-color: #38BDF8;
+            --info-color: #2DD4BF;
+            --secondary-color: #475569;
+            --border-color: #334155;
+            --success-bg-color: #164E63;
+            --success-text-color: #67E8F9;
+            --input-bg: #334155;
+            --box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        }
+        
+        /* --- 基本樣式套用 --- */
+        body, html {
+            height: 100%;
+        }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .main-container {
+            max-width: 600px;
+            width: 100%;
+            padding: 2rem;
+            background-color: var(--surface-color);
+            border-radius: 15px;
+            box-shadow: var(--box-shadow);
+            position: relative; /* 為了讓切換器定位 */
+            transition: background-color 0.3s;
+        }
+
+        /* --- 主題切換器 --- */
+        .theme-switcher {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .theme-switcher:hover {
+            background-color: var(--primary-color);
+            color: var(--surface-color);
+        }
+
+        /* 隱藏 DIV 的 class */
+        .hidden { display: none; }
+
+        /* --- 元件樣式覆寫 --- */
+        h1, h3, h5, p { color: inherit; }
+        #topic-display-step2, #topic-display-step3 { color: var(--primary-color); }
+        hr { border-top: 1px solid var(--border-color); }
+        
+        .form-control {
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border-color: var(--border-color);
+        }
+        .form-control::placeholder { color: var(--text-muted-color); }
+        .form-control:focus {
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(var(--primary-color-rgb), 0.25);
+        }
+
+        .btn-primary { 
+            background-color: var(--primary-color); 
+            border-color: var(--primary-color);
+            color: var(--surface-color);
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+            color: var(--surface-color);
+        }
+
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: var(--surface-color);
+        }
+        
+        .btn-info {
+            background-color: var(--info-color);
+            border-color: var(--info-color);
+            color: #111;
+        }
+        [data-theme="dark"] .btn-info { color: #fff; }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            color: var(--surface-color);
+        }
+        
+        .list-group-item {
+            background-color: var(--surface-color);
+            border-color: var(--border-color);
+            color: var(--text-color);
+        }
+
+        #options-list .list-group-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .alert-success {
+            background-color: var(--success-bg-color);
+            color: var(--success-text-color);
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <!-- Theme Switcher -->
+        <button id="theme-toggle" class="theme-switcher">
+            <i id="theme-icon" class="bi"></i>
+        </button>
+
+        <!-- Welcome Screen -->
+        <div id="welcome-view">
+            <div class="text-center">
+                <h1 class="mb-3">選擇障礙小幫手</h1>
+                <img src="https://howzservice.azurewebsites.net/images/orei.jpg" 
+                     alt="選擇障礙小幫手 Logo" 
+                     class="img-fluid w-50 d-block mx-auto my-4 rounded">
+                <button id="start-btn" class="btn btn-primary btn-lg mt-3">開始</button>
+            </div>
+        </div>
+
+        <!-- Step 1: Input Topic -->
+        <div id="step1-view" class="hidden">
+            <h3 class="text-center">選擇障礙小幫手</h3>
+            <h5 class="mt-4">Step 1：輸入選擇主題</h5>
+            <hr>
+            <p>請輸入今天想要交給上天決定的命運難題是什麼？</p>
+            <div class="mb-3">
+                <input type="text" class="form-control" id="topic-input" placeholder="ex：今天晚餐吃什麼">
+            </div>
+            <hr>
+            <div class="d-flex justify-content-end">
+                <button id="step1-next-btn" class="btn btn-primary me-2" disabled>下一步</button>
+                <button class="btn btn-secondary end-btn">結束</button>
+            </div>
+        </div>
+
+        <!-- Step 2: Input Options -->
+        <div id="step2-view" class="hidden">
+            <h3 class="text-center">選擇障礙小幫手</h3>
+            <h5 id="topic-display-step2" class="mt-4"></h5>
+            <h5 class="mt-3">Step 2：輸入選項</h5>
+            <hr>
+            <p>請逐一輸入選項項目。</p>
+            <div class="input-group mb-3">
+                <input type="text" id="option-input" class="form-control" placeholder="請輸入選項">
+                <button class="btn btn-outline-primary" type="button" id="add-option-btn">＋</button>
+            </div>
+            <ul id="options-list" class="list-group mb-3">
+                <!-- Options will be added here by JavaScript -->
+            </ul>
+            <hr>
+            <div class="d-flex justify-content-end">
+                <button id="step2-back-btn" class="btn btn-info me-auto">上一步</button>
+                <button id="step2-next-btn" class="btn btn-primary me-2" disabled>下一步</button>
+                <button class="btn btn-secondary end-btn">結束</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Result -->
+        <div id="step3-view" class="hidden">
+            <h3 class="text-center">選擇障礙小幫手</h3>
+            <h5 id="topic-display-step3" class="mt-4"></h5>
+            <hr>
+            <div class="text-center my-4">
+                <p class="fs-5">上天的旨意是...</p>
+                <div id="result-display" class="alert alert-success fs-2" role="alert">
+                    <!-- Result will be shown here -->
+                </div>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between">
+                 <button id="step3-back-btn" class="btn btn-info">上一頁</button>
+                 <button class="btn btn-secondary end-btn">結束</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- THEME SWITCHER LOGIC ---
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            const localStorageKey = 'theme-preference';
+
+            // Function to apply the theme
+            const applyTheme = (theme) => {
+                document.documentElement.setAttribute('data-theme', theme);
+                if (theme === 'dark') {
+                    themeIcon.classList.remove('bi-sun-fill');
+                    themeIcon.classList.add('bi-moon-stars-fill');
+                } else {
+                    themeIcon.classList.remove('bi-moon-stars-fill');
+                    themeIcon.classList.add('bi-sun-fill');
+                }
+            };
+            
+            // Get user preference from localStorage or system
+            const getInitialTheme = () => {
+                const savedTheme = localStorage.getItem(localStorageKey);
+                if (savedTheme) {
+                    return savedTheme;
+                }
+                // Fallback to system preference
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            };
+
+            // Set initial theme
+            const currentTheme = getInitialTheme();
+            applyTheme(currentTheme);
+
+            // Add event listener for the toggle button
+            themeToggleBtn.addEventListener('click', () => {
+                const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                localStorage.setItem(localStorageKey, newTheme);
+                applyTheme(newTheme);
+            });
+
+
+            // --- APPLICATION LOGIC ---
+
+            // --- DOM Elements ---
+            const welcomeView = document.getElementById('welcome-view');
+            const step1View = document.getElementById('step1-view');
+            const step2View = document.getElementById('step2-view');
+            const step3View = document.getElementById('step3-view');
+            const views = [welcomeView, step1View, step2View, step3View];
+
+            const startBtn = document.getElementById('start-btn');
+            const endBtns = document.querySelectorAll('.end-btn');
+
+            // Step 1 Elements
+            const topicInput = document.getElementById('topic-input');
+            const step1NextBtn = document.getElementById('step1-next-btn');
+
+            // Step 2 Elements
+            const topicDisplayStep2 = document.getElementById('topic-display-step2');
+            const optionInput = document.getElementById('option-input');
+            const addOptionBtn = document.getElementById('add-option-btn');
+            const optionsList = document.getElementById('options-list');
+            const step2BackBtn = document.getElementById('step2-back-btn');
+            const step2NextBtn = document.getElementById('step2-next-btn');
+
+            // Step 3 Elements
+            const topicDisplayStep3 = document.getElementById('topic-display-step3');
+            const resultDisplay = document.getElementById('result-display');
+            const step3BackBtn = document.getElementById('step3-back-btn');
+
+            // --- State ---
+            let topic = '';
+            let options = [];
+
+            // --- Helper Functions ---
+
+            const switchView = (viewToShow) => {
+                views.forEach(view => view.classList.add('hidden'));
+                viewToShow.classList.remove('hidden');
+            };
+
+            const updateStep1NextBtnState = () => {
+                const hasContent = topicInput.value.trim().length > 0;
+                step1NextBtn.disabled = !hasContent;
+            };
+
+            const updateStep2NextBtnState = () => {
+                step2NextBtn.disabled = options.length < 2;
+            };
+
+            const renderOptions = () => {
+                optionsList.innerHTML = ''; 
+                options.forEach((optionText, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item';
+                    
+                    const textSpan = document.createElement('span');
+                    textSpan.textContent = optionText;
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'btn btn-danger btn-sm';
+                    deleteBtn.textContent = 'X';
+                    deleteBtn.onclick = () => { removeOption(index); };
+                    
+                    li.appendChild(textSpan);
+                    li.appendChild(deleteBtn);
+                    optionsList.appendChild(li);
+                });
+                updateStep2NextBtnState(); 
+            };
+            
+            const addOption = () => {
+                const optionText = optionInput.value.trim();
+                if (optionText) {
+                    options.push(optionText);
+                    optionInput.value = '';
+                    renderOptions();
+                }
+                 optionInput.focus();
+            };
+
+            const removeOption = (indexToRemove) => {
+                options.splice(indexToRemove, 1);
+                renderOptions();
+            };
+            
+            const showResult = () => {
+                if (options.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * options.length);
+                    const result = options[randomIndex];
+                    resultDisplay.textContent = result;
+                }
+            };
+
+
+            // --- Event Listeners ---
+            startBtn.addEventListener('click', () => switchView(step1View));
+            endBtns.forEach(btn => btn.addEventListener('click', () => location.reload()));
+            
+            // Step 1
+            topicInput.addEventListener('input', updateStep1NextBtnState);
+            step1NextBtn.addEventListener('click', () => {
+                topic = topicInput.value.trim();
+                topicDisplayStep2.textContent = topic;
+                topicDisplayStep3.textContent = topic;
+                switchView(step2View);
+            });
+
+            // Step 2
+            addOptionBtn.addEventListener('click', addOption);
+            optionInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') addOption();
+            });
+            step2BackBtn.addEventListener('click', () => switchView(step1View));
+            step2NextBtn.addEventListener('click', () => {
+                showResult();
+                switchView(step3View);
+            });
+
+            // Step 3
+            step3BackBtn.addEventListener('click', () => switchView(step2View));
+        });
+    </script>
+</body>
+</html>
