@@ -12,20 +12,19 @@
     <style>
         /* --- 色彩變數定義 --- */
         :root, [data-theme="light"] {
-            --bg-color: #F8F9FA;         /* 背景色 */
-            --surface-color: #FFFFFF;    /* 容器背景色 */
-            --text-color: #212529;       /* 主要文字顏色 */
-            --text-muted-color: #6C757D; /* 輔助文字顏色 */
-            --primary-color: #0D6EFD;    /* 主色 (按鈕) */
-            --info-color: #0DCAF0;       /* 輔色 (上一步按鈕) */
-            --secondary-color: #6C757D;  /* 次要按鈕 */
-            --primary-btn-text-color: #FFFFFF; /* 主按鈕文字顏色 */
-            --secondary-btn-text-color: #FFFFFF; /* 次要按鈕文字顏色 */
-            --border-color: #DEE2E6;     /* 分隔線/邊框 */
-            --success-bg-color: #D1E7DD; /* 結果區塊背景 */
-            --success-text-color: #0F5132;/* 結果區塊文字 */
-            --input-bg: #FFFFFF;         /* 輸入框背景 */
+            --bg-color: #F8F9FA;
+            --surface-color: #FFFFFF;
+            --text-color: #212529;
+            --text-muted-color: #6C757D;
+            --primary-color: #0D6EFD;
+            --info-color: #0DCAF0;
+            --secondary-color: #6C757D;
+            --primary-btn-text-color: #FFFFFF;
+            --secondary-btn-text-color: #FFFFFF;
+            --border-color: #DEE2E6;
+            --input-bg: #FFFFFF;
             --box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            --gradient-stop-color: rgba(255, 255, 255, 1);
         }
 
         [data-theme="dark"] {
@@ -35,20 +34,17 @@
             --text-muted-color: #94A3B8;
             --primary-color: #38BDF8;
             --info-color: #2DD4BF;
-            --secondary-color: #64748B;  /* 更新：次要按鈕顏色調亮 */
-            --primary-btn-text-color: #0F172A; /* 更新：主按鈕文字顏色確保對比 */
-            --secondary-btn-text-color: #E2E8F0; /* 更新：次要按鈕文字顏色確保對比 */
+            --secondary-color: #64748B;
+            --primary-btn-text-color: #0F172A;
+            --secondary-btn-text-color: #E2E8F0;
             --border-color: #334155;
-            --success-bg-color: #164E63;
-            --success-text-color: #67E8F9;
             --input-bg: #334155;
             --box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            --gradient-stop-color: rgba(30, 41, 59, 1);
         }
         
         /* --- 基本樣式套用 --- */
-        body, html {
-            height: 100%;
-        }
+        body, html { height: 100%; }
         body {
             display: flex;
             align-items: center;
@@ -64,7 +60,7 @@
             background-color: var(--surface-color);
             border-radius: 15px;
             box-shadow: var(--box-shadow);
-            position: relative; /* 為了讓切換器定位 */
+            position: relative;
             transition: background-color 0.3s;
         }
 
@@ -90,75 +86,86 @@
             color: var(--surface-color);
         }
 
-        /* 隱藏 DIV 的 class */
         .hidden { display: none; }
 
         /* --- 元件樣式覆寫 --- */
         h1, h3, h5, p { color: inherit; }
         #topic-display-step2, #topic-display-step3 { color: var(--primary-color); }
         hr { border-top: 1px solid var(--border-color); }
-        
-        .form-control {
-            background-color: var(--input-bg);
-            color: var(--text-color);
-            border-color: var(--border-color);
-        }
+        .form-control { background-color: var(--input-bg); color: var(--text-color); border-color: var(--border-color); }
         .form-control::placeholder { color: var(--text-muted-color); }
-        .form-control:focus {
-            background-color: var(--input-bg);
-            color: var(--text-color);
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.25rem rgba(var(--primary-color-rgb), 0.25);
-        }
-
-        .btn-primary { 
-            background-color: var(--primary-color); 
-            border-color: var(--primary-color);
-            color: var(--primary-btn-text-color);
-        }
-        .btn-primary:hover {
-            opacity: 0.9;
-            color: var(--primary-btn-text-color);
-        }
-
-        .btn-outline-primary {
-            color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-        .btn-outline-primary:hover {
-            background-color: var(--primary-color);
-            color: var(--primary-btn-text-color);
-        }
-        
-        .btn-info {
-            background-color: var(--info-color);
-            border-color: var(--info-color);
-            color: #111;
-        }
+        .form-control:focus { background-color: var(--input-bg); color: var(--text-color); border-color: var(--primary-color); box-shadow: none; }
+        .btn-primary { background-color: var(--primary-color); border-color: var(--primary-color); color: var(--primary-btn-text-color); }
+        .btn-primary:hover { opacity: 0.9; color: var(--primary-btn-text-color); }
+        .btn-outline-primary { color: var(--primary-color); border-color: var(--primary-color); }
+        .btn-outline-primary:hover { background-color: var(--primary-color); color: var(--primary-btn-text-color); }
+        .btn-info { background-color: var(--info-color); border-color: var(--info-color); color: #111; }
         [data-theme="dark"] .btn-info { color: #fff; }
-
-        .btn-secondary {
-            background-color: var(--secondary-color);
-            border-color: var(--secondary-color);
-            color: var(--secondary-btn-text-color);
-        }
+        .btn-secondary { background-color: var(--secondary-color); border-color: var(--secondary-color); color: var(--secondary-btn-text-color); }
+        .list-group-item { background-color: var(--surface-color); border-color: var(--border-color); color: var(--text-color); }
+        #options-list .list-group-item { display: flex; justify-content: space-between; align-items: center; }
         
-        .list-group-item {
-            background-color: var(--surface-color);
-            border-color: var(--border-color);
+        /* --- 拉霸機動畫樣式 (更新) --- */
+        #slot-container {
+            position: relative;
+            height: 120px; /* 增加高度以容納更大的字體 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 2rem;
+        }
+        #slot-reel-wrapper {
+            height: 80px; /* 增加視窗高度 */
+            width: 100%;
+            background-color: var(--input-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            /* 內凹陰影效果 */
+            box-shadow: inset 0 6px 10px -6px rgba(0,0,0,0.3), inset 0 -6px 10px -6px rgba(0,0,0,0.3);
+        }
+        /* 上下漸層遮罩 */
+        #slot-reel-wrapper::before,
+        #slot-reel-wrapper::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 25px;
+            z-index: 2;
+        }
+        #slot-reel-wrapper::before {
+            top: 0;
+            background: linear-gradient(to bottom, var(--gradient-stop-color) 0%, transparent 100%);
+        }
+        #slot-reel-wrapper::after {
+            bottom: 0;
+            background: linear-gradient(to top, var(--gradient-stop-color) 0%, transparent 100%);
+        }
+
+        #slot-reel {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1;
+        }
+        .slot-item {
+            height: 80px; /* 匹配視窗高度 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5rem; /* H1 等級大小 */
+            font-weight: bold;
             color: var(--text-color);
         }
-
-        #options-list .list-group-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .alert-success {
-            background-color: var(--success-bg-color);
-            color: var(--success-text-color);
-            border: none;
+        .slot-pointer {
+            position: absolute;
+            left: 0;
+            font-size: 2rem;
+            color: var(--primary-color);
+            transform: translateX(-110%);
+            z-index: 3;
         }
     </style>
 </head>
@@ -226,15 +233,20 @@
             <h5 id="topic-display-step3" class="mt-4"></h5>
             <hr>
             <div class="text-center my-4">
-                <p class="fs-5">上天的旨意是...</p>
-                <div id="result-display" class="alert alert-success fs-2" role="alert">
-                    <!-- Result will be shown here -->
+                <p id="result-text-label" class="fs-5">上天的旨意是...</p>
+                <div id="slot-container">
+                    <div class="slot-pointer">➤</div>
+                    <div id="slot-reel-wrapper">
+                        <div id="slot-reel">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
                 </div>
             </div>
             <hr>
             <div class="d-flex justify-content-between">
                  <button id="step3-back-btn" class="btn btn-info">上一頁</button>
-                 <button class="btn btn-secondary end-btn">結束</button>
+                 <button id="step3-end-btn" class="btn btn-secondary end-btn">結束</button>
             </div>
         </div>
 
@@ -251,83 +263,61 @@
             const themeIcon = document.getElementById('theme-icon');
             const localStorageKey = 'theme-preference';
 
-            // Function to apply the theme
             const applyTheme = (theme) => {
                 document.documentElement.setAttribute('data-theme', theme);
-                if (theme === 'dark') {
-                    themeIcon.classList.remove('bi-sun-fill');
-                    themeIcon.classList.add('bi-moon-stars-fill');
-                } else {
-                    themeIcon.classList.remove('bi-moon-stars-fill');
-                    themeIcon.classList.add('bi-sun-fill');
-                }
+                themeIcon.className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
             };
             
-            // Get user preference from localStorage or system
             const getInitialTheme = () => {
                 const savedTheme = localStorage.getItem(localStorageKey);
-                if (savedTheme) {
-                    return savedTheme;
-                }
-                // Fallback to system preference
+                if (savedTheme) return savedTheme;
                 return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
             };
 
-            // Set initial theme
             const currentTheme = getInitialTheme();
             applyTheme(currentTheme);
 
-            // Add event listener for the toggle button
             themeToggleBtn.addEventListener('click', () => {
                 const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
                 localStorage.setItem(localStorageKey, newTheme);
                 applyTheme(newTheme);
             });
 
-
             // --- APPLICATION LOGIC ---
-
-            // --- DOM Elements ---
-            const welcomeView = document.getElementById('welcome-view');
-            const step1View = document.getElementById('step1-view');
-            const step2View = document.getElementById('step2-view');
-            const step3View = document.getElementById('step3-view');
-            const views = [welcomeView, step1View, step2View, step3View];
+            const views = {
+                welcome: document.getElementById('welcome-view'),
+                step1: document.getElementById('step1-view'),
+                step2: document.getElementById('step2-view'),
+                step3: document.getElementById('step3-view')
+            };
 
             const startBtn = document.getElementById('start-btn');
             const endBtns = document.querySelectorAll('.end-btn');
-
-            // Step 1 Elements
             const topicInput = document.getElementById('topic-input');
             const step1NextBtn = document.getElementById('step1-next-btn');
-
-            // Step 2 Elements
             const topicDisplayStep2 = document.getElementById('topic-display-step2');
             const optionInput = document.getElementById('option-input');
             const addOptionBtn = document.getElementById('add-option-btn');
             const optionsList = document.getElementById('options-list');
             const step2BackBtn = document.getElementById('step2-back-btn');
             const step2NextBtn = document.getElementById('step2-next-btn');
-
-            // Step 3 Elements
             const topicDisplayStep3 = document.getElementById('topic-display-step3');
-            const resultDisplay = document.getElementById('result-display');
             const step3BackBtn = document.getElementById('step3-back-btn');
+            const step3EndBtn = document.getElementById('step3-end-btn');
+            const slotReel = document.getElementById('slot-reel');
+            const resultTextLabel = document.getElementById('result-text-label');
 
-            // --- State ---
             let topic = '';
             let options = [];
-
-            // --- Helper Functions ---
+            let isSpinning = false;
 
             const switchView = (viewToShow) => {
-                views.forEach(view => view.classList.add('hidden'));
+                Object.values(views).forEach(view => view.classList.add('hidden'));
                 viewToShow.classList.remove('hidden');
             };
 
             const updateStep1NextBtnState = () => {
-                const hasContent = topicInput.value.trim().length > 0;
-                step1NextBtn.disabled = !hasContent;
+                step1NextBtn.disabled = topicInput.value.trim().length === 0;
             };
 
             const updateStep2NextBtnState = () => {
@@ -339,15 +329,12 @@
                 options.forEach((optionText, index) => {
                     const li = document.createElement('li');
                     li.className = 'list-group-item';
-                    
                     const textSpan = document.createElement('span');
                     textSpan.textContent = optionText;
-                    
                     const deleteBtn = document.createElement('button');
                     deleteBtn.className = 'btn btn-danger btn-sm';
                     deleteBtn.textContent = 'X';
-                    deleteBtn.onclick = () => { removeOption(index); };
-                    
+                    deleteBtn.onclick = () => removeOption(index);
                     li.appendChild(textSpan);
                     li.appendChild(deleteBtn);
                     optionsList.appendChild(li);
@@ -370,41 +357,75 @@
                 renderOptions();
             };
             
-            const showResult = () => {
-                if (options.length > 0) {
-                    const randomIndex = Math.floor(Math.random() * options.length);
-                    const result = options[randomIndex];
-                    resultDisplay.textContent = result;
+            const runSlotAnimation = () => {
+                if (isSpinning) return;
+                isSpinning = true;
+
+                resultTextLabel.textContent = "決定中...";
+                step3BackBtn.disabled = true;
+                step3EndBtn.disabled = true;
+                
+                const itemHeight = 80; // 匹配 CSS 的 .slot-item 高度
+                const dummyRounds = 3;
+                let reelItems = [];
+                for (let i = 0; i < dummyRounds; i++) {
+                    reelItems = reelItems.concat([...options].sort(() => 0.5 - Math.random()));
                 }
+                const winnerIndex = Math.floor(Math.random() * options.length);
+                reelItems.push(...options); // 確保最後一輪順序正確
+
+                slotReel.innerHTML = '';
+                reelItems.forEach(optionText => {
+                    const item = document.createElement('div');
+                    item.className = 'slot-item';
+                    item.textContent = optionText;
+                    slotReel.appendChild(item);
+                });
+
+                const targetReelIndex = (dummyRounds * options.length) + winnerIndex;
+                const finalTranslateY = -targetReelIndex * itemHeight;
+                
+                slotReel.style.transition = 'none';
+                slotReel.style.transform = 'translateY(0px)';
+                slotReel.offsetHeight; 
+
+                const animationDuration = 4000; // 更新：動畫時間為 4 秒
+                slotReel.style.transition = `transform ${animationDuration / 1000}s cubic-bezier(0.25, 0.1, 0.25, 1)`;
+                slotReel.style.transform = `translateY(${finalTranslateY}px)`;
+
+                setTimeout(() => {
+                    resultTextLabel.textContent = "上天的旨意是...";
+                    step3BackBtn.disabled = false;
+                    step3EndBtn.disabled = false;
+                    isSpinning = false;
+                }, animationDuration);
             };
 
-
-            // --- Event Listeners ---
-            startBtn.addEventListener('click', () => switchView(step1View));
+            startBtn.addEventListener('click', () => switchView(views.step1));
             endBtns.forEach(btn => btn.addEventListener('click', () => location.reload()));
             
-            // Step 1
             topicInput.addEventListener('input', updateStep1NextBtnState);
             step1NextBtn.addEventListener('click', () => {
                 topic = topicInput.value.trim();
                 topicDisplayStep2.textContent = topic;
                 topicDisplayStep3.textContent = topic;
-                switchView(step2View);
+                switchView(views.step2);
             });
 
-            // Step 2
             addOptionBtn.addEventListener('click', addOption);
             optionInput.addEventListener('keypress', (event) => {
                 if (event.key === 'Enter') addOption();
             });
-            step2BackBtn.addEventListener('click', () => switchView(step1View));
+            step2BackBtn.addEventListener('click', () => switchView(views.step1));
+            
             step2NextBtn.addEventListener('click', () => {
-                showResult();
-                switchView(step3View);
+                switchView(views.step3);
+                setTimeout(runSlotAnimation, 50); 
             });
 
-            // Step 3
-            step3BackBtn.addEventListener('click', () => switchView(step2View));
+            step3BackBtn.addEventListener('click', () => {
+                if (!isSpinning) switchView(views.step2);
+            });
         });
     </script>
 </body>
