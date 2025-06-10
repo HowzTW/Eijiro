@@ -19,6 +19,8 @@
             --primary-color: #0D6EFD;    /* 主色 (按鈕) */
             --info-color: #0DCAF0;       /* 輔色 (上一步按鈕) */
             --secondary-color: #6C757D;  /* 次要按鈕 */
+            --primary-btn-text-color: #FFFFFF; /* 主按鈕文字顏色 */
+            --secondary-btn-text-color: #FFFFFF; /* 次要按鈕文字顏色 */
             --border-color: #DEE2E6;     /* 分隔線/邊框 */
             --success-bg-color: #D1E7DD; /* 結果區塊背景 */
             --success-text-color: #0F5132;/* 結果區塊文字 */
@@ -33,7 +35,9 @@
             --text-muted-color: #94A3B8;
             --primary-color: #38BDF8;
             --info-color: #2DD4BF;
-            --secondary-color: #475569;
+            --secondary-color: #64748B;  /* 更新：次要按鈕顏色調亮 */
+            --primary-btn-text-color: #0F172A; /* 更新：主按鈕文字顏色確保對比 */
+            --secondary-btn-text-color: #E2E8F0; /* 更新：次要按鈕文字顏色確保對比 */
             --border-color: #334155;
             --success-bg-color: #164E63;
             --success-text-color: #67E8F9;
@@ -110,11 +114,11 @@
         .btn-primary { 
             background-color: var(--primary-color); 
             border-color: var(--primary-color);
-            color: var(--surface-color);
+            color: var(--primary-btn-text-color);
         }
         .btn-primary:hover {
             opacity: 0.9;
-            color: var(--surface-color);
+            color: var(--primary-btn-text-color);
         }
 
         .btn-outline-primary {
@@ -123,7 +127,7 @@
         }
         .btn-outline-primary:hover {
             background-color: var(--primary-color);
-            color: var(--surface-color);
+            color: var(--primary-btn-text-color);
         }
         
         .btn-info {
@@ -136,7 +140,7 @@
         .btn-secondary {
             background-color: var(--secondary-color);
             border-color: var(--secondary-color);
-            color: var(--surface-color);
+            color: var(--secondary-btn-text-color);
         }
         
         .list-group-item {
