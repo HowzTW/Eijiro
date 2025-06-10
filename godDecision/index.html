@@ -24,7 +24,8 @@
             --border-color: #DEE2E6;
             --input-bg: #FFFFFF;
             --box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            --gradient-stop-color: rgba(255, 255, 255, 1);
+            --slot-bg-color: #E9ECEF; /* 更新：淺色模式拉霸背景 */
+            --gradient-stop-color: rgba(233, 236, 239, 1); /* 更新：匹配拉霸背景的漸層色 */
         }
 
         [data-theme="dark"] {
@@ -40,7 +41,8 @@
             --border-color: #334155;
             --input-bg: #334155;
             --box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-            --gradient-stop-color: rgba(30, 41, 59, 1);
+            --slot-bg-color: #273447; /* 更新：深色模式拉霸背景 */
+            --gradient-stop-color: rgba(39, 52, 71, 1); /* 更新：匹配拉霸背景的漸層色 */
         }
         
         /* --- 基本樣式套用 --- */
@@ -105,26 +107,25 @@
         .list-group-item { background-color: var(--surface-color); border-color: var(--border-color); color: var(--text-color); }
         #options-list .list-group-item { display: flex; justify-content: space-between; align-items: center; }
         
-        /* --- 拉霸機動畫樣式 (更新) --- */
+        /* --- 拉霸機動畫樣式 --- */
         #slot-container {
             position: relative;
-            height: 120px; /* 增加高度以容納更大的字體 */
+            height: 120px;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 0 2rem;
         }
         #slot-reel-wrapper {
-            height: 80px; /* 增加視窗高度 */
+            height: 80px;
             width: 100%;
-            background-color: var(--input-bg);
+            background-color: var(--slot-bg-color); /* 更新：使用新的背景變數 */
             border-radius: 10px;
             overflow: hidden;
             position: relative;
-            /* 內凹陰影效果 */
             box-shadow: inset 0 6px 10px -6px rgba(0,0,0,0.3), inset 0 -6px 10px -6px rgba(0,0,0,0.3);
+            transition: background-color 0.3s;
         }
-        /* 上下漸層遮罩 */
         #slot-reel-wrapper::before,
         #slot-reel-wrapper::after {
             content: '';
@@ -133,6 +134,7 @@
             right: 0;
             height: 25px;
             z-index: 2;
+            transition: background 0.3s;
         }
         #slot-reel-wrapper::before {
             top: 0;
@@ -151,11 +153,11 @@
             z-index: 1;
         }
         .slot-item {
-            height: 80px; /* 匹配視窗高度 */
+            height: 80px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 2.5rem; /* H1 等級大小 */
+            font-size: 2.5rem;
             font-weight: bold;
             color: var(--text-color);
         }
@@ -380,7 +382,7 @@
                     item.className = 'slot-item';
                     item.textContent = optionText;
                     slotReel.appendChild(item);
-                });
+});
 
                 const targetReelIndex = (dummyRounds * options.length) + winnerIndex;
                 const finalTranslateY = -targetReelIndex * itemHeight;
