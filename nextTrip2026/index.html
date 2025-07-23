@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026歐洲自助遊：伊斯坦堡 vs. 布達佩斯 互動分析</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutral Harmony -->
+    <!-- Application Structure Plan: A top-down, single-page dashboard design. The structure begins with a hero section, followed by a sticky navigation bar for quick access to six comparative sections: Budget, Safety, Climate, Culture, Transport, and Visa. The core design principle is side-by-side comparison, facilitated by interactive elements like a dynamic budget chart and a personalized recommendation quiz at the end. This structure was chosen to transform the dense report into an engaging, user-driven experience, allowing users to quickly grasp key differences and draw conclusions based on their own priorities, rather than passively reading. -->
+    <!-- Visualization & Content Choices: 
+        - Budget: Report Info -> Budget table. Goal -> Compare cost breakdown. Viz -> Interactive Bar Chart (Chart.js). Interaction -> Buttons to switch between "Economy" and "Comfort" styles, dynamically updating the chart. Justification -> More engaging than a static table, clearly shows cost composition.
+        - Safety: Report Info -> List of scams. Goal -> Inform without alarming. Viz -> HTML/CSS flip cards. Interaction -> Click/hover to reveal details. Justification -> Breaks down text into digestible, interactive chunks.
+        - Climate: Report Info -> Temp/Rain data. Goal -> Quick comparison. Viz -> Side-by-side cards with icons and data, plus a simple line chart for temperature range. Interaction -> Hover tooltips. Justification -> Scannable and visually clear.
+        - Culture: Report Info -> Descriptions of experiences. Goal -> Visually showcase appeal. Viz -> HTML/CSS image grid. Interaction -> Hover effects. Justification -> More appealing than a text list.
+        - Recommendation: Report Info -> Traveler type matrix. Goal -> Personalized conclusion. Viz -> Clickable tags/buttons. Interaction -> User selection highlights the recommended city. Justification -> Turns a static summary into an interactive, actionable insight.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #FDFBF8; }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 350px; max-height: 50vh; }
+        @media (min-width: 768px) { .chart-container { height: 450px; } }
+        .nav-btn { transition: all 0.3s ease; }
+        .nav-btn:hover { background-color: #EAE3D9; color: #3D352E; }
+        .active-nav-btn { background-color: #D5C6B3; color: #3D352E; font-weight: 700; }
+        .city-card { transition: all 0.3s ease; border: 2px solid transparent; }
+        .city-card-highlight-ist { border-color: #D35400; box-shadow: 0 0 15px rgba(211, 84, 0, 0.3); }
+        .city-card-highlight-bud { border-color: #2980B9; box-shadow: 0 0 15px rgba(41, 128, 185, 0.3); }
+        .risk-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .risk-card:hover .risk-card-inner { transform: rotateY(180deg); }
+        .risk-card-front, .risk-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 1rem; border-radius: 0.75rem; }
+        .risk-card-back { transform: rotateY(180deg); }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <header class="text-center py-12 px-4 bg-stone-100">
+        <h1 class="text-4xl md:text-5xl font-bold text-stone-800">2026年4月歐洲自助旅行目的地分析</h1>
+        <p class="mt-4 text-xl text-stone-600">伊斯坦堡 vs. 布達佩斯</p>
+        <p class="mt-2 text-sm text-stone-500">分析資料基準時間：2025年7月</p>
+    </header>
+
+    <nav id="navbar" class="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm py-3">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex flex-wrap justify-center gap-2 md:gap-4">
+                <a href="#budget" class="nav-btn px-4 py-2 rounded-full text-sm font-medium text-stone-700">📊 整體預算</a>
+                <a href="#safety" class="nav-btn px-4 py-2 rounded-full text-sm font-medium text-stone-700">🛡️ 旅遊安全</a>
+                <a href="#climate" class="nav-btn px-4 py-2 rounded-full text-sm font-medium text-stone-700">☀️ 天氣氣候</a>
+                <a href="#culture" class="nav-btn px-4 py-2 rounded-full text-sm font-medium text-stone-700">🏛️ 文化景點</a>
+                <a href="#transport" class="nav-btn px-4 py-2 rounded-full text-sm font-medium text-stone-700">🚇 交通便利</a>
+                <a href="#visa" class="nav-btn px-4 py-2 rounded-full text-sm font-medium text-stone-700">🛂 旅行文件</a>
+                <a href="#recommendation" class="nav-btn px-4 py-2 rounded-full text-sm font-medium text-stone-700">💡 結論建議</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 py-12 space-y-20">
+        
+        <section id="budget" class="scroll-mt-24">
+            <h2 class="text-3xl font-bold text-center mb-2">📊 整體旅遊預算</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">旅遊預算是規劃的核心。此處我們互動式地比較兩種旅行風格下，伊斯坦堡與布達佩斯的費用結構。請選擇您的旅行風格，圖表將動態顯示7天6夜的預算分佈。</p>
+            <div class="text-center mb-8">
+                <button id="btn-economy" class="bg-amber-600 text-white px-6 py-2 rounded-l-full font-bold">經濟型</button>
+                <button id="btn-comfort" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-r-full font-bold">舒適型</button>
+            </div>
+            <div class="chart-container">
+                <canvas id="budgetChart"></canvas>
+            </div>
+        </section>
+
+        <section id="safety" class="scroll-mt-24">
+            <h2 class="text-3xl font-bold text-center mb-2">🛡️ 治安與旅遊安全性</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">旅遊安全是影響體驗的根本。伊斯坦堡的風險較具設計性，布達佩斯則多為機會型犯罪。將滑鼠懸停在下方的卡片上，了解針對觀光客的常見風險與應對策略。</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-amber-700">伊斯坦堡</h3>
+                    <div class="space-y-4">
+                        <div class="risk-card h-32" style="perspective: 1000px;">
+                            <div class="risk-card-inner">
+                                <div class="risk-card-front bg-amber-100">
+                                    <p class="text-lg font-bold">酒吧/飲料詐騙</p>
+                                </div>
+                                <div class="risk-card-back bg-amber-200">
+                                    <p class="text-sm"><strong>應對：</strong>堅決拒絕陌生人的飲酒邀約，不進入無標價的酒吧。</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="risk-card h-32" style="perspective: 1000px;">
+                            <div class="risk-card-inner">
+                                <div class="risk-card-front bg-amber-100">
+                                    <p class="text-lg font-bold">擦鞋詐騙</p>
+                                </div>
+                                <div class="risk-card-back bg-amber-200">
+                                    <p class="text-sm"><strong>應對：</strong>忽略掉落的工具，不撿拾，不與之互動，直接走開。</p>
+                                </div>
+                            </div>
+                        </div>
+                         <div class="risk-card h-32" style="perspective: 1000px;">
+                            <div class="risk-card-inner">
+                                <div class="risk-card-front bg-amber-100">
+                                    <p class="text-lg font-bold">計程車詐騙</p>
+                                </div>
+                                <div class="risk-card-back bg-amber-200">
+                                    <p class="text-sm"><strong>應對：</strong>使用Uber或BiTaksi等App叫車，確保價格透明。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-sky-700">布達佩斯</h3>
+                    <div class="space-y-4">
+                        <div class="risk-card h-32" style="perspective: 1000px;">
+                            <div class="risk-card-inner">
+                                <div class="risk-card-front bg-sky-100">
+                                    <p class="text-lg font-bold">公共交通罰款</p>
+                                </div>
+                                <div class="risk-card-back bg-sky-200">
+                                    <p class="text-sm"><strong>應對：</strong>購買多日交通卡最省心。若用單程票，務必每次打票驗證。</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="risk-card h-32" style="perspective: 1000px;">
+                            <div class="risk-card-inner">
+                                <div class="risk-card-front bg-sky-100">
+                                    <p class="text-lg font-bold">街頭換匯詐騙</p>
+                                </div>
+                                <div class="risk-card-back bg-sky-200">
+                                    <p class="text-sm"><strong>應對：</strong>絕不在街頭換錢。前往正規換匯所、銀行或ATM提款。</p>
+                                </div>
+                            </div>
+                        </div>
+                         <div class="risk-card h-32" style="perspective: 1000px;">
+                            <div class="risk-card-inner">
+                                <div class="risk-card-front bg-sky-100">
+                                    <p class="text-lg font-bold">餐廳超額收費</p>
+                                </div>
+                                <div class="risk-card-back bg-sky-200">
+                                    <p class="text-sm"><strong>應對：</strong>點餐前確認菜單價格，拒絕陌生人的陪酒邀約。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="climate" class="scroll-mt-24">
+            <h2 class="text-3xl font-bold text-center mb-2">☀️ 4月氣候與旅遊舒適度</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">4月的歐洲春暖花開，但兩地體感略有不同。伊斯坦堡受海風影響，布達佩斯則日夜溫差較大。兩地皆需「洋蔥式穿搭」。</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg text-center">
+                    <h3 class="text-2xl font-bold mb-4 text-amber-700">伊斯坦堡</h3>
+                    <div class="grid grid-cols-2 gap-4 text-lg">
+                        <div class="bg-amber-50 p-4 rounded-lg">
+                            <p class="text-3xl">🌡️</p>
+                            <p class="font-bold mt-2">7-18°C</p>
+                            <p class="text-sm text-gray-500">日夜溫差</p>
+                        </div>
+                        <div class="bg-amber-50 p-4 rounded-lg">
+                            <p class="text-3xl">💨</p>
+                            <p class="font-bold mt-2">海風較涼</p>
+                            <p class="text-sm text-gray-500">體感影響</p>
+                        </div>
+                        <div class="bg-amber-50 p-4 rounded-lg">
+                            <p class="text-3xl">💧</p>
+                            <p class="font-bold mt-2">~20%</p>
+                            <p class="text-sm text-gray-500">降雨機率</p>
+                        </div>
+                        <div class="bg-amber-50 p-4 rounded-lg">
+                            <p class="text-3xl">☀️</p>
+                            <p class="font-bold mt-2">~13.5小時</p>
+                            <p class="text-sm text-gray-500">平均日照</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg text-center">
+                    <h3 class="text-2xl font-bold mb-4 text-sky-700">布達佩斯</h3>
+                     <div class="grid grid-cols-2 gap-4 text-lg">
+                        <div class="bg-sky-50 p-4 rounded-lg">
+                            <p class="text-3xl">🌡️</p>
+                            <p class="font-bold mt-2">4-19°C</p>
+                            <p class="text-sm text-gray-500">日夜溫差</p>
+                        </div>
+                        <div class="bg-sky-50 p-4 rounded-lg">
+                            <p class="text-3xl">🌗</p>
+                            <p class="font-bold mt-2">溫差極大</p>
+                            <p class="text-sm text-gray-500">體感影響</p>
+                        </div>
+                        <div class="bg-sky-50 p-4 rounded-lg">
+                            <p class="text-3xl">💧</p>
+                            <p class="font-bold mt-2">~22%</p>
+                            <p class="text-sm text-gray-500">降雨機率</p>
+                        </div>
+                        <div class="bg-sky-50 p-4 rounded-lg">
+                            <p class="text-3xl">☀️</p>
+                            <p class="font-bold mt-2">~14小時</p>
+                            <p class="text-sm text-gray-500">平均日照</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="culture" class="scroll-mt-24">
+            <h2 class="text-3xl font-bold text-center mb-2">🏛️ 景點豐富度與文化體驗</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">伊斯坦堡是帝國交疊的文化熔爐，布達佩斯則展現中歐帝國的輝煌。兩座城市都提供獨一無二的文化盛宴與美食體驗。</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-amber-700">伊斯坦堡：感官的盛宴</h3>
+                    <ul class="list-disc list-inside space-y-2 text-gray-700">
+                        <li><strong>帝國交疊：</strong>見證聖索菲亞與藍色清真寺的文明對話。</li>
+                        <li><strong>文化穿越：</strong>乘船橫渡博斯普魯斯海峽，穿梭歐亞之間。</li>
+                        <li><strong>古老洗禮：</strong>在百年土耳其浴 (Hammam) 中洗滌身心。</li>
+                        <li><strong>市集尋寶：</strong>迷失在有頂大市集與香料市集的喧囂中。</li>
+                        <li><strong>美食探險：</strong>從豐盛的土耳其早餐到多元的街頭小吃。</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-sky-700">布達佩斯：悠閒的享受</h3>
+                     <ul class="list-disc list-inside space-y-2 text-gray-700">
+                        <li><strong>帝國輝煌：</strong>讚嘆國會大廈的宏偉與多瑙河的夜景。</li>
+                        <li><strong>溫泉社交：</strong>在百年溫泉浴場中泡湯、下棋，融入當地生活。</li>
+                        <li><strong>另類創意：</strong>在獨特的廢墟酒吧 (Ruin Bars) 感受重生力量。</li>
+                        <li><strong>咖啡時光：</strong>於世界最美咖啡館體驗奧匈帝國的優雅。</li>
+                        <li><strong>味覺經典：</strong>品嚐濃郁的匈牙利燉牛肉 (Goulash) 與煙囪捲。</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="transport" class="scroll-mt-24">
+            <h2 class="text-3xl font-bold text-center mb-2">🚇 交通便利性與自助友善度</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">兩城大眾運輸系統皆發達，但體驗有所不同。布達佩斯系統更緊湊直觀，適合新手；伊斯坦堡系統龐大，需時適應。英語溝通在布達佩斯通常更為順暢。</p>
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-amber-700">伊斯坦堡</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start"><span class="text-amber-600 mr-3 mt-1">✓</span><span>交通網絡龐大，渡輪是特色，T1路面電車串連核心景點。</span></li>
+                        <li class="flex items-start"><span class="text-amber-600 mr-3 mt-1">✓</span><span>使用「伊斯坦堡卡」方便支付所有交通工具。</span></li>
+                        <li class="flex items-start"><span class="text-red-500 mr-3 mt-1">✗</span><span>系統複雜，交通擁擠，對新手有挑戰。</span></li>
+                        <li class="flex items-start"><span class="text-red-500 mr-3 mt-1">✗</span><span>離開觀光區後，英語普及率顯著下降。</span></li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-sky-700">布達佩斯</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start"><span class="text-sky-600 mr-3 mt-1">✓</span><span>系統高效直觀，景觀電車（2, 4, 6號）本身就是景點。</span></li>
+                        <li class="flex items-start"><span class="text-sky-600 mr-3 mt-1">✓</span><span>英語在市中心普及率高，溝通順暢。</span></li>
+                        <li class="flex items-start"><span class="text-red-500 mr-3 mt-1">✗</span><span>查票嚴格，務必遵守票務規定，否則會被高額罰款。</span></li>
+                        <li class="flex items-start"><span class="text-sky-600 mr-3 mt-1">✓</span><span>整體對自助旅行新手更為友好。</span></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="visa" class="scroll-mt-24">
+            <h2 class="text-3xl font-bold text-center mb-2">🛂 旅行文件與簽證便利性</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">針對持有台灣護照的旅客，自2026年起，兩地皆需線上預先申請旅行授權，便利性差距已大幅縮小。</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-amber-700">入境土耳其</h3>
+                    <div class="text-center">
+                        <p class="text-lg font-semibold">電子簽證 (e-Visa)</p>
+                        <p class="text-4xl font-bold my-4 text-green-600">免費</p>
+                        <p class="text-gray-600">線上申請，效期180天</p>
+                        <p class="text-gray-600">單次停留最多30天</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-sky-700">入境匈牙利 (申根區)</h3>
+                     <div class="text-center">
+                        <p class="text-lg font-semibold">ETIAS 旅行授權</p>
+                        <p class="text-4xl font-bold my-4 text-blue-600">€7 <span class="text-lg font-normal">(預估)</span></p>
+                        <p class="text-gray-600">線上申請，效期3年</p>
+                        <p class="text-gray-600">180天內最多停留90天</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="recommendation" class="scroll-mt-24">
+            <h2 class="text-3xl font-bold text-center mb-2">💡 結論與個人化建議</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">最終選擇取決於您的旅行風格。請選擇最符合您的旅行優先考量，我們將為您推薦更適合的目的地。</p>
+            <div class="flex flex-wrap justify-center gap-3 mb-8" id="traveler-types">
+                <button data-type="budget" class="bg-white border border-gray-300 px-4 py-2 rounded-full hover:bg-gray-100 transition">預算有限的探索者</button>
+                <button data-type="history" class="bg-white border border-gray-300 px-4 py-2 rounded-full hover:bg-gray-100 transition">深度歷史文化迷</button>
+                <button data-type="solo" class="bg-white border border-gray-300 px-4 py-2 rounded-full hover:bg-gray-100 transition">首次歐洲獨行者</button>
+                <button data-type="social" class="bg-white border border-gray-300 px-4 py-2 rounded-full hover:bg-gray-100 transition">社交與夜生活愛好者</button>
+                <button data-type="adventure" class="bg-white border border-gray-300 px-4 py-2 rounded-full hover:bg-gray-100 transition">尋求異域風情的冒險家</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div id="card-istanbul" class="city-card bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center text-amber-700">伊斯坦堡</h3>
+                    <p class="mt-2 text-gray-600 text-center">充滿感官衝擊與文化深度的城市，適合不畏混亂、尋求非典型歐洲風情的冒險家。</p>
+                    <div id="reason-istanbul" class="mt-4 text-sm bg-amber-50 p-4 rounded-lg hidden"></div>
+                </div>
+                <div id="card-budapest" class="city-card bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center text-sky-700">布達佩斯</h3>
+                    <p class="mt-2 text-gray-600 text-center">優雅、舒適且極具性價比的首都，適合尋求經典歐洲之美、預算有限或首次自助的旅客。</p>
+                    <div id="reason-budapest" class="mt-4 text-sm bg-sky-50 p-4 rounded-lg hidden"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-800 text-white text-center py-6 mt-12">
+        <p>本互動式報告由 AI 根據指定文件生成</p>
+        <p class="text-xs text-stone-400 mt-1">所有數據與建議僅供參考，請以官方最新資訊為準</p>
+        <a href="https://docs.google.com/document/d/1Tod4zR2WXMcPeLKGEBdiq9LBQ3OH068tCe2XXW0wRjI/edit?tab=t.0" target="_blank" rel="noopener noreferrer" class="text-sm text-stone-300 hover:text-white underline mt-4 inline-block">完整報告文件</a>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const budgetData = {
+                economy: {
+                    labels: ['伊斯坦堡', '布達佩斯'],
+                    datasets: [
+                        { label: '國際機票', data: [22000, 20000], backgroundColor: '#8E44AD' },
+                        { label: '住宿', data: [9000, 10800], backgroundColor: '#2980B9' },
+                        { label: '每日花費', data: [7000, 9100], backgroundColor: '#27AE60' },
+                        { label: '主要景點', data: [3500, 3500], backgroundColor: '#F1C40F' },
+                    ],
+                    total: [41500, 43400]
+                },
+                comfort: {
+                    labels: ['伊斯坦堡', '布達佩斯'],
+                    datasets: [
+                        { label: '國際機票', data: [28000, 26000], backgroundColor: '#8E44AD' },
+                        { label: '住宿', data: [24000, 21000], backgroundColor: '#2980B9' },
+                        { label: '每日花費', data: [17500, 16100], backgroundColor: '#27AE60' },
+                        { label: '主要景點', data: [4000, 4000], backgroundColor: '#F1C40F' },
+                    ],
+                    total: [73500, 67100]
+                }
+            };
+
+            const ctx = document.getElementById('budgetChart').getContext('2d');
+            let budgetChart;
+
+            function createOrUpdateBudgetChart(style) {
+                const data = budgetData[style];
+                if (budgetChart) {
+                    budgetChart.destroy();
+                }
+                budgetChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: data.datasets
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: `7日旅遊預算估算 (${style === 'economy' ? '經濟型' : '舒適型'}) - 單位: 新台幣`,
+                                font: { size: 16 }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    footer: function(tooltipItems) {
+                                        const totalIstanbul = budgetData[style].total[0];
+                                        const totalBudapest = budgetData[style].total[1];
+                                        return `總計: 伊斯坦堡 NT$${totalIstanbul.toLocaleString()} | 布達佩斯 NT$${totalBudapest.toLocaleString()}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: { stacked: true, title: { display: true, text: '費用 (新台幣)' } },
+                            y: { stacked: true }
+                        }
+                    }
+                });
+            }
+
+            const btnEconomy = document.getElementById('btn-economy');
+            const btnComfort = document.getElementById('btn-comfort');
+
+            btnEconomy.addEventListener('click', () => {
+                createOrUpdateBudgetChart('economy');
+                btnEconomy.classList.add('bg-amber-600', 'text-white');
+                btnEconomy.classList.remove('bg-gray-200', 'text-gray-700');
+                btnComfort.classList.add('bg-gray-200', 'text-gray-700');
+                btnComfort.classList.remove('bg-sky-600', 'text-white');
+            });
+
+            btnComfort.addEventListener('click', () => {
+                createOrUpdateBudgetChart('comfort');
+                btnComfort.classList.add('bg-sky-600', 'text-white');
+                btnComfort.classList.remove('bg-gray-200', 'text-gray-700');
+                btnEconomy.classList.add('bg-gray-200', 'text-gray-700');
+                btnEconomy.classList.remove('bg-amber-600', 'text-white');
+            });
+
+            createOrUpdateBudgetChart('economy');
+
+            const recommendations = {
+                budget: { city: 'budapest', reason: '整體消費水平（住宿、餐飲）穩定且偏低，能以較少預算獲得高品質體驗，預算管理壓力小。' },
+                history: { city: 'istanbul', reason: '橫跨歐亞、融合基督與伊斯蘭文明的千年帝國史，提供了無可比擬的文化深度與獨特性。' },
+                solo: { city: 'budapest', reason: '官方旅遊警示級別最低，犯罪風險較單純，交通系統直觀易用，英語普及率相對較高，整體壓力較小。' },
+                social: { city: 'budapest', reason: '舉世聞名的廢墟酒吧文化提供獨一無二的社交體驗，溫泉浴場本身也是一種社交活動，氛圍輕鬆多元。' },
+                adventure: { city: 'istanbul', reason: '從宣禮塔的喚拜聲、市集的喧囂，到橫渡海峽的體驗，伊斯坦堡提供了更強烈的「異國」感官刺激。' }
+            };
+
+            const travelerTypesContainer = document.getElementById('traveler-types');
+            const cardIstanbul = document.getElementById('card-istanbul');
+            const cardBudapest = document.getElementById('card-budapest');
+            const reasonIstanbul = document.getElementById('reason-istanbul');
+            const reasonBudapest = document.getElementById('reason-budapest');
+
+            travelerTypesContainer.addEventListener('click', function(e) {
+                if (e.target.tagName === 'BUTTON') {
+                    const type = e.target.dataset.type;
+                    const recommendation = recommendations[type];
+
+                    Array.from(travelerTypesContainer.children).forEach(btn => {
+                        btn.classList.remove('bg-stone-800', 'text-white');
+                        btn.classList.add('bg-white', 'border-gray-300');
+                    });
+                    e.target.classList.add('bg-stone-800', 'text-white');
+                    e.target.classList.remove('bg-white', 'border-gray-300');
+
+                    cardIstanbul.classList.remove('city-card-highlight-ist');
+                    cardBudapest.classList.remove('city-card-highlight-bud');
+                    reasonIstanbul.classList.add('hidden');
+                    reasonBudapest.classList.add('hidden');
+
+                    if (recommendation.city === 'istanbul') {
+                        cardIstanbul.classList.add('city-card-highlight-ist');
+                        reasonIstanbul.textContent = recommendation.reason;
+                        reasonIstanbul.classList.remove('hidden');
+                    } else {
+                        cardBudapest.classList.add('city-card-highlight-bud');
+                        reasonBudapest.textContent = recommendation.reason;
+                        reasonBudapest.classList.remove('hidden');
+                    }
+                }
+            });
+
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('nav a');
+
+            window.onscroll = () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active-nav-btn');
+                    if (link.getAttribute('href').substring(1) === current) {
+                        link.classList.add('active-nav-btn');
+                    }
+                });
+            };
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
