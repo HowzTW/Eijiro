@@ -21,11 +21,11 @@
         body {
             background-color: #f0f2f5;
             font-size: 1.1rem;
-            padding-top: 70px; /* 為固定的 header 留出空間 */
+            padding-top: 80px; /* 為加高的 header 留出空間 */
             padding-bottom: 40px; /* 為固定的 footer 留出空間 */
         }
         .carousel-item {
-            min-height: calc(90vh - 70px); /* 減去 header 的高度 */
+            min-height: calc(90vh - 80px); /* 減去 header 的高度 */
             padding: 2rem 1rem;
         }
         .btn {
@@ -125,8 +125,10 @@
     <header class="app-header fixed-top bg-success text-white p-2 shadow">
         <div class="container-fluid d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
-                <img src="./icon-64.png" alt="App Icon" style="height: 32px; margin-right: 10px; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3);" onerror="this.style.display='none'">
-                <h4 class="mb-0 text-white">追劇小幫手</h4>
+                <!-- Icon 尺寸加大 -->
+                <img src="./icon-64.png" alt="App Icon" style="height: 40px; margin-right: 12px; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3);" onerror="this.style.display='none'">
+                <!-- 標題字體加大 -->
+                <span class="fs-2 fw-bold text-white">追劇小幫手</span>
             </div>
             <button id="currentUserBtn" class="btn btn-outline-light btn-user" onclick="goToUserSelectionPage()">
                 <i class="bi bi-person-circle me-1"></i>
@@ -181,13 +183,12 @@
     </div>
 
     <footer class="fixed-bottom bg-dark text-white text-center py-1 d-flex justify-content-center align-items-center">
-        <small>程式最後更新：2025-08-25 17:45:00</small>
+        <small>程式最後更新：2025-08-25 17:55:00</small>
         <button class="btn btn-sm btn-outline-light ms-2" onclick="location.reload(true);" style="padding: 0.1rem 0.4rem; font-size: 0.8rem;" title="強制重新載入">
             <i class="bi bi-arrow-clockwise"></i>
         </button>
     </footer>
 
-    <!-- 新增：更新提示 Toast -->
     <div class="toast-container update-toast">
         <div id="updateToast" class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex">
@@ -422,7 +423,6 @@
             confirmModal.show();
         }
 
-        // --- PWA Service Worker 註冊與更新邏輯 ---
         if ('serviceWorker' in navigator) {
             const toastEl = document.getElementById('updateToast');
             const toast = new bootstrap.Toast(toastEl, { autohide: false });
@@ -433,7 +433,6 @@
                     installingWorker.onstatechange = () => {
                         if (installingWorker.state === 'installed') {
                             if (navigator.serviceWorker.controller) {
-                                // 新版本已下載，顯示更新提示
                                 toast.show();
                                 document.getElementById('updateBtn').onclick = () => {
                                     installingWorker.postMessage({ type: 'SKIP_WAITING' });
