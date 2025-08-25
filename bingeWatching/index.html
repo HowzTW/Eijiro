@@ -22,6 +22,7 @@
             background-color: #f0f2f5;
             font-size: 1.1rem;
             padding-top: 70px; /* 為固定的 header 留出空間 */
+            padding-bottom: 40px; /* 為固定的 footer 留出空間 */
         }
         .carousel-item {
             min-height: calc(90vh - 70px); /* 減去 header 的高度 */
@@ -170,6 +171,14 @@
         </div>
       </div>
     </div>
+
+    <!-- 更新 Footer -->
+    <footer class="fixed-bottom bg-dark text-white text-center py-1 d-flex justify-content-center align-items-center">
+        <small>程式最後更新：2025-08-25 17:11:00</small>
+        <button class="btn btn-sm btn-outline-light ms-2" onclick="location.reload(true);" style="padding: 0.1rem 0.4rem; font-size: 0.8rem;" title="強制重新載入">
+            <i class="bi bi-arrow-clockwise"></i>
+        </button>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -331,24 +340,18 @@
                 appState.watchStatus.push({ statusId, userId: appState.currentUser.userId, seriesId, lastWatchedSourceId: sourceId, lastWatchedEpisodeId: episodeId, lastWatchedTimestamp: nowTimestamp });
             }
             renderUI();
-            // 對於點擊集數這種高頻操作，我們不在 postData 後強制刷新，以提供更好的體驗
             postData(payload, false).catch(error => console.error('更新觀看狀態失敗:', error));
         }
         
-        // --- Bug 修正：重構事件處理流程 ---
-
-        // 通用的動作處理函式
         function handleDataAction(actionPromise) {
             showLoading(true);
             actionPromise
                 .then(() => {
-                    // 等待 Google Sheet 後端有足夠時間更新
                     setTimeout(() => {
-                        initializeApp(); // 重新初始化 App 以取得最新資料並刷新 UI
+                        initializeApp(); 
                     }, 1500);
                 })
                 .catch(error => {
-                    // 如果 postData 過程出錯，顯示錯誤訊息並隱藏載入畫面
                     alert("操作失敗，請檢查網路連線。");
                     showLoading(false);
                 });
@@ -367,7 +370,7 @@
             try {
                 const seriesData = JSON.parse(jsonText);
                 if (!seriesData.seriesId || !seriesData.title || !seriesData.sources) throw new Error('JSON 格式不符');
-                document.getElementById('seriesJson').value = ''; // 立即清空輸入框
+                document.getElementById('seriesJson').value = ''; 
                 handleDataAction(postData({ action: 'uploadSeries', seriesData: seriesData }));
             } catch (error) { 
                 alert(`JSON 格式錯誤，請檢查！\n${error.message}`); 
@@ -382,14 +385,11 @@
         
         function goToUserSelectionPage() { if (appState.carouselInstance) appState.carouselInstance.to(0); }
 
-        // Bug 修正：重構 postData 函式
         async function postData(payload) {
             try {
-                // 這個函式現在只負責發送請求，並回傳一個 Promise
                 await fetch(GAS_URL, { method: 'POST', mode: 'no-cors', cache: 'no-cache', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), redirect: 'follow' });
             } catch (error) {
                 console.error("PostData Error:", error);
-                // 如果 fetch 本身失敗（例如網路斷線），就拋出錯誤
                 throw error;
             }
         }
