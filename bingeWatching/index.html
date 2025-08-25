@@ -12,7 +12,6 @@
 
     <!-- iOS Safari PWA 設定 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <!-- Bug 修正：改用 default 模式，徹底阻止內容穿透狀態列 -->
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="追劇小幫手">
     <link rel="apple-touch-icon" href="./icon-256.png">
@@ -189,7 +188,7 @@
     </div>
 
     <footer class="fixed-bottom bg-dark text-white text-center py-1 d-flex justify-content-center align-items-center">
-        <small>程式最後更新：2025-08-26 00:25:00</small>
+        <small>程式最後更新：2025-08-26 00:31:00</small>
         <button class="btn btn-sm btn-outline-light ms-2" onclick="forceUpdateAndReload();" style="padding: 0.1rem 0.4rem; font-size: 0.8rem;" title="檢查更新並重新載入">
             <i class="bi bi-arrow-clockwise"></i>
         </button>
@@ -356,24 +355,11 @@
             renderUI();
         }
 
+        // Bug 修正：將點擊集數的行為統一由 handleDataAction 處理
         function handleEpisodeClick(seriesId, sourceId, episodeId) {
             window.open(`https://gimy.ai/eps/${seriesId}-${sourceId}-${episodeId}.html`, '_blank');
             const payload = { action: 'updateWatchStatus', userId: appState.currentUser.userId, seriesId, sourceId, episodeId };
-            
-            const statusId = `${appState.currentUser.userId}_${seriesId}`;
-            const nowTimestamp = new Date().toISOString();
-            const existingStatusIndex = appState.watchStatus.findIndex(s => s.statusId === statusId);
-
-            if (existingStatusIndex > -1) {
-                appState.watchStatus[existingStatusIndex].lastWatchedSourceId = sourceId;
-                appState.watchStatus[existingStatusIndex].lastWatchedEpisodeId = episodeId;
-                appState.watchStatus[existingStatusIndex].lastWatchedTimestamp = nowTimestamp;
-            } else {
-                appState.watchStatus.push({ statusId, userId: appState.currentUser.userId, seriesId, lastWatchedSourceId: sourceId, lastWatchedEpisodeId: episodeId, lastWatchedTimestamp: nowTimestamp });
-            }
-
-            renderUI();
-            postData(payload).catch(error => console.error('更新觀看狀態失敗:', error));
+            handleDataAction(postData(payload));
         }
         
         function handleDataAction(actionPromise) {
