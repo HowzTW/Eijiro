@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>追劇小幫手</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <style>
+        /* 為長者優化的樣式 */
+        body {
+            background-color: #f0f2f5;
+            font-size: 1.1rem;
+            padding-top: 70px; /* 為固定的 header 留出空間 */
+        }
+        .carousel-item {
+            min-height: calc(90vh - 70px); /* 減去 header 的高度 */
+            padding: 2rem 1rem;
+        }
+        .btn {
+            font-size: 1.2rem;
+            padding: 0.8rem 1.2rem;
+            margin: 0.5rem;
+        }
+        .form-control, .form-select {
+            font-size: 1.2rem;
+            padding: 0.8rem 1.2rem;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: bold;
+            color: #333;
+        }
+        .carousel-indicators {
+             margin-bottom: 0.5rem; /* 微調指示器位置 */
+        }
+        .carousel-indicators [data-bs-target] {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin: 0 5px;
+        }
+        .highlight-last-watched {
+            background-color: #ffc107 !important;
+            border-color: #ffc107 !important;
+            color: #000 !important;
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(255, 193, 7, 0.7);
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 2rem;
+        }
+        .series-list-item {
+            font-size: 1.3rem;
+        }
+        .series-cover {
+            max-width: 200px;
+            width: 100%;
+            height: auto;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            margin-bottom: 1.5rem;
+        }
+        .carousel-control-prev,
+        .carousel-control-next {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 100px;
+            width: 8%;
+            max-width: 70px;
+            background: none;
+            border: none;
+            z-index: 10;
+        }
+        .carousel-control-prev { left: 5px; }
+        .carousel-control-next { right: 5px; }
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            padding: 1.5rem;
+            background-size: 50% 50%;
+        }
+        .app-header {
+            z-index: 1030;
+        }
+        .app-header .btn-user {
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+        }
+    </style>
+</head>
+<body>
+    
+    <header class="app-header fixed-top bg-success text-white p-2 shadow">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 text-white">追劇小幫手</h4>
+            <button id="currentUserBtn" class="btn btn-outline-light btn-user" onclick="goToUserSelectionPage()">
+                <i class="bi bi-person-circle me-1"></i>
+                <span>載入中...</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="container-fluid p-0">
+        <div id="mainCarousel" class="carousel slide" data-bs-ride="false" data-bs-interval="false">
+            <div class="carousel-indicators" id="carousel-indicators"></div>
+            <div class="carousel-inner" id="carousel-inner">
+                <div class="carousel-item active">
+                    <div class="d-flex flex-column justify-content-center align-items-center h-100 text-center">
+                        <div class="spinner-border text-success" role="status" style="width: 4rem; height: 4rem;">
+                            <span class="visually-hidden">載入中...</span>
+                        </div>
+                        <h2 class="mt-4">正在從雲端載入資料...</h2>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">上一頁</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">下一頁</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="loading-overlay d-none" id="loading-overlay">
+        <div class="spinner-border" role="status"><span class="visually-hidden">處理中...</span></div>
+        <span class="ms-3">處理中...</span>
+    </div>
+    
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title fs-3" id="confirmModalLabel">請確認</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body fs-4" id="confirmModalBody"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-danger" id="confirmModalConfirmBtn">確定</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbw3AzQJX6QHqU7FCHg0kALAvqIEYJlpRgjRGdIi2s_DzoIQcOZzYrBTqWwuupl6_-rX/exec';
+        let appState = { allUsers: [], allSeries: [], watchStatus: [], removedSeries: [], currentUser: null, isLoading: false, carouselInstance: null };
+        const mainCarouselEl = document.getElementById('mainCarousel');
+        const carouselInner = document.getElementById('carousel-inner');
+        const carouselIndicators = document.getElementById('carousel-indicators');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        const confirmModalBody = document.getElementById('confirmModalBody');
+        const confirmModalConfirmBtn = document.getElementById('confirmModalConfirmBtn');
+        const currentUserBtnSpan = document.querySelector('#currentUserBtn span');
+
+        document.addEventListener('DOMContentLoaded', initializeApp);
+        
+        // 新增：監聽輪播事件，在切換分頁時自動滾動到最上方
+        mainCarouselEl.addEventListener('slide.bs.carousel', () => {
+            window.scrollTo(0, 0);
+        });
+
+        async function initializeApp() {
+            showLoading(true);
+            try {
+                const savedUserId = localStorage.getItem('currentUserId');
+                const response = await fetch(`${GAS_URL}?action=getAllData`);
+                if (!response.ok) throw new Error(`伺服器錯誤: ${response.statusText}`);
+                const result = await response.json();
+                if (result.status !== 'success') throw new Error(`API 錯誤: ${result.message}`);
+                
+                appState.allUsers = result.data.users || [];
+                appState.allSeries = result.data.series || [];
+                appState.watchStatus = result.data.watchStatus || [];
+                appState.removedSeries = result.data.removedSeries || [];
+
+                if (savedUserId && appState.allUsers.some(u => u.userId === savedUserId)) {
+                    appState.currentUser = appState.allUsers.find(u => u.userId === savedUserId);
+                } else if (appState.allUsers.length > 0) {
+                    appState.currentUser = appState.allUsers[0];
+                    localStorage.setItem('currentUserId', appState.currentUser.userId);
+                } else {
+                    throw new Error('找不到任何使用者資料');
+                }
+                renderUI();
+            } catch (error) {
+                console.error('初始化失敗:', error);
+                carouselInner.innerHTML = `<div class="carousel-item active"><div class="alert alert-danger p-5 text-center fs-3">無法載入資料，請檢查網路連線或聯絡管理員。<br><small>${error.message}</small></div></div>`;
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        function renderUI() {
+            carouselInner.innerHTML = '';
+            carouselIndicators.innerHTML = '';
+            let pageIndex = 0;
+            
+            currentUserBtnSpan.textContent = appState.currentUser.displayName;
+            
+            const userRemovedSeriesIds = new Set(appState.removedSeries.filter(r => r.userId === appState.currentUser.userId).map(r => r.seriesId));
+            const visibleSeries = appState.allSeries.filter(s => !userRemovedSeriesIds.has(s.seriesId));
+            const userWatchStatusMap = new Map(appState.watchStatus.filter(s => s.userId === appState.currentUser.userId).map(s => [s.seriesId, s]));
+
+            const watchedSeries = [], unwatchedSeries = [];
+            visibleSeries.forEach(series => {
+                if (userWatchStatusMap.has(series.seriesId)) {
+                    series.watchInfo = userWatchStatusMap.get(series.seriesId);
+                    watchedSeries.push(series);
+                } else {
+                    unwatchedSeries.push(series);
+                }
+            });
+
+            watchedSeries.sort((a, b) => new Date(b.watchInfo.lastWatchedTimestamp) - new Date(a.watchInfo.lastWatchedTimestamp));
+            unwatchedSeries.sort((a, b) => new Date(a.uploadTimestamp) - new Date(b.uploadTimestamp));
+            const sortedVisibleSeries = [...watchedSeries, ...unwatchedSeries];
+
+            const startPageIndex = (sortedVisibleSeries.length > 0) ? 1 : 0;
+
+            addCarouselItem('使用者', createUserSelectionPage(), pageIndex++, pageIndex - 1 === startPageIndex);
+            sortedVisibleSeries.forEach(series => {
+                addCarouselItem(series.title, createSeriesPage(series), pageIndex++, pageIndex - 1 === startPageIndex);
+            });
+            addCarouselItem('上傳', createUploadPage(), pageIndex++, pageIndex - 1 === startPageIndex);
+
+            if (appState.carouselInstance) appState.carouselInstance.dispose();
+            appState.carouselInstance = new bootstrap.Carousel(mainCarouselEl, {
+                ride: false
+            });
+            appState.carouselInstance.to(startPageIndex);
+        }
+
+        function addCarouselItem(title, contentElement, index, isActive = false) {
+            const indicator = document.createElement('button');
+            indicator.type = 'button';
+            indicator.dataset.bsTarget = '#mainCarousel';
+            indicator.dataset.bsSlideTo = index;
+            indicator.setAttribute('aria-label', title);
+            if (isActive) indicator.classList.add('active');
+            carouselIndicators.appendChild(indicator);
+
+            const item = document.createElement('div');
+            item.className = `carousel-item ${isActive ? 'active' : ''}`;
+            item.appendChild(contentElement);
+            carouselInner.appendChild(item);
+        }
+
+        function createUserSelectionPage() {
+            const page = document.createElement('div');
+            page.className = 'd-flex flex-column justify-content-center align-items-center text-center';
+            let buttonsHTML = appState.allUsers.map(user => `
+                <button class="btn ${user.userId === appState.currentUser.userId ? 'btn-success' : 'btn-outline-secondary'} btn-lg" 
+                    onclick="handleUserChange('${user.userId}')">
+                    <i class="bi bi-person-circle me-2"></i>我是 ${user.displayName}
+                </button>`).join('');
+            page.innerHTML = `<h1 class="mb-5">您好，請問是哪位？</h1><div class="d-grid gap-3 col-10 col-md-6 mx-auto">${buttonsHTML}</div>`;
+            return page;
+        }
+
+        function createSeriesPage(series) {
+            const page = document.createElement('div');
+            page.className = 'container';
+            const userWatchStatus = appState.watchStatus.find(s => s.userId === appState.currentUser.userId && s.seriesId === series.seriesId);
+            let sourcesHTML = series.sources.map(source => {
+                let episodesHTML = source.episodes.map(ep => {
+                    const isLastWatched = userWatchStatus && String(userWatchStatus.lastWatchedSourceId) === String(source.sourceId) && String(userWatchStatus.lastWatchedEpisodeId) === String(ep.episodeId);
+                    return `<button class="btn btn-outline-primary m-1 ${isLastWatched ? 'highlight-last-watched' : ''}" onclick="handleEpisodeClick('${series.seriesId}', '${source.sourceId}', '${ep.episodeId}')">${ep.episodeName}</button>`;
+                }).join('');
+                return `<div class="card mb-4"><div class="card-header fs-4">${source.sourceName}</div><div class="card-body">${episodesHTML}</div></div>`;
+            }).join('');
+            page.innerHTML = `<div class="row justify-content-center"><div class="col-12 text-center mb-4"><h1 class="display-4">${series.title}</h1><img src="${series.coverImageUrl}" alt="${series.title} 封面" class="series-cover mx-auto d-block" onerror="this.style.display='none'"></div><div class="col-12 col-lg-10">${sourcesHTML}</div><div class="col-12 text-center mt-4"><button class="btn btn-lg btn-danger" onclick="handleRemoveSeriesForUser('${series.seriesId}', '${series.title}')"><i class="bi bi-eye-slash me-2"></i> 不想看了 (移除)</button></div></div>`;
+            return page;
+        }
+
+        function createUploadPage() {
+            const page = document.createElement('div');
+            page.className = 'container';
+            let sortedSeries = [...appState.allSeries].sort((a,b) => new Date(b.uploadTimestamp) - new Date(a.uploadTimestamp));
+            let seriesListHTML = sortedSeries.map(s => `<li class="list-group-item d-flex justify-content-between align-items-center series-list-item">${s.title}<button class="btn btn-sm btn-outline-danger" onclick="handleDeleteSeries('${s.seriesId}', '${s.title}')"><i class="bi bi-trash-fill"></i> 刪除</button></li>`).join('');
+            page.innerHTML = `<div class="row justify-content-center"><div class="col-12 col-lg-8"><h1 class="text-center mb-4">影集資訊上傳</h1><div class="card"><div class="card-body"><form id="uploadForm"><div class="mb-3"><label for="seriesJson" class="form-label fs-4">貼上影集 JSON 內容：</label><textarea class="form-control" id="seriesJson" rows="10" placeholder="請在此貼上 JSON 格式的影集資訊..."></textarea></div><div class="d-grid"><button type="submit" class="btn btn-success btn-lg"><i class="bi bi-cloud-arrow-up-fill me-2"></i> 上傳資料</button></div></form></div></div><h2 class="text-center mt-5 mb-3">已上傳影集清單</h2><ul class="list-group">${seriesListHTML.length > 0 ? seriesListHTML : '<li class="list-group-item text-muted">目前沒有任何影集</li>'}</ul></div></div>`;
+            page.querySelector('#uploadForm').addEventListener('submit', handleUploadSubmit);
+            return page;
+        }
+
+        function handleUserChange(userId) {
+            appState.currentUser = appState.allUsers.find(u => u.userId === userId);
+            localStorage.setItem('currentUserId', userId);
+            renderUI();
+        }
+
+        function handleEpisodeClick(seriesId, sourceId, episodeId) {
+            window.open(`https://gimy.ai/eps/${seriesId}-${sourceId}-${episodeId}.html`, '_blank');
+            const payload = { action: 'updateWatchStatus', userId: appState.currentUser.userId, seriesId, sourceId, episodeId };
+            const statusId = `${appState.currentUser.userId}_${seriesId}`;
+            const existingStatusIndex = appState.watchStatus.findIndex(s => s.statusId === statusId);
+            const nowTimestamp = new Date().toISOString();
+            if (existingStatusIndex > -1) {
+                appState.watchStatus[existingStatusIndex] = { ...appState.watchStatus[existingStatusIndex], lastWatchedSourceId: sourceId, lastWatchedEpisodeId: episodeId, lastWatchedTimestamp: nowTimestamp };
+            } else {
+                appState.watchStatus.push({ statusId, userId: appState.currentUser.userId, seriesId, lastWatchedSourceId: sourceId, lastWatchedEpisodeId: episodeId, lastWatchedTimestamp: nowTimestamp });
+            }
+            renderUI();
+            postData(payload).catch(error => console.error('更新觀看狀態失敗:', error));
+        }
+        
+        function handleRemoveSeriesForUser(seriesId, seriesTitle) { showConfirmationModal(`您確定要為【${appState.currentUser.displayName}】移除《${seriesTitle}》嗎？`, () => postData({ action: 'removeSeriesForUser', userId: appState.currentUser.userId, seriesId })); }
+        function handleUploadSubmit(event) {
+            event.preventDefault();
+            const jsonText = document.getElementById('seriesJson').value;
+            if (!jsonText.trim()) { alert('請貼上 JSON 內容！'); return; }
+            try {
+                const seriesData = JSON.parse(jsonText);
+                if (!seriesData.seriesId || !seriesData.title || !seriesData.sources) throw new Error('JSON 格式不符');
+                postData({ action: 'uploadSeries', seriesData: seriesData });
+                document.getElementById('seriesJson').value = '';
+            } catch (error) { alert(`JSON 格式錯誤，請檢查！\n${error.message}`); }
+        }
+        function handleDeleteSeries(seriesId, seriesTitle) { showConfirmationModal(`您確定要從資料庫中【永久刪除】《${seriesTitle}》嗎？<br><strong class="text-danger">此操作會影響所有使用者，且無法復原！</strong>`, () => postData({ action: 'deleteSeries', seriesId })); }
+        
+        function goToUserSelectionPage() { if (appState.carouselInstance) appState.carouselInstance.to(0); }
+
+        async function postData(payload) {
+            showLoading(true);
+            try {
+                await fetch(GAS_URL, { method: 'POST', mode: 'no-cors', cache: 'no-cache', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), redirect: 'follow' });
+            } catch (error) {
+                console.error("PostData Error:", error);
+                alert("操作失敗，請檢查網路連線。");
+            } finally {
+                setTimeout(() => initializeApp(), 1500); 
+            }
+        }
+
+        function showLoading(isLoading) { loadingOverlay.classList.toggle('d-none', !isLoading); }
+        function showConfirmationModal(bodyText, onConfirm) {
+            confirmModalBody.innerHTML = bodyText;
+            const newConfirmBtn = confirmModalConfirmBtn.cloneNode(true);
+            confirmModalConfirmBtn.parentNode.replaceChild(newConfirmBtn, confirmModalConfirmBtn);
+            newConfirmBtn.addEventListener('click', () => { onConfirm(); confirmModal.hide(); }, { once: true });
+            confirmModal.show();
+        }
+    </script>
+</body>
+</html>
