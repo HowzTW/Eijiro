@@ -112,7 +112,6 @@
         }
         .app-header {
             z-index: 1030;
-            /* Bug 修正：強制設定不透明的背景色 */
             background-color: #198754 !important;
         }
         .app-header .btn-user {
@@ -126,6 +125,19 @@
             left: 50%;
             transform: translateX(-50%);
             z-index: 1056; /* 確保在最上層 */
+        }
+        /* Bug 修正：新增偽元素來填補 iOS 狀態列後的背景 */
+        body::before {
+            content: '';
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: constant(safe-area-inset-top); /* 舊版 iOS */
+            height: env(safe-area-inset-top);     /* 新版 iOS */
+            background-color: #198754; /* 必須與 header 顏色一致 */
+            z-index: 1029; /* 放在 header 後面 */
         }
     </style>
 </head>
@@ -190,7 +202,7 @@
     </div>
 
     <footer class="fixed-bottom bg-dark text-white text-center py-1 d-flex justify-content-center align-items-center">
-        <small>程式最後更新：2025-08-25 22:58:00</small>
+        <small>程式最後更新：2025-08-25 23:20:00</small>
         <button class="btn btn-sm btn-outline-light ms-2" onclick="forceUpdateAndReload();" style="padding: 0.1rem 0.4rem; font-size: 0.8rem;" title="檢查更新並重新載入">
             <i class="bi bi-arrow-clockwise"></i>
         </button>
@@ -329,7 +341,7 @@
         function createSeriesPage(series) {
             const page = document.createElement('div');
             page.className = 'container';
-            const userWatchStatus = series.watchInfo; 
+            const userWatchStatus = appState.watchStatus.find(s => s.userId === appState.currentUser.userId && s.seriesId === series.seriesId);
             let sourcesHTML = series.sources.map(source => {
                 let episodesHTML = source.episodes.map(ep => {
                     const isLastWatched = userWatchStatus && String(userWatchStatus.lastWatchedSourceId) === String(source.sourceId) && String(userWatchStatus.lastWatchedEpisodeId) === String(ep.episodeId);
@@ -360,14 +372,19 @@
         function handleEpisodeClick(seriesId, sourceId, episodeId) {
             window.open(`https://gimy.ai/eps/${seriesId}-${sourceId}-${episodeId}.html`, '_blank');
             const payload = { action: 'updateWatchStatus', userId: appState.currentUser.userId, seriesId, sourceId, episodeId };
+            
             const statusId = `${appState.currentUser.userId}_${seriesId}`;
-            const existingStatusIndex = appState.watchStatus.findIndex(s => s.statusId === statusId);
             const nowTimestamp = new Date().toISOString();
+            const existingStatusIndex = appState.watchStatus.findIndex(s => s.statusId === statusId);
+
             if (existingStatusIndex > -1) {
-                appState.watchStatus[existingStatusIndex] = { ...appState.watchStatus[existingStatusIndex], lastWatchedSourceId: sourceId, lastWatchedEpisodeId: episodeId, lastWatchedTimestamp: nowTimestamp };
+                appState.watchStatus[existingStatusIndex].lastWatchedSourceId = sourceId;
+                appState.watchStatus[existingStatusIndex].lastWatchedEpisodeId = episodeId;
+                appState.watchStatus[existingStatusIndex].lastWatchedTimestamp = nowTimestamp;
             } else {
                 appState.watchStatus.push({ statusId, userId: appState.currentUser.userId, seriesId, lastWatchedSourceId: sourceId, lastWatchedEpisodeId: episodeId, lastWatchedTimestamp: nowTimestamp });
             }
+
             renderUI();
             postData(payload).catch(error => console.error('更新觀看狀態失敗:', error));
         }
@@ -464,7 +481,7 @@
                     const installingWorker = reg.installing;
                     installingWorker.onstatechange = () => {
                         if (installingWorker.state === 'installed') {
-                            if (navigator.serviceWorker.controller) {
+                            if (navigator.service-worker.controller) {
                                 toast.show();
                                 document.getElementById('updateBtn').onclick = () => {
                                     installingWorker.postMessage({ type: 'SKIP_WAITING' });
