@@ -115,7 +115,6 @@
     
     <header class="app-header fixed-top bg-success text-white p-2 shadow">
         <div class="container-fluid d-flex justify-content-between align-items-center">
-            <!-- 新增 Icon -->
             <div class="d-flex align-items-center">
                 <img src="./icon-64.png" alt="App Icon" style="height: 32px; margin-right: 10px; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3);" onerror="this.style.display='none'">
                 <h4 class="mb-0 text-white">追劇小幫手</h4>
@@ -332,10 +331,35 @@
                 appState.watchStatus.push({ statusId, userId: appState.currentUser.userId, seriesId, lastWatchedSourceId: sourceId, lastWatchedEpisodeId: episodeId, lastWatchedTimestamp: nowTimestamp });
             }
             renderUI();
-            postData(payload).catch(error => console.error('更新觀看狀態失敗:', error));
+            // 對於點擊集數這種高頻操作，我們不在 postData 後強制刷新，以提供更好的體驗
+            postData(payload, false).catch(error => console.error('更新觀看狀態失敗:', error));
         }
         
-        function handleRemoveSeriesForUser(seriesId, seriesTitle) { showConfirmationModal(`您確定要為【${appState.currentUser.displayName}】移除《${seriesTitle}》嗎？`, () => postData({ action: 'removeSeriesForUser', userId: appState.currentUser.userId, seriesId })); }
+        // --- Bug 修正：重構事件處理流程 ---
+
+        // 通用的動作處理函式
+        function handleDataAction(actionPromise) {
+            showLoading(true);
+            actionPromise
+                .then(() => {
+                    // 等待 Google Sheet 後端有足夠時間更新
+                    setTimeout(() => {
+                        initializeApp(); // 重新初始化 App 以取得最新資料並刷新 UI
+                    }, 1500);
+                })
+                .catch(error => {
+                    // 如果 postData 過程出錯，顯示錯誤訊息並隱藏載入畫面
+                    alert("操作失敗，請檢查網路連線。");
+                    showLoading(false);
+                });
+        }
+
+        function handleRemoveSeriesForUser(seriesId, seriesTitle) { 
+            showConfirmationModal(`您確定要為【${appState.currentUser.displayName}】移除《${seriesTitle}》嗎？`, () => {
+                handleDataAction(postData({ action: 'removeSeriesForUser', userId: appState.currentUser.userId, seriesId }));
+            }); 
+        }
+
         function handleUploadSubmit(event) {
             event.preventDefault();
             const jsonText = document.getElementById('seriesJson').value;
@@ -343,23 +367,30 @@
             try {
                 const seriesData = JSON.parse(jsonText);
                 if (!seriesData.seriesId || !seriesData.title || !seriesData.sources) throw new Error('JSON 格式不符');
-                postData({ action: 'uploadSeries', seriesData: seriesData });
-                document.getElementById('seriesJson').value = '';
-            } catch (error) { alert(`JSON 格式錯誤，請檢查！\n${error.message}`); }
+                document.getElementById('seriesJson').value = ''; // 立即清空輸入框
+                handleDataAction(postData({ action: 'uploadSeries', seriesData: seriesData }));
+            } catch (error) { 
+                alert(`JSON 格式錯誤，請檢查！\n${error.message}`); 
+            }
         }
-        function handleDeleteSeries(seriesId, seriesTitle) { showConfirmationModal(`您確定要從資料庫中【永久刪除】《${seriesTitle}》嗎？<br><strong class="text-danger">此操作會影響所有使用者，且無法復原！</strong>`, () => postData({ action: 'deleteSeries', seriesId })); }
+
+        function handleDeleteSeries(seriesId, seriesTitle) { 
+            showConfirmationModal(`您確定要從資料庫中【永久刪除】《${seriesTitle}》嗎？<br><strong class="text-danger">此操作會影響所有使用者，且無法復原！</strong>`, () => {
+                handleDataAction(postData({ action: 'deleteSeries', seriesId }));
+            }); 
+        }
         
         function goToUserSelectionPage() { if (appState.carouselInstance) appState.carouselInstance.to(0); }
 
+        // Bug 修正：重構 postData 函式
         async function postData(payload) {
-            showLoading(true);
             try {
+                // 這個函式現在只負責發送請求，並回傳一個 Promise
                 await fetch(GAS_URL, { method: 'POST', mode: 'no-cors', cache: 'no-cache', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), redirect: 'follow' });
             } catch (error) {
                 console.error("PostData Error:", error);
-                alert("操作失敗，請檢查網路連線。");
-            } finally {
-                setTimeout(() => initializeApp(), 1500); 
+                // 如果 fetch 本身失敗（例如網路斷線），就拋出錯誤
+                throw error;
             }
         }
 
