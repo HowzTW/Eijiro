@@ -12,7 +12,8 @@
 
     <!-- iOS Safari PWA 設定 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Bug 修正：改用 default 模式，徹底阻止內容穿透狀態列 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="追劇小幫手">
     <link rel="apple-touch-icon" href="./icon-256.png">
 
@@ -112,7 +113,6 @@
         }
         .app-header {
             z-index: 1030;
-            background-color: #198754 !important;
         }
         .app-header .btn-user {
             font-size: 1rem;
@@ -125,19 +125,6 @@
             left: 50%;
             transform: translateX(-50%);
             z-index: 1056; /* 確保在最上層 */
-        }
-        /* Bug 修正：新增偽元素來填補 iOS 狀態列後的背景 */
-        body::before {
-            content: '';
-            display: block;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: constant(safe-area-inset-top); /* 舊版 iOS */
-            height: env(safe-area-inset-top);     /* 新版 iOS */
-            background-color: #198754; /* 必須與 header 顏色一致 */
-            z-index: 1029; /* 放在 header 後面 */
         }
     </style>
 </head>
@@ -202,7 +189,7 @@
     </div>
 
     <footer class="fixed-bottom bg-dark text-white text-center py-1 d-flex justify-content-center align-items-center">
-        <small>程式最後更新：2025-08-25 23:36:00</small>
+        <small>程式最後更新：2025-08-26 00:25:00</small>
         <button class="btn btn-sm btn-outline-light ms-2" onclick="forceUpdateAndReload();" style="padding: 0.1rem 0.4rem; font-size: 0.8rem;" title="檢查更新並重新載入">
             <i class="bi bi-arrow-clockwise"></i>
         </button>
