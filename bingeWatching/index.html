@@ -125,9 +125,7 @@
     <header class="app-header fixed-top bg-success text-white p-2 shadow">
         <div class="container-fluid d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
-                <!-- Icon 尺寸加大 -->
                 <img src="./icon-64.png" alt="App Icon" style="height: 40px; margin-right: 12px; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3);" onerror="this.style.display='none'">
-                <!-- 標題字體加大 -->
                 <span class="fs-2 fw-bold text-white">追劇小幫手</span>
             </div>
             <button id="currentUserBtn" class="btn btn-outline-light btn-user" onclick="goToUserSelectionPage()">
@@ -183,8 +181,9 @@
     </div>
 
     <footer class="fixed-bottom bg-dark text-white text-center py-1 d-flex justify-content-center align-items-center">
-        <small>程式最後更新：2025-08-25 17:55:00</small>
-        <button class="btn btn-sm btn-outline-light ms-2" onclick="location.reload(true);" style="padding: 0.1rem 0.4rem; font-size: 0.8rem;" title="強制重新載入">
+        <small>程式最後更新：2025-08-25 18:05:00</small>
+        <!-- 更新：更改 onclick 事件 -->
+        <button class="btn btn-sm btn-outline-light ms-2" onclick="forceUpdateAndReload();" style="padding: 0.1rem 0.4rem; font-size: 0.8rem;" title="檢查更新並重新載入">
             <i class="bi bi-arrow-clockwise"></i>
         </button>
     </footer>
@@ -421,6 +420,31 @@
             confirmModalConfirmBtn.parentNode.replaceChild(newConfirmBtn, confirmModalConfirmBtn);
             newConfirmBtn.addEventListener('click', () => { onConfirm(); confirmModal.hide(); }, { once: true });
             confirmModal.show();
+        }
+
+        // --- PWA Service Worker 註冊與更新邏輯 ---
+        
+        // 新增：強制更新並重新載入的函式
+        async function forceUpdateAndReload() {
+            if (!('serviceWorker' in navigator)) {
+                location.reload(true);
+                return;
+            }
+            try {
+                const registration = await navigator.serviceWorker.ready;
+                showLoading(true);
+                await registration.update();
+                if (registration.waiting) {
+                    registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                } else {
+                    showLoading(false);
+                    alert('您已經在使用最新版本。');
+                }
+            } catch (error) {
+                console.error('Error during forced update:', error);
+                showLoading(false);
+                alert('檢查更新失敗，請稍後再試。');
+            }
         }
 
         if ('serviceWorker' in navigator) {
