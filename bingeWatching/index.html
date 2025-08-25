@@ -112,6 +112,8 @@
         }
         .app-header {
             z-index: 1030;
+            /* Bug 修正：強制設定不透明的背景色 */
+            background-color: #198754 !important;
         }
         .app-header .btn-user {
             font-size: 1rem;
@@ -188,7 +190,7 @@
     </div>
 
     <footer class="fixed-bottom bg-dark text-white text-center py-1 d-flex justify-content-center align-items-center">
-        <small>程式最後更新：2025-08-25 22:22:00</small>
+        <small>程式最後更新：2025-08-25 22:58:00</small>
         <button class="btn btn-sm btn-outline-light ms-2" onclick="forceUpdateAndReload();" style="padding: 0.1rem 0.4rem; font-size: 0.8rem;" title="檢查更新並重新載入">
             <i class="bi bi-arrow-clockwise"></i>
         </button>
