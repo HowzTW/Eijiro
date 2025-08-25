@@ -172,9 +172,8 @@
       </div>
     </div>
 
-    <!-- 更新 Footer -->
     <footer class="fixed-bottom bg-dark text-white text-center py-1 d-flex justify-content-center align-items-center">
-        <small>程式最後更新：2025-08-25 17:11:00</small>
+        <small>程式最後更新：2025-08-25 17:23:00</small>
         <button class="btn btn-sm btn-outline-light ms-2" onclick="location.reload(true);" style="padding: 0.1rem 0.4rem; font-size: 0.8rem;" title="強制重新載入">
             <i class="bi bi-arrow-clockwise"></i>
         </button>
@@ -340,16 +339,17 @@
                 appState.watchStatus.push({ statusId, userId: appState.currentUser.userId, seriesId, lastWatchedSourceId: sourceId, lastWatchedEpisodeId: episodeId, lastWatchedTimestamp: nowTimestamp });
             }
             renderUI();
-            postData(payload, false).catch(error => console.error('更新觀看狀態失敗:', error));
+            postData(payload).catch(error => console.error('更新觀看狀態失敗:', error));
         }
         
         function handleDataAction(actionPromise) {
             showLoading(true);
             actionPromise
                 .then(() => {
+                    // Bug 修正：改用更穩定的 location.reload()
                     setTimeout(() => {
-                        initializeApp(); 
-                    }, 1500);
+                        location.reload(true); 
+                    }, 1000); // 縮短等待時間
                 })
                 .catch(error => {
                     alert("操作失敗，請檢查網路連線。");
