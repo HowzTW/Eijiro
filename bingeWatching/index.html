@@ -197,7 +197,7 @@
     </div>
 
     <footer class="fixed-bottom bg-dark text-white text-center py-1 d-flex justify-content-center align-items-center">
-        <small>程式最後更新：2025-08-25 20:46:00</small>
+        <small>程式最後更新：2025-08-25 21:45:00</small>
         <button class="btn btn-sm btn-outline-light ms-2" onclick="forceUpdateAndReload();" style="padding: 0.1rem 0.4rem; font-size: 0.8rem;" title="檢查更新並重新載入">
             <i class="bi bi-arrow-clockwise"></i>
         </button>
@@ -343,7 +343,6 @@
         function createSeriesPage(series) {
             const page = document.createElement('div');
             page.className = 'container';
-            // Bug 修正：直接使用 renderUI 中附加的 series.watchInfo
             const userWatchStatus = series.watchInfo; 
             let sourcesHTML = series.sources.map(source => {
                 let episodesHTML = source.episodes.map(ep => {
@@ -461,13 +460,13 @@
                 if (registration.waiting) {
                     registration.waiting.postMessage({ type: 'SKIP_WAITING' });
                 } else {
-                    showLoading(false);
-                    alert('您已經在使用最新版本。');
+                    // 如果沒有新版本，也要重新載入頁面
+                    location.reload(true);
                 }
             } catch (error) {
                 console.error('Error during forced update:', error);
-                showLoading(false);
-                alert('檢查更新失敗，請稍後再試。');
+                alert('檢查更新失敗，將執行強制重新整理。');
+                location.reload(true);
             }
         }
 
