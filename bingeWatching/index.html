@@ -125,15 +125,6 @@
             transform: translateX(-50%);
             z-index: 1056; /* 確保在最上層 */
         }
-        /* iOS 安裝提示樣式 */
-        #ios-install-prompt {
-            position: fixed;
-            bottom: 50px;
-            left: 10px;
-            right: 10px;
-            z-index: 1055;
-            border-radius: 10px;
-        }
     </style>
 </head>
 <body>
@@ -197,7 +188,7 @@
     </div>
 
     <footer class="fixed-bottom bg-dark text-white text-center py-1 d-flex justify-content-center align-items-center">
-        <small>程式最後更新：2025-08-25 21:45:00</small>
+        <small>程式最後更新：2025-08-25 22:05:00</small>
         <button class="btn btn-sm btn-outline-light ms-2" onclick="forceUpdateAndReload();" style="padding: 0.1rem 0.4rem; font-size: 0.8rem;" title="檢查更新並重新載入">
             <i class="bi bi-arrow-clockwise"></i>
         </button>
@@ -212,12 +203,6 @@
                 <button type="button" id="updateBtn" class="btn btn-light btn-sm me-2 m-auto">更新</button>
             </div>
         </div>
-    </div>
-
-    <div id="ios-install-prompt" class="alert alert-info alert-dismissible fade show d-none" role="alert">
-        將「追劇小幫手」加到主畫面，方便快速開啟！<br>
-        請點擊 <i class="bi bi-box-arrow-up"></i> 然後選擇「加入主畫面」。
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -235,7 +220,6 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             initializeApp();
-            showIosInstallPrompt();
         });
         
         mainCarouselEl.addEventListener('slide.bs.carousel', () => {
@@ -460,22 +444,12 @@
                 if (registration.waiting) {
                     registration.waiting.postMessage({ type: 'SKIP_WAITING' });
                 } else {
-                    // 如果沒有新版本，也要重新載入頁面
                     location.reload(true);
                 }
             } catch (error) {
                 console.error('Error during forced update:', error);
                 alert('檢查更新失敗，將執行強制重新整理。');
                 location.reload(true);
-            }
-        }
-
-        function showIosInstallPrompt() {
-            const isIos = () => /iPad|iPhone|iPod/.test(navigator.userAgent);
-            const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
-            if (isIos() && !isInStandaloneMode()) {
-                const prompt = document.getElementById('ios-install-prompt');
-                prompt.classList.remove('d-none');
             }
         }
 
