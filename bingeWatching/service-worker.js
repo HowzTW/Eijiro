@@ -1,5 +1,5 @@
 // 定義快取名稱和需要快取的檔案列表
-const CACHE_NAME = 'series-tracker-cache-v2'; // 更新快取版本號
+const CACHE_NAME = 'series-tracker-cache-v3'; // 更新快取版本號，強制觸發更新
 const urlsToCache = [
   './', // 代表根目錄，通常會對應到 index.html
   './index.html',
