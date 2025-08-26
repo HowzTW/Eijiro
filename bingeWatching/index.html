@@ -32,7 +32,7 @@
             padding-bottom: 40px; /* 為固定的 footer 留出空間 */
         }
         .carousel-item {
-            min-height: calc(90vh - 80px); /* 減去 header 的高度 */
+            min-height: calc(90vh - 80px); /* 減去 header の高度 */
             padding: 2rem 1rem;
         }
         .btn {
@@ -188,7 +188,7 @@
     </div>
 
     <footer class="fixed-bottom bg-dark text-white text-center py-1 d-flex justify-content-center align-items-center">
-        <small>程式最後更新：2025-08-26 09:01:00</small>
+        <small>程式最後更新：2025-08-26 09:50:00</small>
         <button class="btn btn-sm btn-outline-light ms-2" onclick="forceUpdateAndReload();" style="padding: 0.1rem 0.4rem; font-size: 0.8rem;" title="檢查更新並重新載入">
             <i class="bi bi-arrow-clockwise"></i>
         </button>
@@ -196,11 +196,13 @@
 
     <div class="toast-container update-toast">
         <div id="updateToast" class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
+            <!-- Bug 修正：新增 align-items-center -->
+            <div class="d-flex align-items-center">
                 <div class="toast-body fs-5">
                     應用程式有新版本可供使用！
                 </div>
-                <button type="button" id="updateBtn" class="btn btn-light btn-sm me-2 m-auto">更新</button>
+                <!-- Bug 修正：移除 m-auto 和 btn-sm -->
+                <button type="button" id="updateBtn" class="btn btn-light me-2">更新</button>
             </div>
         </div>
     </div>
@@ -462,7 +464,6 @@
             const toastEl = document.getElementById('updateToast');
             const toast = new bootstrap.Toast(toastEl, { autohide: false });
 
-            // Bug 修正：加入 { updateViaCache: 'none' }
             navigator.serviceWorker.register('./service-worker.js', { updateViaCache: 'none' }).then(reg => {
                 reg.onupdatefound = () => {
                     const installingWorker = reg.installing;
