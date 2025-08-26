@@ -188,7 +188,7 @@
     </div>
 
     <footer class="fixed-bottom bg-dark text-white text-center py-1 d-flex justify-content-center align-items-center">
-        <small>程式最後更新：2025-08-26 11:15:00</small>
+        <small>程式最後更新：2025-08-26 13:05:00</small>
         <button class="btn btn-sm btn-outline-light ms-2" onclick="forceUpdateAndReload();" style="padding: 0.1rem 0.4rem; font-size: 0.8rem;" title="檢查更新並重新載入">
             <i class="bi bi-arrow-clockwise"></i>
         </button>
@@ -264,14 +264,16 @@
             
             currentUserBtnSpan.textContent = appState.currentUser.displayName;
             
-            const userRemovedSeriesIds = new Set(appState.removedSeries.filter(r => r.userId === appState.currentUser.userId).map(r => r.seriesId));
-            const visibleSeries = appState.allSeries.filter(s => !userRemovedSeriesIds.has(s.seriesId));
-            const userWatchStatusMap = new Map(appState.watchStatus.filter(s => s.userId === appState.currentUser.userId).map(s => [s.seriesId, s]));
+            const userRemovedSeriesIds = new Set(appState.removedSeries.filter(r => r.userId === appState.currentUser.userId).map(r => String(r.seriesId)));
+            const visibleSeries = appState.allSeries.filter(s => !userRemovedSeriesIds.has(String(s.seriesId)));
+            // Bug 修正：建立 Map 時，強制將 key 轉為字串
+            const userWatchStatusMap = new Map(appState.watchStatus.filter(s => s.userId === appState.currentUser.userId).map(s => [String(s.seriesId), s]));
 
             const watchedSeries = [], unwatchedSeries = [];
             visibleSeries.forEach(series => {
-                if (userWatchStatusMap.has(series.seriesId)) {
-                    series.watchInfo = userWatchStatusMap.get(series.seriesId);
+                // Bug 修正：查詢 Map 時，也強制將 key 轉為字串
+                if (userWatchStatusMap.has(String(series.seriesId))) {
+                    series.watchInfo = userWatchStatusMap.get(String(series.seriesId));
                     watchedSeries.push(series);
                 } else {
                     unwatchedSeries.push(series);
@@ -327,7 +329,6 @@
         function createSeriesPage(series) {
             const page = document.createElement('div');
             page.className = 'container';
-            // Bug 修正：直接使用 renderUI 中附加的 series.watchInfo
             const userWatchStatus = series.watchInfo; 
             let sourcesHTML = series.sources.map(source => {
                 let episodesHTML = source.episodes.map(ep => {
