@@ -188,7 +188,7 @@
     </div>
 
     <footer class="fixed-bottom bg-dark text-white text-center py-1 d-flex justify-content-center align-items-center">
-        <small>程式最後更新：2025-08-26 10:43:00</small>
+        <small>程式最後更新：2025-08-26 11:15:00</small>
         <button class="btn btn-sm btn-outline-light ms-2" onclick="forceUpdateAndReload();" style="padding: 0.1rem 0.4rem; font-size: 0.8rem;" title="檢查更新並重新載入">
             <i class="bi bi-arrow-clockwise"></i>
         </button>
@@ -327,7 +327,8 @@
         function createSeriesPage(series) {
             const page = document.createElement('div');
             page.className = 'container';
-            const userWatchStatus = appState.watchStatus.find(s => s.userId === appState.currentUser.userId && s.seriesId === series.seriesId);
+            // Bug 修正：直接使用 renderUI 中附加的 series.watchInfo
+            const userWatchStatus = series.watchInfo; 
             let sourcesHTML = series.sources.map(source => {
                 let episodesHTML = source.episodes.map(ep => {
                     const isLastWatched = userWatchStatus && String(userWatchStatus.lastWatchedSourceId) === String(source.sourceId) && String(userWatchStatus.lastWatchedEpisodeId) === String(ep.episodeId);
@@ -355,7 +356,6 @@
             renderUI();
         }
 
-        // Bug 修正：改回無刷新更新
         function handleEpisodeClick(seriesId, sourceId, episodeId) {
             window.open(`https://gimy.ai/eps/${seriesId}-${sourceId}-${episodeId}.html`, '_blank');
             const payload = { action: 'updateWatchStatus', userId: appState.currentUser.userId, seriesId, sourceId, episodeId };
