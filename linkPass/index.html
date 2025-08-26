@@ -6,7 +6,7 @@
     <title>Hatarō Link Pass</title>
     
     <!-- Apple Touch Icon for iOS Home Screen -->
-    <link rel="apple-touch-icon" href="linkPassIcon-1024.png">
+    <link rel="apple-touch-icon" href="https://howztw.github.io/Eijiro/linkPass/linkPassIcon-1024.png">
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
-        /* --- 全新配色：溫暖護眼主題 --- */
+        /* --- 還原配色：溫暖護眼主題 --- */
         body {
             background-color: #fdfaf3; /* 柔和的米黃色背景 */
             color: #3d2c1c; /* 深咖啡色文字 */
@@ -26,6 +26,7 @@
         .btn-primary {
             background-color: #ff8c42; /* 暖橘色 */
             border-color: #ff8c42;
+            color: #ffffff;
         }
         .btn-primary:hover, .btn-primary:focus {
             background-color: #e07b3a;
@@ -38,14 +39,6 @@
         .btn-secondary:hover, .btn-secondary:focus {
             background-color: #8b8b8b;
             border-color: #8b8b8b;
-        }
-        .btn-outline-primary {
-            color: #ff8c42;
-            border-color: #ff8c42;
-        }
-        .btn-outline-primary:hover, .btn-outline-primary:focus {
-            background-color: #ff8c42;
-            color: #fff;
         }
 
         /* --- 針對大螢幕（電視）進行優化 --- */
@@ -66,12 +59,12 @@
                 border-radius: 16px;
             }
             .header-icon-fallback {
-                font-size: 70px; /* 在大螢幕上放大備用圖示 */
+                font-size: 70px;
             }
         }
 
         /* --- 焦點狀態優化 --- */
-        .btn:focus, .form-control:focus, .link-card a:focus {
+        .btn:focus, .form-control:focus, .link-card a:focus, footer a:focus {
             box-shadow: 0 0 0 0.25rem rgba(255, 140, 66, 0.5); /* 橘色系的外框 */
             outline: 2px solid #ff8c42;
             border-radius: 0.5rem;
@@ -80,11 +73,13 @@
         /* --- 元件樣式 --- */
         #input-section {
             background-color: #f5f0e1; /* 稍深的暖米色 */
+            border-radius: 1rem;
         }
         
         .link-card {
             border: 1px solid #b9d8d2; /* 統一的藍綠色邊框 */
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            border-radius: 0.75rem;
         }
         
         #links-container .link-card:nth-of-type(odd) {
@@ -97,7 +92,7 @@
         .link-card .url-text {
             word-break: break-all;
             font-size: 1.2em;
-            color: #0056b3; /* 清晰的藍色，方便識別為連結 */
+            color: #0056b3;
         }
 
         .link-card .description-text {
@@ -108,15 +103,14 @@
         .header-icon {
             width: 60px;
             height: 60px;
-            border-radius: 12px; /* 大圓角效果 */
-            object-fit: cover; /* 確保圖片不變形 */
+            border-radius: 12px;
+            object-fit: cover;
         }
         
-        /* [新增] 備用圖示的樣式 */
         .header-icon-fallback {
-            font-size: 50px; /* 設定備用圖示的大小 */
-            display: none; /* 預設隱藏 */
-            width: 60px; /* 確保佔位寬度一致 */
+            font-size: 50px;
+            display: none;
+            width: 60px;
             text-align: center;
         }
 
@@ -134,6 +128,17 @@
         .lead.text-muted {
             color: #6c757d !important;
         }
+        
+        /* [新增] 頁尾連結樣式 */
+        footer a {
+            color: #5D4037; /* 深棕色 */
+            text-decoration: none;
+            font-size: 1.1rem;
+        }
+        footer a:hover {
+            color: #000;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -141,9 +146,7 @@
     <!-- Header -->
     <header class="container text-center py-4 py-lg-5">
         <h1 class="display-4 fw-bold d-flex align-items-center justify-content-center">
-            <!-- [修改] 加入 onerror 事件處理圖片載入失敗 -->
-            <img src="linkPassIcon-1024.png" alt="Hatarō Link Pass 圖示" class="header-icon me-3 shadow-sm" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
-            <!-- [新增] 這是備用的 Bootstrap 圖示，預設隱藏 -->
+            <img src="https://howztw.github.io/Eijiro/linkPass/linkPassIcon-1024.png" alt="Hatarō Link Pass 圖示" class="header-icon me-3 shadow-sm" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
             <i class="bi bi-tv-fill header-icon-fallback me-3"></i>
             Hatarō Link Pass
         </h1>
@@ -152,7 +155,7 @@
 
     <main class="container pb-5">
         <!-- 網址輸入區 -->
-        <section id="input-section" class="mb-5 p-4 rounded-3">
+        <section id="input-section" class="mb-5 p-4">
             <div class="mb-3">
                 <label for="url-input" class="form-label fs-4">網址 (必填)</label>
                 <input type="url" class="form-control form-control-lg" id="url-input" placeholder="https://example.com" required>
@@ -185,6 +188,13 @@
             </div>
         </section>
     </main>
+
+    <!-- [新增] 頁尾 -->
+    <footer class="container text-center pt-4 pb-5">
+        <a href="https://docs.google.com/spreadsheets/d/1KK6q-iVUmzpoSY8Txqe94BbUY0MG6BnUIxSzwF4kFVk" target="_blank" rel="noopener noreferrer">
+            <i class="bi bi-table me-2"></i>Hatarō Link Pass 資料庫
+        </a>
+    </footer>
     
     <!-- 提示訊息框容器 -->
     <div id="toast-container"></div>
