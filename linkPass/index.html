@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hatarō Link Pass</title>
+    
+    <!-- Apple Touch Icon for iOS Home Screen -->
+    <link rel="apple-touch-icon" href="linkPassIcon-1024.png">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        /* --- 全新配色：溫暖護眼主題 --- */
+        body {
+            background-color: #fdfaf3; /* 柔和的米黃色背景 */
+            color: #3d2c1c; /* 深咖啡色文字 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        /* --- 按鈕顏色覆寫 --- */
+        .btn-primary {
+            background-color: #ff8c42; /* 暖橘色 */
+            border-color: #ff8c42;
+        }
+        .btn-primary:hover, .btn-primary:focus {
+            background-color: #e07b3a;
+            border-color: #e07b3a;
+        }
+        .btn-secondary {
+            background-color: #a9a9a9; /* 柔和灰 */
+            border-color: #a9a9a9;
+        }
+        .btn-secondary:hover, .btn-secondary:focus {
+            background-color: #8b8b8b;
+            border-color: #8b8b8b;
+        }
+        .btn-outline-primary {
+            color: #ff8c42;
+            border-color: #ff8c42;
+        }
+        .btn-outline-primary:hover, .btn-outline-primary:focus {
+            background-color: #ff8c42;
+            color: #fff;
+        }
+
+        /* --- 針對大螢幕（電視）進行優化 --- */
+        @media (min-width: 992px) {
+            body {
+                font-size: 1.25rem;
+            }
+            .form-control-lg, .btn-lg {
+                font-size: 1.5rem;
+                padding: 1rem 1.5rem;
+            }
+            .display-4 {
+                font-size: 4rem;
+            }
+            .header-icon {
+                width: 80px;
+                height: 80px;
+                border-radius: 16px;
+            }
+            .header-icon-fallback {
+                font-size: 70px; /* 在大螢幕上放大備用圖示 */
+            }
+        }
+
+        /* --- 焦點狀態優化 --- */
+        .btn:focus, .form-control:focus, .link-card a:focus {
+            box-shadow: 0 0 0 0.25rem rgba(255, 140, 66, 0.5); /* 橘色系的外框 */
+            outline: 2px solid #ff8c42;
+            border-radius: 0.5rem;
+        }
+
+        /* --- 元件樣式 --- */
+        #input-section {
+            background-color: #f5f0e1; /* 稍深的暖米色 */
+        }
+        
+        .link-card {
+            border: 1px solid #b9d8d2; /* 統一的藍綠色邊框 */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        
+        #links-container .link-card:nth-of-type(odd) {
+            background-color: #e8f5f3; /* 淺藍綠色 */
+        }
+        #links-container .link-card:nth-of-type(even) {
+            background-color: #d1e8e2; /* 稍深的藍綠色 */
+        }
+        
+        .link-card .url-text {
+            word-break: break-all;
+            font-size: 1.2em;
+            color: #0056b3; /* 清晰的藍色，方便識別為連結 */
+        }
+
+        .link-card .description-text {
+            font-size: 1em;
+            color: #495057;
+        }
+        
+        .header-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px; /* 大圓角效果 */
+            object-fit: cover; /* 確保圖片不變形 */
+        }
+        
+        /* [新增] 備用圖示的樣式 */
+        .header-icon-fallback {
+            font-size: 50px; /* 設定備用圖示的大小 */
+            display: none; /* 預設隱藏 */
+            width: 60px; /* 確保佔位寬度一致 */
+            text-align: center;
+        }
+
+        /* --- 提示訊息框樣式 --- */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1050;
+            min-width: 300px;
+            text-align: center;
+        }
+        
+        .lead.text-muted {
+            color: #6c757d !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="container text-center py-4 py-lg-5">
+        <h1 class="display-4 fw-bold d-flex align-items-center justify-content-center">
+            <!-- [修改] 加入 onerror 事件處理圖片載入失敗 -->
+            <img src="linkPassIcon-1024.png" alt="Hatarō Link Pass 圖示" class="header-icon me-3 shadow-sm" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+            <!-- [新增] 這是備用的 Bootstrap 圖示，預設隱藏 -->
+            <i class="bi bi-tv-fill header-icon-fallback me-3"></i>
+            Hatarō Link Pass
+        </h1>
+        <p class="lead text-muted">在手機上輸入網址，在電視上輕鬆開啟</p>
+    </header>
+
+    <main class="container pb-5">
+        <!-- 網址輸入區 -->
+        <section id="input-section" class="mb-5 p-4 rounded-3">
+            <div class="mb-3">
+                <label for="url-input" class="form-label fs-4">網址 (必填)</label>
+                <input type="url" class="form-control form-control-lg" id="url-input" placeholder="https://example.com" required>
+            </div>
+            <div class="mb-4">
+                <label for="description-input" class="form-label fs-5">說明 (選填)</label>
+                <input type="text" class="form-control form-control-lg" id="description-input" placeholder="例如：今晚要看的電影">
+            </div>
+            <div class="d-grid gap-3 d-md-flex">
+                <button type="button" id="submit-btn" class="btn btn-primary btn-lg flex-grow-1" disabled>
+                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    <i class="bi bi-cloud-arrow-up-fill"></i> 送出儲存
+                </button>
+                <button type="button" id="clear-btn" class="btn btn-secondary btn-lg">
+                    <i class="bi bi-x-circle"></i> 清除
+                </button>
+            </div>
+        </section>
+
+        <!-- 輕鬆開啟網址清單 -->
+        <section id="links-section">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                 <h2 class="fs-3 mb-0">輕鬆開啟網址清單</h2>
+                 <div id="loader" class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">載入中...</span>
+                 </div>
+            </div>
+            <div id="links-container" class="vstack gap-3">
+                <!-- JavaScript 會在這裡動態生成連結卡片 -->
+            </div>
+        </section>
+    </main>
+    
+    <!-- 提示訊息框容器 -->
+    <div id="toast-container"></div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // --- 設定 ---
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyXodqRZoppjEYkAJDgxo_5GawIfQMTB1POIKV6f-iqHA_DKtmmHIFhk5TY8LoIRG1fdA/exec';
+        const MAX_LINKS = 15;
+
+        // --- DOM 元素 ---
+        const urlInput = document.getElementById('url-input');
+        const descriptionInput = document.getElementById('description-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const linksContainer = document.getElementById('links-container');
+        const loader = document.getElementById('loader');
+        const toastContainer = document.getElementById('toast-container');
+
+        // --- 函式 ---
+
+        /**
+         * 顯示提示訊息
+         * @param {string} message - 要顯示的訊息
+         * @param {string} type - 'success' 或 'danger'
+         */
+        function showToast(message, type = 'success') {
+            const toastId = 'toast-' + Date.now();
+            const toastColor = type === 'success' ? 'bg-success' : 'bg-danger';
+            const toastHTML = `
+                <div id="${toastId}" class="toast show align-items-center text-white ${toastColor} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body fs-5">
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+            toastContainer.innerHTML = toastHTML;
+
+            // 3 秒後自動消失
+            setTimeout(() => {
+                const toastElement = document.getElementById(toastId);
+                if (toastElement) {
+                    const bsToast = new bootstrap.Toast(toastElement);
+                    bsToast.hide();
+                }
+            }, 3000);
+        }
+
+        /**
+         * 渲染連結列表
+         * @param {Array} links - 從 API 取得的連結資料陣列
+         */
+        function renderLinks(links = []) {
+            linksContainer.innerHTML = ''; // 清空現有內容
+            for (let i = 0; i < MAX_LINKS; i++) {
+                const link = links[i];
+                let cardHTML;
+
+                if (link) {
+                    // 如果有資料，生成連結卡片
+                    cardHTML = `
+                        <div class="card link-card p-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="flex-grow-1 me-3">
+                                    <p class="mb-1 url-text fw-bold">${link.url}</p>
+                                    <p class="mb-0 description-text">${link.description || '&nbsp;'}</p>
+                                </div>
+                                <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-lg flex-shrink-0">
+                                    <i class="bi bi-box-arrow-up-right"></i> 開啟
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // 如果沒有資料，生成佔位卡片
+                    cardHTML = `
+                        <div class="card link-card p-3 opacity-50">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="flex-grow-1 me-3">
+                                    <p class="mb-1 url-text text-muted">(${i + 1}) 尚無連結</p>
+                                    <p class="mb-0 description-text">&nbsp;</p>
+                                </div>
+                                <button class="btn btn-secondary btn-lg flex-shrink-0" disabled>
+                                    <i class="bi bi-box-arrow-up-right"></i> 開啟
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+                linksContainer.insertAdjacentHTML('beforeend', cardHTML);
+            }
+        }
+
+        /**
+         * 從 Google Sheet 取得連結資料
+         */
+        async function fetchLinks() {
+            loader.classList.remove('d-none');
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const result = await response.json();
+
+                if (result.success) {
+                    renderLinks(result.data);
+                } else {
+                    throw new Error(result.message || '無法載入資料');
+                }
+            } catch (error) {
+                console.error('Fetch Error:', error);
+                showToast(`載入失敗: ${error.message}`, 'danger');
+                renderLinks([]); // 發生錯誤時也渲染空列表
+            } finally {
+                loader.classList.add('d-none');
+            }
+        }
+
+        /**
+         * 驗證是否為有效的 URL
+         * @param {string} string - 要驗證的字串
+         * @returns {boolean}
+         */
+        function isValidURL(string) {
+            if (!string || string.trim().length < 4 || !string.includes('.')) {
+                return false;
+            }
+            try {
+                let url = string;
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    url = 'https://' + url;
+                }
+                new URL(url);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        /**
+         * 提交新的連結
+         */
+        async function submitLink() {
+            const url = urlInput.value.trim();
+            const description = descriptionInput.value.trim();
+
+            if (!isValidURL(url)) {
+                showToast('請輸入有效的網址格式', 'danger');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.querySelector('.spinner-border').classList.remove('d-none');
+
+            try {
+                let fullUrl = url;
+                if (!fullUrl.startsWith('http://') && !fullUrl.startsWith('https://')) {
+                    fullUrl = 'https://' + fullUrl;
+                }
+
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: fullUrl, description: description }),
+                });
+                
+                showToast('儲存成功！正在更新列表...', 'success');
+                urlInput.value = '';
+                descriptionInput.value = '';
+                urlInput.dispatchEvent(new Event('input'));
+                
+                setTimeout(fetchLinks, 1500);
+
+            } catch (error) {
+                console.error('Submit Error:', error);
+                showToast(`儲存失敗: ${error.message}`, 'danger');
+            } finally {
+                submitBtn.querySelector('.spinner-border').classList.add('d-none');
+            }
+        }
+
+        // --- 事件監聽 ---
+        document.addEventListener('DOMContentLoaded', fetchLinks);
+        urlInput.addEventListener('input', () => {
+            submitBtn.disabled = urlInput.value.trim() === '';
+        });
+        submitBtn.addEventListener('click', submitLink);
+        clearBtn.addEventListener('click', () => {
+            urlInput.value = '';
+            descriptionInput.value = '';
+            urlInput.dispatchEvent(new Event('input'));
+        });
+
+    </script>
+</body>
+</html>
