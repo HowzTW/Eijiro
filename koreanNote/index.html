@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hatarō 韓語旅遊常用句型</title>
+    <!-- 載入 Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 載入 Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- 載入我們自己的樣式 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            overflow-x: hidden;
+            background-color: #f9fafb; /* bg-gray-50 */
+        }
+        h1 {
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            border-left: 5px solid #4F46E5;
+            padding-left: 1rem;
+        }
+        .phrase-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .phrase-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        
+        /* 覆蓋 Bootstrap Carousel 的一些樣式 */
+        .carousel-item {
+            transition: transform .6s ease-in-out;
+        }
+
+        /* 桌面版與手機版選單未選中項的文字顏色 */
+        #tab-nav a.tab-link,
+        #mobile-menu a.tab-link-mobile {
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .active-tab {
+            background-color: #4338CA;
+            color: #FFFFFF !important; /* 確保選中項文字為純白，並提高優先級 */
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .speak-btn {
+            flex-shrink: 0;
+        }
+        .speak-btn i {
+            transition: transform 0.2s ease;
+        }
+        .speak-btn:hover i {
+            transform: scale(1.1);
+        }
+
+        /* 正在朗讀時的按鈕背景樣式 */
+        .speaking-active-indigo { background-color: #eef2ff; }
+        .speaking-active-green { background-color: #d1fae5; }
+        .speaking-active-pink { background-color: #fce7f3; }
+        .speaking-active-yellow { background-color: #fef9c3; }
+        .speaking-active-sky { background-color: #e0f2fe; }
+        .speaking-active-violet { background-color: #ede9fe; }
+
+        /* 語音切換開關樣式 */
+        .toggle-checkbox:checked {
+            transform: translateX(100%);
+            border-color: #6366F1;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #6366F1;
+        }
+        .toggle-checkbox {
+            transition: transform 0.2s ease-in-out;
+        }
+        
+        /* 固定浮動的左右按鈕 */
+        .fixed-nav-btn {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 40;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+        .fixed-nav-btn:hover {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        .fixed-nav-btn.prev { left: 1rem; }
+        .fixed-nav-btn.next { right: 1rem; }
+
+        /* 影片卡片樣式 */
+        .video-thumbnail {
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            border-radius: 0.375rem; /* rounded-md */
+        }
+        .video-thumbnail img {
+            transition: transform 0.3s ease;
+        }
+        .video-thumbnail:hover img {
+            transform: scale(1.05);
+        }
+        .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem; /* 調整圖示大小 */
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            pointer-events: none; /* 讓點擊穿透圖示 */
+            transition: transform 0.3s ease;
+        }
+        .video-thumbnail:hover .play-icon {
+             transform: translate(-50%, -50%) scale(1.1);
+        }
+
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Header & Tab Navigation -->
+    <header class="bg-indigo-600 text-white p-4 shadow-lg sticky top-0 z-50 w-full">
+        <div class="container mx-auto flex justify-between items-center flex-wrap gap-y-2">
+            <h1 class="text-xl sm:text-2xl font-bold">Hatarō 韓語旅遊常用句型</h1>
+            <div class="flex items-center space-x-4">
+                <div class="hidden sm:flex items-center space-x-4">
+                    <div id="voice-toggle-container" class="hidden items-center space-x-2">
+                        <span class="text-sm font-medium">聲調A</span>
+                        <div class="relative inline-block w-10 align-middle select-none">
+                            <input type="checkbox" name="voice-toggle" id="voice-toggle" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-2 appearance-none cursor-pointer"/>
+                            <label for="voice-toggle" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
+                        </div>
+                        <span class="text-sm font-medium">聲調B</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm font-medium">正常</span>
+                        <div class="relative inline-block w-10 align-middle select-none">
+                            <input type="checkbox" name="speed-toggle" id="speed-toggle" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-2 appearance-none cursor-pointer"/>
+                            <label for="speed-toggle" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
+                        </div>
+                        <span class="text-sm font-medium">慢速</span>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="menu-btn" class="text-white focus:outline-none p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="sm:hidden w-full flex justify-center items-center space-x-4 mt-2">
+                 <div id="voice-toggle-container-mobile" class="hidden items-center space-x-2">
+                    <span class="text-sm font-medium">聲調A</span>
+                    <div class="relative inline-block w-10 align-middle select-none">
+                        <input type="checkbox" name="voice-toggle-mobile" id="voice-toggle-mobile" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-2 appearance-none cursor-pointer"/>
+                        <label for="voice-toggle-mobile" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
+                    </div>
+                    <span class="text-sm font-medium">聲調B</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm font-medium">正常</span>
+                    <div class="relative inline-block w-10 align-middle select-none">
+                        <input type="checkbox" name="speed-toggle-mobile" id="speed-toggle-mobile" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-2 appearance-none cursor-pointer"/>
+                        <label for="speed-toggle-mobile" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
+                    </div>
+                    <span class="text-sm font-medium">慢速</span>
+                </div>
+            </div>
+        </div>
+        <nav id="tab-nav" class="container mx-auto mt-2 md:flex items-center justify-center space-x-1 lg:space-x-2 hidden">
+            <a href="#" data-index="0" class="tab-link px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors active-tab">情境1: 互動</a>
+            <a href="#" data-index="1" class="tab-link px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors">情境2: 購物</a>
+            <a href="#" data-index="2" class="tab-link px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors">情境3: 禮貌</a>
+            <a href="#" data-index="3" class="tab-link px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors">情境4: 問路</a>
+            <a href="#" data-index="4" class="tab-link px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors">情境5: 告別</a>
+            <a href="#" data-index="5" class="tab-link px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors">情境6: 語言</a>
+            <a href="#" data-index="6" class="tab-link px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors">資源</a>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden mt-2">
+            <a href="#" data-index="0" class="tab-link-mobile block text-center py-3 px-4 text-base hover:bg-indigo-700 rounded-md active-tab">情境 1: 與陌生人互動</a>
+            <a href="#" data-index="1" class="tab-link-mobile block text-center py-3 px-4 text-base hover:bg-indigo-700 rounded-md">情境 2: 購物／餐廳</a>
+            <a href="#" data-index="2" class="tab-link-mobile block text-center py-3 px-4 text-base hover:bg-indigo-700 rounded-md">情境 3: 請求／禮貌用語</a>
+            <a href="#" data-index="3" class="tab-link-mobile block text-center py-3 px-4 text-base hover:bg-indigo-700 rounded-md">情境 4: 問路／交通</a>
+            <a href="#" data-index="4" class="tab-link-mobile block text-center py-3 px-4 text-base hover:bg-indigo-700 rounded-md">情境 5: 告別</a>
+            <a href="#" data-index="5" class="tab-link-mobile block text-center py-3 px-4 text-base hover:bg-indigo-700 rounded-md">情境 6: 語言相關</a>
+            <a href="#" data-index="6" class="tab-link-mobile block text-center py-3 px-4 text-base hover:bg-indigo-700 rounded-md">資源: 韓語自學影音</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-4 sm:p-6 md:p-8">
+        <div id="koreanCarousel" class="carousel slide" data-bs-ride="false" data-bs-wrap="true" data-bs-interval="false">
+            <div class="carousel-inner">
+                <!-- Carousel Item 1 -->
+                <div class="carousel-item active">
+                    <section id="interaction" data-index="0" class="tab-panel active">
+                        <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-gray-700">【情境 1】與陌生人互動 (打招呼／自我介紹)</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-indigo-700 mb-2">打招呼</h3>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">안녕하세요</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="indigo"><i class="bi bi-mic text-indigo-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">annyeonghaseyo</p>
+                                <p class="text-lg mb-4">中文：您好</p>
+                                <p class="text-sm bg-indigo-100 text-indigo-800 p-3 rounded-md"><strong>場合：</strong>任何初次見面或日常禮貌問候。</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-indigo-700 mb-2">自我介紹</h3>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">저는 하타로예요</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="indigo"><i class="bi bi-mic text-indigo-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">jeoneun hataro-yeyo</p>
+                                <p class="text-lg mb-4">中文：我是哈太郎。</p>
+                                <p class="text-sm bg-indigo-100 text-indigo-800 p-3 rounded-md"><strong>場合：</strong>初次見面時簡單介紹自己名字。</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-indigo-700 mb-2">我來自台灣</h3>
+                                 <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">저는 대만에서 왔어요</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="indigo"><i class="bi bi-mic text-indigo-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">jeoneun daeman-eseo wasseoyo</p>
+                                <p class="text-lg mb-4">中文：我來自台灣。</p>
+                                <p class="text-sm bg-indigo-100 text-indigo-800 p-3 rounded-md"><strong>場合：</strong>介紹自己國籍或來自的地方。</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-indigo-700 mb-2">自我介紹 (完整版本)</h3>
+                                 <div class="flex items-center justify-between gap-2">
+                                    <p class="text-xl font-semibold text-gray-900 korean-text">저는 하타로예요. 대만에서 왔어요.</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="indigo"><i class="bi bi-mic text-indigo-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">jeoneun hataro-yeyo. daeman-eseo wasseoyo.</p>
+                                <p class="text-lg mb-4">中文：我是哈太郎。我來自台灣。</p>
+                                <p class="text-sm bg-indigo-100 text-indigo-800 p-3 rounded-md"><strong>場合：</strong>正式或半正式的自我介紹場合。</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-indigo-700 mb-2">很高興認識你！</h3>
+                                 <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">반가워요!</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="indigo"><i class="bi bi-mic text-indigo-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">bangawoyo!</p>
+                                <p class="text-lg mb-4">中文：很高興認識你！</p>
+                                <p class="text-sm bg-indigo-100 text-indigo-800 p-3 rounded-md"><strong>場合：</strong>氣氛輕鬆、對象年紀相仿或較年輕。</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-indigo-700 mb-2">很高興認識您！</h3>
+                                 <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">반갑습니다!</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="indigo"><i class="bi bi-mic text-indigo-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">bangapsseumnida!</p>
+                                <p class="text-lg mb-4">中文：很高興認識您！</p>
+                                <p class="text-sm bg-indigo-100 text-indigo-800 p-3 rounded-md"><strong>場合：</strong>場合正式、對長輩或地位較高的人。</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <!-- Carousel Item 2 -->
+                <div class="carousel-item">
+                     <section id="shopping" data-index="1" class="tab-panel active">
+                        <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-gray-700">【情境 2】購物／餐廳 (問價錢、點餐、結帳)</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-green-700 mb-2">這個多少錢？</h3>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">이거 얼마예요?</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="green"><i class="bi bi-mic text-green-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">igeo eolmayeyo?</p>
+                                <p class="text-lg mb-4">中文：這個多少錢？</p>
+                                <p class="text-sm bg-green-100 text-green-800 p-3 rounded-md"><strong>場合：</strong>購物、餐廳點餐前詢問價格。</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-green-700 mb-2">請給我這個</h3>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">이거 주세요</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="green"><i class="bi bi-mic text-green-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">igeo juseyo</p>
+                                <p class="text-lg mb-4">中文：請給我這個。</p>
+                                <p class="text-sm bg-green-100 text-green-800 p-3 rounded-md"><strong>場合：</strong>點餐、購物時指著想要的東西點單。</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-green-700 mb-2">我要結帳 (商店)</h3>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">계산할게요</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="green"><i class="bi bi-mic text-green-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">gyesanhalgeyo</p>
+                                <p class="text-lg mb-4">中文：我要結帳。</p>
+                                <p class="text-sm bg-green-100 text-green-800 p-3 rounded-md"><strong>場合：</strong>買好東西走到櫃檯，或餐廳走去櫃檯時使用。</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-green-700 mb-2">請幫我結帳 (餐廳)</h3>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">계산해주세요</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="green"><i class="bi bi-mic text-green-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">gyesanhaejuseyo</p>
+                                <p class="text-lg mb-4">中文：請幫我結帳。</p>
+                                <p class="text-sm bg-green-100 text-green-800 p-3 rounded-md"><strong>場合：</strong>餐廳坐在座位上時招呼店員結帳。</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-green-700 mb-2">請給我帳單</h3>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">계산서 주세요</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="green"><i class="bi bi-mic text-green-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">gyesanseo juseyo</p>
+                                <p class="text-lg mb-4">中文：請給我帳單。</p>
+                                <p class="text-sm bg-green-100 text-green-800 p-3 rounded-md"><strong>場合：</strong>有紙本帳單制度的餐廳使用。</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <!-- Carousel Item 3 -->
+                <div class="carousel-item">
+                     <section id="politeness" data-index="2" class="tab-panel active">
+                        <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-gray-700">【情境 3】請求／禮貌用語</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-pink-700 mb-2">不好意思／這邊</h3>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">저기요</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="pink"><i class="bi bi-mic text-pink-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">jeogiyo</p>
+                                <p class="text-lg mb-4">中文：不好意思／這邊</p>
+                                <p class="text-sm bg-pink-100 text-pink-800 p-3 rounded-md"><strong>場合：</strong>常用於餐廳舉手叫店員，或想叫住陌生人時。</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-pink-700 mb-2">請 (請給我)</h3>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">주세요</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="pink"><i class="bi bi-mic text-pink-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">juseyo</p>
+                                <p class="text-lg mb-4">中文：請</p>
+                                <p class="text-sm bg-pink-100 text-pink-800 p-3 rounded-md"><strong>場合：</strong>請別人給你某物或幫你做某事。</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-pink-700 mb-2">請給我菜單</h3>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">메뉴 주세요</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="pink"><i class="bi bi-mic text-pink-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">menyu juseyo</p>
+                                <p class="text-lg mb-4">中文：請給我菜單。</p>
+                                <p class="text-sm bg-pink-100 text-pink-800 p-3 rounded-md"><strong>場合：</strong>在餐廳想要看菜單時使用。</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-pink-700 mb-2">謝謝 (最正式)</h3>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">감사합니다</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="pink"><i class="bi bi-mic text-pink-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">gamsahamnida</p>
+                                <p class="text-lg mb-4">中文：謝謝</p>
+                                <p class="text-sm bg-pink-100 text-pink-800 p-3 rounded-md"><strong>場合：</strong>任何感謝場合都適用。</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-pink-700 mb-2">謝謝 (輕鬆版)</h3>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">고마워요</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="pink"><i class="bi bi-mic text-pink-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">gomawoyo</p>
+                                <p class="text-lg mb-4">中文：謝謝 (不那麼隆重)</p>
+                                <p class="text-sm bg-pink-100 text-pink-800 p-3 rounded-md"><strong>場合：</strong>氣氛較輕鬆、對象年紀相仿或較年輕。</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-pink-700 mb-2">對不起 (正式)</h3>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">죄송합니다</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="pink"><i class="bi bi-mic text-pink-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">joesonghamnida</p>
+                                <p class="text-lg mb-4">中文：對不起／不好意思</p>
+                                <p class="text-sm bg-pink-100 text-pink-800 p-3 rounded-md"><strong>場合：</strong>需要正式道歉、打擾別人時。</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-pink-700 mb-2">在人群中輕微道歉</h3>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">미안해요</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="pink"><i class="bi bi-mic text-pink-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">mianhaeyo</p>
+                                <p class="text-lg mb-4">中文：不好意思／抱歉</p>
+                                <p class="text-sm bg-pink-100 text-pink-800 p-3 rounded-md"><strong>場合：</strong>在人多的地方輕輕碰到別人時。</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-pink-700 mb-2">借過／抱歉打擾</h3>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">실례합니다</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="pink"><i class="bi bi-mic text-pink-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">sillyehamnida</p>
+                                <p class="text-lg mb-4">中文：失禮了／抱歉打擾</p>
+                                <p class="text-sm bg-pink-100 text-pink-800 p-3 rounded-md"><strong>場合：</strong>在人群中想通行、借過時。</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <!-- Carousel Item 4 -->
+                <div class="carousel-item">
+                    <section id="directions" data-index="3" class="tab-panel active">
+                        <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-gray-700">【情境 4】問路／交通</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-yellow-700 mb-2">...在哪裡？</h3>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">... 어디에 있어요?</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="yellow"><i class="bi bi-mic text-yellow-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">... eodie isseoyo?</p>
+                                <p class="text-lg mb-4">中文：...在哪裡？</p>
+                                <p class="text-sm bg-yellow-100 text-yellow-800 p-3 rounded-md"><strong>場合：</strong>問地點位置時的通用模板。</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-yellow-700 mb-2">車站在哪裡？</h3>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">역이 어디에 있어요?</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="yellow"><i class="bi bi-mic text-yellow-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">yeogi eodie isseoyo?</p>
+                                <p class="text-lg mb-4">中文：車站在哪裡？</p>
+                                <p class="text-sm bg-yellow-100 text-yellow-800 p-3 rounded-md"><strong>場合：</strong>問火車站、地鐵站、巴士站等位置。</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-yellow-700 mb-2">請問廁所在哪裡？</h3>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">화장실이 어디에 있어요?</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="yellow"><i class="bi bi-mic text-yellow-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">hwajangshil-i eodie isseoyo?</p>
+                                <p class="text-lg mb-4">中文：請問廁所在哪裡？</p>
+                                <p class="text-sm bg-yellow-100 text-yellow-800 p-3 rounded-md"><strong>場合：</strong>找洗手間時的必備句。</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <!-- Carousel Item 5 -->
+                <div class="carousel-item">
+                    <section id="farewell" data-index="4" class="tab-panel active">
+                        <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-gray-700">【情境 5】告別</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-sky-700 mb-2">再見 (對方留下)</h3>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">안녕히 계세요</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="sky"><i class="bi bi-mic text-sky-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">annyeonghi gyeseyo</p>
+                                <p class="text-lg mb-4">中文：再見 (請留步)</p>
+                                <p class="text-sm bg-sky-100 text-sky-800 p-3 rounded-md"><strong>場合：</strong>你要離開、對方留在原地時。</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-sky-700 mb-2">再見 (對方離開)</h3>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">안녕히 가세요</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="sky"><i class="bi bi-mic text-sky-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">annyeonghi gaseyo</p>
+                                <p class="text-lg mb-4">中文：再見 (慢走)</p>
+                                <p class="text-sm bg-sky-100 text-sky-800 p-3 rounded-md"><strong>場合：</strong>你留在原地、對方要離開時。</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <!-- Carousel Item 6 -->
+                <div class="carousel-item">
+                    <section id="language" data-index="5" class="tab-panel active">
+                        <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-gray-700">【情境 6】語言相關</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-violet-700 mb-2">我不會說韓語</h3>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">저는 한국어를 못해요.</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="violet"><i class="bi bi-mic text-violet-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">jeoneun hangug-eoreul mothaeyo</p>
+                                <p class="text-lg mb-4">中文：我不會說韓語。</p>
+                                <p class="text-sm bg-violet-100 text-violet-800 p-3 rounded-md"><strong>場合：</strong>先告知對方你不懂韓文。</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-violet-700 mb-2">請問您會說英文嗎？</h3>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-2xl font-semibold text-gray-900 korean-text">영어 하실 수 있으세요?</p>
+                                    <button class="speak-btn p-2 rounded-full" data-color="violet"><i class="bi bi-mic text-violet-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">yeongeo hasil su isseuseyo?</p>
+                                <p class="text-lg mb-4">中文：請問您會說英文嗎？</p>
+                                <p class="text-sm bg-violet-100 text-violet-800 p-3 rounded-md"><strong>場合：</strong>需要用英文溝通時的禮貌詢問。</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <!-- Carousel Item 7: Resources -->
+                <div class="carousel-item">
+                    <section id="resources" data-index="6" class="tab-panel active">
+                        <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-gray-700">【資源】韓語自學影音</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-indigo-700 mb-4 truncate">韓文40音｜發音技巧大公開(上)</h3>
+                                <a href="https://www.youtube.com/watch?v=YAS3k8FYOsA" target="_blank" class="video-thumbnail aspect-w-16 aspect-h-9 block">
+                                    <img src="https://img.youtube.com/vi/YAS3k8FYOsA/hqdefault.jpg" alt="影片封面" class="w-full h-full object-cover">
+                                    <i class="bi bi-play-circle-fill play-icon"></i>
+                                </a>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-indigo-700 mb-4 truncate">韓文40音(下)ㅣ分不清的那些子音母音們！</h3>
+                                <a href="https://www.youtube.com/watch?v=OgP8QVhC028" target="_blank" class="video-thumbnail aspect-w-16 aspect-h-9 block">
+                                    <img src="https://img.youtube.com/vi/OgP8QVhC028/hqdefault.jpg" alt="影片封面" class="w-full h-full object-cover">
+                                    <i class="bi bi-play-circle-fill play-icon"></i>
+                                </a>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-indigo-700 mb-4 truncate">韓文40音總整理ㅣ一起唸完子母音399字</h3>
+                                <a href="https://www.youtube.com/watch?v=7xALdUCRSX0" target="_blank" class="video-thumbnail aspect-w-16 aspect-h-9 block">
+                                    <img src="https://img.youtube.com/vi/7xALdUCRSX0/hqdefault.jpg" alt="影片封面" class="w-full h-full object-cover">
+                                    <i class="bi bi-play-circle-fill play-icon"></i>
+                                </a>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-indigo-700 mb-4 truncate">韓文發音訣竅！掌握2原則</h3>
+                                <a href="https://www.youtube.com/watch?v=FbzpzcOiqcE" target="_blank" class="video-thumbnail aspect-w-16 aspect-h-9 block">
+                                    <img src="https://img.youtube.com/vi/FbzpzcOiqcE/hqdefault.jpg" alt="影片封面" class="w-full h-full object-cover">
+                                    <i class="bi bi-play-circle-fill play-icon"></i>
+                                </a>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-indigo-700 mb-4 truncate">麵滴Mindy│韓文四十音，我是這樣學母音</h3>
+                                <a href="https://www.youtube.com/watch?v=UX58vbv3Z1w" target="_blank" class="video-thumbnail aspect-w-16 aspect-h-9 block">
+                                    <img src="https://img.youtube.com/vi/UX58vbv3Z1w/hqdefault.jpg" alt="影片封面" class="w-full h-full object-cover">
+                                    <i class="bi bi-play-circle-fill play-icon"></i>
+                                </a>
+                            </div>
+                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-indigo-700 mb-4 truncate">麵滴Mindy│韓文四十音，我是這樣學子音</h3>
+                                <a href="https://www.youtube.com/watch?v=i9VYBLDWmQQ" target="_blank" class="video-thumbnail aspect-w-16 aspect-h-9 block">
+                                    <img src="https://img.youtube.com/vi/i9VYBLDWmQQ/hqdefault.jpg" alt="影片封面" class="w-full h-full object-cover">
+                                    <i class="bi bi-play-circle-fill play-icon"></i>
+                                </a>
+                            </div>
+                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-indigo-700 mb-4 truncate">麵滴Mindy│韓文的받침終聲 =收音=尾音</h3>
+                                <a href="https://www.youtube.com/watch?v=BFMUcb62zuo" target="_blank" class="video-thumbnail aspect-w-16 aspect-h-9 block">
+                                    <img src="https://img.youtube.com/vi/BFMUcb62zuo/hqdefault.jpg" alt="影片封面" class="w-full h-full object-cover">
+                                    <i class="bi bi-play-circle-fill play-icon"></i>
+                                </a>
+                            </div>
+                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-indigo-700 mb-4 truncate">麵滴Mindy ㅣ發音規則這樣學😵</h3>
+                                <a href="https://www.youtube.com/watch?v=mZx-u3S6lD8" target="_blank" class="video-thumbnail aspect-w-16 aspect-h-9 block">
+                                    <img src="https://img.youtube.com/vi/mZx-u3S6lD8/hqdefault.jpg" alt="影片封面" class="w-full h-full object-cover">
+                                    <i class="bi bi-play-circle-fill play-icon"></i>
+                                </a>
+                            </div>
+                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-indigo-700 mb-4 truncate">麵滴Mindy│韓文數字系統—漢式數字</h3>
+                                <a href="https://www.youtube.com/watch?v=_coqWSRZR6w" target="_blank" class="video-thumbnail aspect-w-16 aspect-h-9 block">
+                                    <img src="https://img.youtube.com/vi/_coqWSRZR6w/hqdefault.jpg" alt="影片封面" class="w-full h-full object-cover">
+                                    <i class="bi bi-play-circle-fill play-icon"></i>
+                                </a>
+                            </div>
+                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-indigo-700 mb-4 truncate">麵滴Mindy│韓文數字系統—韓式固有數字</h3>
+                                <a href="https://www.youtube.com/watch?v=-pqV8Hvt2Ys" target="_blank" class="video-thumbnail aspect-w-16 aspect-h-9 block">
+                                    <img src="https://img.youtube.com/vi/-pqV8Hvt2Ys/hqdefault.jpg" alt="影片封面" class="w-full h-full object-cover">
+                                    <i class="bi bi-play-circle-fill play-icon"></i>
+                                </a>
+                            </div>
+                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-indigo-700 mb-4 truncate">如何用韓文介紹自己與他人</h3>
+                                <a href="https://www.youtube.com/watch?v=pXmQwwVakKY" target="_blank" class="video-thumbnail aspect-w-16 aspect-h-9 block">
+                                    <img src="https://img.youtube.com/vi/pXmQwwVakKY/hqdefault.jpg" alt="影片封面" class="w-full h-full object-cover">
+                                    <i class="bi bi-play-circle-fill play-icon"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+        <!-- 左右切換按鈕 (固定定位) -->
+        <button id="prev-btn" class="fixed-nav-btn prev hidden md:block rounded-full p-2" data-bs-target="#koreanCarousel" data-bs-slide="prev">
+            <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        </button>
+        <button id="next-btn" class="fixed-nav-btn next hidden md:block rounded-full p-2" data-bs-target="#koreanCarousel" data-bs-slide="next">
+             <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </button>
+    </main>
+
+    <!-- 載入 Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- 全域變數 ---
+            const synth = window.speechSynthesis;
+            const speakBtns = document.querySelectorAll('.speak-btn');
+            
+            // 語音控制
+            const voiceToggleContainer = document.getElementById('voice-toggle-container');
+            const voiceToggle = document.getElementById('voice-toggle');
+            const speedToggle = document.getElementById('speed-toggle');
+            const voiceToggleContainerMobile = document.getElementById('voice-toggle-container-mobile');
+            const voiceToggleMobile = document.getElementById('voice-toggle-mobile');
+            const speedToggleMobile = document.getElementById('speed-toggle-mobile');
+            
+            let voice1 = null;
+            let voice2 = null;
+            let preferredVoice = null;
+            let currentRate = 1.0;
+
+            // 導覽控制
+            const carouselElement = document.getElementById('koreanCarousel');
+            const carousel = new bootstrap.Carousel(carouselElement, {
+                interval: false, // 關閉自動播放
+                wrap: true, // 開啟循環
+                touch: true // 開啟觸控
+            });
+            const tabLinks = document.querySelectorAll('.tab-link');
+            const mobileMenuLinks = document.querySelectorAll('.tab-link-mobile');
+            const allNavLinks = [...tabLinks, ...mobileMenuLinks];
+
+            // --- 語音功能初始化 ---
+            function populateVoiceList() {
+                const voices = synth.getVoices().filter(voice => voice.lang === 'ko-KR');
+                
+                if (voices.length >= 2) {
+                    voice1 = voices[0];
+                    voice2 = voices[1];
+                    preferredVoice = voice1;
+                    voiceToggleContainer.classList.remove('hidden');
+                    voiceToggleContainer.classList.add('flex');
+                    voiceToggleContainerMobile.classList.remove('hidden');
+                    voiceToggleContainerMobile.classList.add('flex');
+                    voiceToggle.checked = false;
+                    voiceToggleMobile.checked = false;
+                } else if (voices.length === 1) {
+                    preferredVoice = voices[0];
+                }
+            }
+
+            setTimeout(() => {
+                populateVoiceList();
+                 if (synth.onvoiceschanged !== undefined) {
+                    synth.onvoiceschanged = populateVoiceList;
+                }
+            }, 250);
+
+            function syncToggles(source, target) {
+                target.checked = source.checked;
+            }
+
+            voiceToggle.addEventListener('change', () => {
+                syncToggles(voiceToggle, voiceToggleMobile);
+                preferredVoice = voiceToggle.checked ? voice2 : voice1;
+            });
+            voiceToggleMobile.addEventListener('change', () => {
+                syncToggles(voiceToggleMobile, voiceToggle);
+                preferredVoice = voiceToggleMobile.checked ? voice2 : voice1;
+            });
+
+            speedToggle.addEventListener('change', () => {
+                syncToggles(speedToggle, speedToggleMobile);
+                currentRate = speedToggle.checked ? 0.6 : 1.0;
+            });
+            speedToggleMobile.addEventListener('change', () => {
+                syncToggles(speedToggleMobile, speedToggle);
+                currentRate = speedToggleMobile.checked ? 0.6 : 1.0;
+            });
+
+            function speak(textToSpeak, btn) {
+                if (synth.speaking) {
+                    synth.cancel();
+                }
+                
+                const icon = btn.querySelector('i');
+                const color = btn.dataset.color;
+
+                if (textToSpeak !== '' && preferredVoice) {
+                    const utterThis = new SpeechSynthesisUtterance(textToSpeak);
+                    
+                    utterThis.onstart = () => {
+                        icon.classList.replace('bi-mic', 'bi-mic-fill');
+                        btn.classList.add(`speaking-active-${color}`);
+                    };
+
+                    utterThis.onend = () => {
+                        icon.classList.replace('bi-mic-fill', 'bi-mic');
+                        btn.classList.remove(`speaking-active-${color}`);
+                    };
+
+                    utterThis.onerror = (event) => {
+                        console.error('Speech synthesis error', event);
+                        utterThis.onend();
+                    };
+
+                    utterThis.voice = preferredVoice;
+                    utterThis.rate = currentRate;
+                    utterThis.lang = 'ko-KR';
+                    synth.speak(utterThis);
+                } else if (textToSpeak !== '') {
+                    console.warn("韓語語音包未找到，使用預設語音朗讀。");
+                    const utterThis = new SpeechSynthesisUtterance(textToSpeak);
+                    utterThis.lang = 'ko-KR';
+                    utterThis.rate = currentRate;
+                    synth.speak(utterThis);
+                }
+            }
+
+            speakBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const currentBtn = e.currentTarget;
+                    const text = currentBtn.closest('.flex').querySelector('.korean-text').textContent;
+                    speak(text, currentBtn);
+                });
+            });
+
+            // --- 導覽核心功能 ---
+            // 監聽 Carousel 滑動事件，以同步頂部選單
+            carouselElement.addEventListener('slide.bs.carousel', event => {
+                window.scrollTo({ top: 0, behavior: 'instant' });
+                const newIndex = event.to;
+                allNavLinks.forEach(link => {
+                    link.classList.remove('active-tab');
+                    if (parseInt(link.dataset.index) === newIndex) {
+                        link.classList.add('active-tab');
+                    }
+                });
+            });
+            
+            // 頂部選單點擊事件
+            allNavLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const index = parseInt(e.currentTarget.dataset.index);
+                    carousel.to(index); // 使用 Bootstrap API 跳轉
+                    const mobileMenu = document.getElementById('mobile-menu');
+                     if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+            });
+            
+            // 手機漢堡選單
+            const menuBtn = document.getElementById('menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            menuBtn.addEventListener('click', (event) => {
+                event.stopPropagation();
+                mobileMenu.classList.toggle('hidden');
+            });
+        });
+    </script>
+
+</body>
+</html>
