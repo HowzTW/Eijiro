@@ -57,24 +57,24 @@
             pointer-events: none;
         }
 
-        .speak-btn {
+        .speak-btn, .copy-btn {
             flex-shrink: 0;
         }
-        .speak-btn i {
+        .speak-btn i, .copy-btn i {
             transition: transform 0.2s ease;
         }
-        .speak-btn:hover i {
+        .speak-btn:hover i, .copy-btn:hover i {
             transform: scale(1.1);
         }
 
         /* 正在朗讀時的按鈕背景樣式 */
-        .speaking-active-indigo { background-color: #eef2ff; }
-        .speaking-active-green { background-color: #d1fae5; }
-        .speaking-active-pink { background-color: #fce7f3; }
-        .speaking-active-yellow { background-color: #fef9c3; }
-        .speaking-active-sky { background-color: #e0f2fe; }
-        .speaking-active-violet { background-color: #ede9fe; }
-        .speaking-active-orange { background-color: #ffedd5; }
+        .speaking-active-indigo, .copy-btn[data-color="indigo"]:hover { background-color: #eef2ff; }
+        .speaking-active-green, .copy-btn[data-color="green"]:hover { background-color: #d1fae5; }
+        .speaking-active-pink, .copy-btn[data-color="pink"]:hover { background-color: #fce7f3; }
+        .speaking-active-yellow, .copy-btn[data-color="yellow"]:hover { background-color: #fef9c3; }
+        .speaking-active-sky, .copy-btn[data-color="sky"]:hover { background-color: #e0f2fe; }
+        .speaking-active-violet, .copy-btn[data-color="violet"]:hover { background-color: #ede9fe; }
+        .speaking-active-orange, .copy-btn[data-color="orange"]:hover { background-color: #ffedd5; }
 
         /* 語音切換開關樣式 */
         .toggle-checkbox:checked {
@@ -226,8 +226,11 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-indigo-700 mb-2">打招呼</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">안녕하세요</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="indigo"><i class="bi bi-clipboard text-indigo-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">안녕하세요</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="indigo"><i class="bi bi-mic text-indigo-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">annyeonghaseyo</p>
@@ -236,8 +239,11 @@
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-indigo-700 mb-2">自我介紹</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">저는 하타로예요</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="indigo"><i class="bi bi-clipboard text-indigo-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">저는 하타로예요</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="indigo"><i class="bi bi-mic text-indigo-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">jeoneun hataro-yeyo</p>
@@ -246,8 +252,11 @@
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-indigo-700 mb-2">我來自台灣</h3>
-                                 <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">저는 대만에서 왔어요</p>
+                                 <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="indigo"><i class="bi bi-clipboard text-indigo-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">저는 대만에서 왔어요</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="indigo"><i class="bi bi-mic text-indigo-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">jeoneun daeman-eseo wasseoyo</p>
@@ -256,8 +265,11 @@
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-indigo-700 mb-2">自我介紹 (完整版本)</h3>
-                                 <div class="flex items-center justify-between gap-2">
-                                    <p class="text-xl font-semibold text-gray-900 korean-text">저는 하타로예요. 대만에서 왔어요.</p>
+                                 <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="indigo"><i class="bi bi-clipboard text-indigo-600 text-lg"></i></button>
+                                        <p class="text-xl font-semibold text-gray-900 korean-text flex-grow">저는 하타로예요. 대만에서 왔어요.</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="indigo"><i class="bi bi-mic text-indigo-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">jeoneun hataro-yeyo. daeman-eseo wasseoyo.</p>
@@ -266,8 +278,11 @@
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-indigo-700 mb-2">很高興認識你！</h3>
-                                 <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">반가워요!</p>
+                                 <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="indigo"><i class="bi bi-clipboard text-indigo-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">반가워요!</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="indigo"><i class="bi bi-mic text-indigo-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">bangawoyo!</p>
@@ -276,8 +291,11 @@
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-indigo-700 mb-2">很高興認識您！</h3>
-                                 <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">반갑습니다!</p>
+                                 <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="indigo"><i class="bi bi-clipboard text-indigo-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">반갑습니다!</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="indigo"><i class="bi bi-mic text-indigo-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">bangapsseumnida!</p>
@@ -294,8 +312,11 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                              <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-green-700 mb-2">這個多少錢？</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">이거 얼마예요?</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="green"><i class="bi bi-clipboard text-green-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">이거 얼마예요?</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="green"><i class="bi bi-mic text-green-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">igeo eolmayeyo?</p>
@@ -304,8 +325,11 @@
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-green-700 mb-2">請給我這個</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">이거 주세요</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="green"><i class="bi bi-clipboard text-green-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">이거 주세요</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="green"><i class="bi bi-mic text-green-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">igeo juseyo</p>
@@ -314,8 +338,11 @@
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-green-700 mb-2">請給我那個</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">저거 주세요</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="green"><i class="bi bi-clipboard text-green-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">저거 주세요</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="green"><i class="bi bi-mic text-green-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">jeogeo juseyo</p>
@@ -324,8 +351,11 @@
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-green-700 mb-2">我要結帳 (商店)</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">계산할게요</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="green"><i class="bi bi-clipboard text-green-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">계산할게요</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="green"><i class="bi bi-mic text-green-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">gyesanhalgeyo</p>
@@ -334,8 +364,11 @@
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-green-700 mb-2">請幫我結帳 (餐廳)</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">계산해주세요</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="green"><i class="bi bi-clipboard text-green-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">계산해주세요</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="green"><i class="bi bi-mic text-green-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">gyesanhaejuseyo</p>
@@ -344,8 +377,11 @@
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-green-700 mb-2">請給我帳單</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">계산서 주세요</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="green"><i class="bi bi-clipboard text-green-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">계산서 주세요</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="green"><i class="bi bi-mic text-green-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">gyesanseo juseyo</p>
@@ -362,8 +398,11 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-pink-700 mb-2">不好意思／這邊</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">저기요</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="pink"><i class="bi bi-clipboard text-pink-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">저기요</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="pink"><i class="bi bi-mic text-pink-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">jeogiyo</p>
@@ -372,8 +411,11 @@
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-pink-700 mb-2">請 (請給我)</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">주세요</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="pink"><i class="bi bi-clipboard text-pink-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">주세요</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="pink"><i class="bi bi-mic text-pink-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">juseyo</p>
@@ -382,8 +424,11 @@
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-pink-700 mb-2">請給我菜單</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">메뉴 주세요</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="pink"><i class="bi bi-clipboard text-pink-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">메뉴 주세요</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="pink"><i class="bi bi-mic text-pink-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">menyu juseyo</p>
@@ -392,8 +437,11 @@
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-pink-700 mb-2">謝謝 (最正式)</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">감사합니다</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="pink"><i class="bi bi-clipboard text-pink-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">감사합니다</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="pink"><i class="bi bi-mic text-pink-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">gamsahamnida</p>
@@ -401,9 +449,25 @@
                                 <p class="text-sm bg-pink-100 text-pink-800 p-3 rounded-md"><strong>場合：</strong>任何感謝場合都適用。</p>
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-pink-700 mb-2">謝謝 (正式, 帶點親切感)</h3>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="pink"><i class="bi bi-clipboard text-pink-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">고맙습니다</p>
+                                    </div>
+                                    <button class="speak-btn p-2 rounded-full" data-color="pink"><i class="bi bi-mic text-pink-600 text-xl"></i></button>
+                                </div>
+                                <p class="text-md text-gray-500 mb-3">gomapseumnida</p>
+                                <p class="text-lg mb-4">中文：謝謝</p>
+                                <p class="text-sm bg-pink-100 text-pink-800 p-3 rounded-md"><strong>場合：</strong>和 감사합니다 一樣屬於正式敬語，但 고맙습니다 相對更日常、更有「親切口語感」，適合在正式場合仍想保持溫和氛圍時使用。常見於服務業人員對顧客的表達。</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-pink-700 mb-2">謝謝 (輕鬆版)</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">고마워요</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="pink"><i class="bi bi-clipboard text-pink-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">고마워요</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="pink"><i class="bi bi-mic text-pink-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">gomawoyo</p>
@@ -412,8 +476,11 @@
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-pink-700 mb-2">對不起 (正式)</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">죄송합니다</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="pink"><i class="bi bi-clipboard text-pink-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">죄송합니다</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="pink"><i class="bi bi-mic text-pink-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">joesonghamnida</p>
@@ -422,8 +489,11 @@
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-pink-700 mb-2">在人群中輕微道歉</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">미안해요</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="pink"><i class="bi bi-clipboard text-pink-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">미안해요</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="pink"><i class="bi bi-mic text-pink-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">mianhaeyo</p>
@@ -432,8 +502,11 @@
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-pink-700 mb-2">借過／抱歉打擾</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">실례합니다</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="pink"><i class="bi bi-clipboard text-pink-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">실례합니다</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="pink"><i class="bi bi-mic text-pink-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">sillyehamnida</p>
@@ -450,8 +523,11 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-yellow-700 mb-2">...在哪裡？</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">... 어디에 있어요?</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="yellow"><i class="bi bi-clipboard text-yellow-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">... 어디에 있어요?</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="yellow"><i class="bi bi-mic text-yellow-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">... eodie isseoyo?</p>
@@ -460,8 +536,11 @@
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-yellow-700 mb-2">車站在哪裡？</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">역이 어디에 있어요?</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="yellow"><i class="bi bi-clipboard text-yellow-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">역이 어디에 있어요?</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="yellow"><i class="bi bi-mic text-yellow-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">yeogi eodie isseoyo?</p>
@@ -470,8 +549,11 @@
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-yellow-700 mb-2">請問廁所在哪裡？</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">화장실이 어디에 있어요?</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="yellow"><i class="bi bi-clipboard text-yellow-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">화장실이 어디에 있어요?</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="yellow"><i class="bi bi-mic text-yellow-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">hwajangshil-i eodie isseoyo?</p>
@@ -488,8 +570,11 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-sky-700 mb-2">再見 (對方留下)</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">안녕히 계세요</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="sky"><i class="bi bi-clipboard text-sky-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">안녕히 계세요</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="sky"><i class="bi bi-mic text-sky-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">annyeonghi gyeseyo</p>
@@ -498,8 +583,11 @@
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-sky-700 mb-2">再見 (對方離開)</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">안녕히 가세요</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="sky"><i class="bi bi-clipboard text-sky-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">안녕히 가세요</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="sky"><i class="bi bi-mic text-sky-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">annyeonghi gaseyo</p>
@@ -516,8 +604,11 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-violet-700 mb-2">我不會說韓語</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">저는 한국어를 못해요.</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="violet"><i class="bi bi-clipboard text-violet-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">저는 한국어를 못해요.</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="violet"><i class="bi bi-mic text-violet-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">jeoneun hangug-eoreul mothaeyo</p>
@@ -526,8 +617,11 @@
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
                                 <h3 class="text-xl font-bold text-violet-700 mb-2">請問您會說英文嗎？</h3>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-2xl font-semibold text-gray-900 korean-text">영어 하실 수 있으세요?</p>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-start gap-2 flex-grow">
+                                        <button class="copy-btn p-2 rounded-full transition-colors" data-color="violet"><i class="bi bi-clipboard text-violet-600 text-lg"></i></button>
+                                        <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">영어 하실 수 있으세요?</p>
+                                    </div>
                                     <button class="speak-btn p-2 rounded-full" data-color="violet"><i class="bi bi-mic text-violet-600 text-xl"></i></button>
                                 </div>
                                 <p class="text-md text-gray-500 mb-3">yeongeo hasil su isseuseyo?</p>
@@ -572,48 +666,66 @@
                             <h3 class="text-2xl font-bold text-gray-700 pt-4">3. 例句</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
-                                    <div class="flex items-center justify-between gap-2">
-                                        <p class="text-2xl font-semibold text-gray-900 korean-text">물 한잔 주세요</p>
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div class="flex items-start gap-2 flex-grow">
+                                            <button class="copy-btn p-2 rounded-full transition-colors" data-color="orange"><i class="bi bi-clipboard text-orange-600 text-lg"></i></button>
+                                            <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">물 한잔 주세요</p>
+                                        </div>
                                         <button class="speak-btn p-2 rounded-full" data-color="orange"><i class="bi bi-mic text-orange-600 text-xl"></i></button>
                                     </div>
                                     <p class="text-md text-gray-500 mb-3">mul hanjan juseyo</p>
                                     <p class="text-lg">中文：請給我一杯水。</p>
                                 </div>
                                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
-                                    <div class="flex items-center justify-between gap-2">
-                                        <p class="text-2xl font-semibold text-gray-900 korean-text">맥주 두잔 주세요</p>
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div class="flex items-start gap-2 flex-grow">
+                                            <button class="copy-btn p-2 rounded-full transition-colors" data-color="orange"><i class="bi bi-clipboard text-orange-600 text-lg"></i></button>
+                                            <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">맥주 두잔 주세요</p>
+                                        </div>
                                         <button class="speak-btn p-2 rounded-full" data-color="orange"><i class="bi bi-mic text-orange-600 text-xl"></i></button>
                                     </div>
                                     <p class="text-md text-gray-500 mb-3">maekju dujan juseyo</p>
                                     <p class="text-lg">中文：請給我兩杯啤酒。</p>
                                 </div>
                                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
-                                    <div class="flex items-center justify-between gap-2">
-                                        <p class="text-2xl font-semibold text-gray-900 korean-text">커피 세잔 주세요</p>
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div class="flex items-start gap-2 flex-grow">
+                                            <button class="copy-btn p-2 rounded-full transition-colors" data-color="orange"><i class="bi bi-clipboard text-orange-600 text-lg"></i></button>
+                                            <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">커피 세잔 주세요</p>
+                                        </div>
                                         <button class="speak-btn p-2 rounded-full" data-color="orange"><i class="bi bi-mic text-orange-600 text-xl"></i></button>
                                     </div>
                                     <p class="text-md text-gray-500 mb-3">keopi sejan juseyo</p>
                                     <p class="text-lg">中文：請給我三杯咖啡。</p>
                                 </div>
                                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
-                                    <div class="flex items-center justify-between gap-2">
-                                        <p class="text-2xl font-semibold text-gray-900 korean-text">김밥 두개 주세요</p>
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div class="flex items-start gap-2 flex-grow">
+                                            <button class="copy-btn p-2 rounded-full transition-colors" data-color="orange"><i class="bi bi-clipboard text-orange-600 text-lg"></i></button>
+                                            <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">김밥 두개 주세요</p>
+                                        </div>
                                         <button class="speak-btn p-2 rounded-full" data-color="orange"><i class="bi bi-mic text-orange-600 text-xl"></i></button>
                                     </div>
                                     <p class="text-md text-gray-500 mb-3">gimbap dugae juseyo</p>
                                     <p class="text-lg">中文：請給我兩份紫菜飯捲。</p>
                                 </div>
                                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
-                                    <div class="flex items-center justify-between gap-2">
-                                        <p class="text-2xl font-semibold text-gray-900 korean-text">라면 한그릇 주세요</p>
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div class="flex items-start gap-2 flex-grow">
+                                            <button class="copy-btn p-2 rounded-full transition-colors" data-color="orange"><i class="bi bi-clipboard text-orange-600 text-lg"></i></button>
+                                            <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">라면 한그릇 주세요</p>
+                                        </div>
                                         <button class="speak-btn p-2 rounded-full" data-color="orange"><i class="bi bi-mic text-orange-600 text-xl"></i></button>
                                     </div>
                                     <p class="text-md text-gray-500 mb-3">ramyeon hangeureut juseyo</p>
                                     <p class="text-lg">中文：請給我一碗拉麵。</p>
                                 </div>
                                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
-                                    <div class="flex items-center justify-between gap-2">
-                                        <p class="text-2xl font-semibold text-gray-900 korean-text">사이다 한병 주세요</p>
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div class="flex items-start gap-2 flex-grow">
+                                            <button class="copy-btn p-2 rounded-full transition-colors" data-color="orange"><i class="bi bi-clipboard text-orange-600 text-lg"></i></button>
+                                            <p class="text-2xl font-semibold text-gray-900 korean-text flex-grow">사이다 한병 주세요</p>
+                                        </div>
                                         <button class="speak-btn p-2 rounded-full" data-color="orange"><i class="bi bi-mic text-orange-600 text-xl"></i></button>
                                     </div>
                                     <p class="text-md text-gray-500 mb-3">saida hanbyeong juseyo</p>
@@ -720,6 +832,13 @@
                                     <i class="bi bi-play-circle-fill play-icon"></i>
                                 </a>
                             </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 phrase-card">
+                                <h3 class="text-xl font-bold text-indigo-700 mb-4 truncate">萬用旅行韓語聽力練習</h3>
+                                <a href="https://www.youtube.com/watch?v=UWg7VH38_Us" target="_blank" class="video-thumbnail aspect-w-16 aspect-h-9 block">
+                                    <img src="https://img.youtube.com/vi/UWg7VH38_Us/hqdefault.jpg" alt="影片封面" class="w-full h-full object-cover">
+                                    <i class="bi bi-play-circle-fill play-icon"></i>
+                                </a>
+                            </div>
                         </div>
                     </section>
                 </div>
@@ -741,6 +860,7 @@
             // --- 全域變數 ---
             const synth = window.speechSynthesis;
             const speakBtns = document.querySelectorAll('.speak-btn');
+            const copyBtns = document.querySelectorAll('.copy-btn');
             
             // 語音控制
             const voiceToggleContainer = document.getElementById('voice-toggle-container');
@@ -856,13 +976,37 @@
             speakBtns.forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const currentBtn = e.currentTarget;
-                    const text = currentBtn.closest('.flex').querySelector('.korean-text').textContent;
+                    const textContainer = currentBtn.closest('.flex.items-start.justify-between');
+                    const text = textContainer.querySelector('.korean-text').textContent;
                     speak(text, currentBtn);
                 });
             });
 
+            // --- 複製功能 ---
+            copyBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const currentBtn = e.currentTarget;
+                    const textToCopy = currentBtn.nextElementSibling.textContent;
+                    
+                    const textArea = document.createElement('textarea');
+                    textArea.value = textToCopy;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        const icon = currentBtn.querySelector('i');
+                        icon.classList.replace('bi-clipboard', 'bi-check2');
+                        setTimeout(() => {
+                            icon.classList.replace('bi-check2', 'bi-clipboard');
+                        }, 1500);
+                    } catch (err) {
+                        console.error('Fallback: Oops, unable to copy', err);
+                    }
+                    document.body.removeChild(textArea);
+                });
+            });
+
             // --- 導覽核心功能 ---
-            // 監聽 Carousel 滑動事件，以同步頂部選單
             carouselElement.addEventListener('slide.bs.carousel', event => {
                 window.scrollTo({ top: 0, behavior: 'instant' });
                 const newIndex = event.to;
@@ -874,12 +1018,11 @@
                 });
             });
             
-            // 頂部選單點擊事件
             allNavLinks.forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
                     const index = parseInt(e.currentTarget.dataset.index);
-                    carousel.to(index); // 使用 Bootstrap API 跳轉
+                    carousel.to(index);
                     const mobileMenu = document.getElementById('mobile-menu');
                      if (!mobileMenu.classList.contains('hidden')) {
                         mobileMenu.classList.add('hidden');
@@ -887,7 +1030,6 @@
                 });
             });
             
-            // 手機漢堡選單
             const menuBtn = document.getElementById('menu-btn');
             const mobileMenu = document.getElementById('mobile-menu');
             menuBtn.addEventListener('click', (event) => {
