@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI 配色方案展示</title>
+    <!-- iOS 主畫面 icon -->
+    <link rel="apple-touch-icon" href="./icon.png">
+    <!-- Favicon -->
+    <link rel="icon" href="./favicon.png">
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts 的 Inter 字體 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* 使用 Noto Sans TC 作為主要中文字體，Inter 作為英數字體 */
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        /* 簡易的 modal 淡入淡出效果 */
+        .modal-transition {
+            transition: opacity 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- 主容器 -->
+    <div class="container mx-auto px-4 py-12 md:py-20">
+
+        <!-- 頁面標題 -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900">UI 配色方案展示</h1>
+            <p class="mt-4 text-lg text-gray-600">結合專屬底色與 UI 元件，預覽最真實的視覺效果。</p>
+        </header>
+
+        <!-- 配色網格容器 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+
+            <!-- 區塊 1: 寧靜藍海 -->
+            <div class="p-8 space-y-6 rounded-2xl shadow-lg" style="background-color: #EBF4F8;">
+                <!-- 色票卡片 -->
+                <div class="bg-white rounded-2xl p-8">
+                    <h2 class="text-2xl font-bold" style="color: #0A2463;">1. 寧靜藍海</h2>
+                    <p class="mt-2 text-gray-600">專業、冷靜且值得信賴。</p>
+                    <div class="mt-6 grid grid-cols-3 sm:grid-cols-5 gap-4 text-center">
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #0A2463;"></div><p class="mt-2 text-sm font-medium">主色</p><p class="text-xs text-gray-500">#0A2463</p></div>
+                        <div><div class="w-full h-16 rounded-lg border" style="background-color: #F8F9FA;"></div><p class="mt-2 text-sm font-medium">輔助色</p><p class="text-xs text-gray-500">#F8F9FA</p></div>
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #3E92CC;"></div><p class="mt-2 text-sm font-medium">點綴色</p><p class="text-xs text-gray-500">#3E92CC</p></div>
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #212529;"></div><p class="mt-2 text-sm font-medium">文字</p><p class="text-xs text-gray-500">#212529</p></div>
+                        <div><div class="w-full h-16 rounded-lg border" style="background-color: #EBF4F8;"></div><p class="mt-2 text-sm font-medium">底色</p><p class="text-xs text-gray-500">#EBF4F8</p></div>
+                    </div>
+                </div>
+                <!-- UI 預覽 -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4" style="color: #0A2463;">UI 元素預覽</h3>
+                    <div class="space-y-4">
+                        <button data-modal-toggle="modal-1" class="w-full text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #0A2463;">取得配色代碼</button>
+                        <div class="p-6 rounded-lg" style="background-color: #F8F9FA;"><h4 class="font-bold" style="color: #212529;">這是一個內容區塊</h4><p class="mt-2" style="color: #212529;">您可以在這裡放置描述，並使用<a href="#" class="font-semibold underline" style="color: #3E92CC;">點綴色連結</a>。</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 區塊 2: 活力珊瑚 -->
+            <div class="p-8 space-y-6 rounded-2xl shadow-lg" style="background-color: #FFF8F0;">
+                <div class="bg-white rounded-2xl p-8">
+                    <h2 class="text-2xl font-bold" style="color: #FF6F61;">2. 活力珊瑚</h2>
+                    <p class="mt-2 text-gray-600">充滿活力與創意。</p>
+                    <div class="mt-6 grid grid-cols-3 sm:grid-cols-5 gap-4 text-center">
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #FF6F61;"></div><p class="mt-2 text-sm font-medium">主色</p><p class="text-xs text-gray-500">#FF6F61</p></div>
+                        <div><div class="w-full h-16 rounded-lg border" style="background-color: #FFF8F0;"></div><p class="mt-2 text-sm font-medium">輔助色</p><p class="text-xs text-gray-500">#FFF8F0</p></div>
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #FFD166;"></div><p class="mt-2 text-sm font-medium">點綴色</p><p class="text-xs text-gray-500">#FFD166</p></div>
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #4A251D;"></div><p class="mt-2 text-sm font-medium">文字</p><p class="text-xs text-gray-500">#4A251D</p></div>
+                        <div><div class="w-full h-16 rounded-lg border" style="background-color: #FFF8F0;"></div><p class="mt-2 text-sm font-medium">底色</p><p class="text-xs text-gray-500">#FFF8F0</p></div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4" style="color: #FF6F61;">UI 元素預覽</h3>
+                    <div class="space-y-4">
+                        <button data-modal-toggle="modal-2" class="w-full font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #FF6F61; color: #FFF8F0;">取得配色代碼</button>
+                        <div class="p-6 rounded-lg" style="background-color: #FFFFFF;"><h4 class="font-bold" style="color: #4A251D;">這是一個內容區塊</h4><p class="mt-2" style="color: #4A251D;">您可以在這裡放置描述，並使用<a href="#" class="font-semibold underline" style="color: #FF6F61;">主要顏色連結</a>。</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 區塊 3: 現代灰階 -->
+            <div class="p-8 space-y-6 rounded-2xl shadow-lg" style="background-color: #F1F5F9;">
+                <div class="bg-white rounded-2xl p-8">
+                    <h2 class="text-2xl font-bold" style="color: #2D3748;">3. 現代灰階</h2>
+                    <p class="mt-2 text-gray-600">簡約、專業，凸顯內容。</p>
+                    <div class="mt-6 grid grid-cols-3 sm:grid-cols-5 gap-4 text-center">
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #2D3748;"></div><p class="mt-2 text-sm font-medium">主色</p><p class="text-xs text-gray-500">#2D3748</p></div>
+                        <div><div class="w-full h-16 rounded-lg border" style="background-color: #F7FAFC;"></div><p class="mt-2 text-sm font-medium">輔助色</p><p class="text-xs text-gray-500">#F7FAFC</p></div>
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #48BB78;"></div><p class="mt-2 text-sm font-medium">點綴色</p><p class="text-xs text-gray-500">#48BB78</p></div>
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #1A202C;"></div><p class="mt-2 text-sm font-medium">文字</p><p class="text-xs text-gray-500">#1A202C</p></div>
+                        <div><div class="w-full h-16 rounded-lg border" style="background-color: #F1F5F9;"></div><p class="mt-2 text-sm font-medium">底色</p><p class="text-xs text-gray-500">#F1F5F9</p></div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4" style="color: #2D3748;">UI 元素預覽</h3>
+                    <div class="space-y-4">
+                        <button data-modal-toggle="modal-3" class="w-full text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #2D3748;">取得配色代碼</button>
+                        <div class="p-6 rounded-lg" style="background-color: #F7FAFC;"><h4 class="font-bold" style="color: #1A202C;">這是一個內容區塊</h4><p class="mt-2" style="color: #1A202C;">您可以在這裡放置描述，並使用<a href="#" class="font-semibold underline" style="color: #48BB78;">點綴色連結</a>。</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 區塊 4: 森林之息 -->
+            <div class="p-8 space-y-6 rounded-2xl shadow-lg" style="background-color: #E8EAE3;">
+                <div class="bg-white rounded-2xl p-8">
+                    <h2 class="text-2xl font-bold" style="color: #2F4858;">4. 森林之息</h2>
+                    <p class="mt-2 text-gray-600">自然、沉穩、健康。</p>
+                    <div class="mt-6 grid grid-cols-3 sm:grid-cols-5 gap-4 text-center">
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #2F4858;"></div><p class="mt-2 text-sm font-medium">主色</p><p class="text-xs text-gray-500">#2F4858</p></div>
+                        <div><div class="w-full h-16 rounded-lg border" style="background-color: #FFFFFF;"></div><p class="mt-2 text-sm font-medium">輔助色</p><p class="text-xs text-gray-500">#FFFFFF</p></div>
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #B07D62;"></div><p class="mt-2 text-sm font-medium">點綴色</p><p class="text-xs text-gray-500">#B07D62</p></div>
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #362419;"></div><p class="mt-2 text-sm font-medium">文字</p><p class="text-xs text-gray-500">#362419</p></div>
+                        <div><div class="w-full h-16 rounded-lg border" style="background-color: #E8EAE3;"></div><p class="mt-2 text-sm font-medium">底色</p><p class="text-xs text-gray-500">#E8EAE3</p></div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4" style="color: #2F4858;">UI 元素預覽</h3>
+                    <div class="space-y-4">
+                        <button data-modal-toggle="modal-4" class="w-full font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #2F4858; color: #E8EAE3;">取得配色代碼</button>
+                        <div class="p-6 rounded-lg bg-white"><h4 class="font-bold" style="color: #362419;">這是一個內容區塊</h4><p class="mt-2" style="color: #362419;">您可以在這裡放置描述，並使用<a href="#" class="font-semibold underline" style="color: #B07D62;">點綴色連結</a>。</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 區塊 5: 科技霓虹 -->
+            <div class="p-8 space-y-6 rounded-2xl shadow-lg" style="background-color: #111827;">
+                <div class="bg-gray-900 border border-gray-700 rounded-2xl p-8">
+                    <h2 class="text-2xl font-bold" style="color: #EC4899;">5. 科技霓虹</h2>
+                    <p class="mt-2 text-gray-400">現代、前衛、具未來感。</p>
+                    <div class="mt-6 grid grid-cols-3 sm:grid-cols-5 gap-4 text-center text-gray-300">
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #1A202C;"></div><p class="mt-2 text-sm font-medium">主色</p><p class="text-xs text-gray-500">#1A202C</p></div>
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #2D3748;"></div><p class="mt-2 text-sm font-medium">輔助色</p><p class="text-xs text-gray-500">#2D3748</p></div>
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #EC4899;"></div><p class="mt-2 text-sm font-medium">點綴色</p><p class="text-xs text-gray-500">#EC4899</p></div>
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #F7FAFC;"></div><p class="mt-2 text-sm font-medium">文字</p><p class="text-xs text-gray-500">#F7FAFC</p></div>
+                        <div><div class="w-full h-16 rounded-lg border border-gray-700" style="background-color: #111827;"></div><p class="mt-2 text-sm font-medium">底色</p><p class="text-xs text-gray-500">#111827</p></div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4" style="color: #EC4899;">UI 元素預覽</h3>
+                    <div class="space-y-4">
+                        <button data-modal-toggle="modal-5" class="w-full font-bold py-3 px-4 rounded-lg shadow-lg transition-transform transform hover:scale-105" style="background-color: #EC4899; color: #111827;">取得配色代碼</button>
+                        <div class="p-6 rounded-lg" style="background-color: #1F2937;"><h4 class="font-bold" style="color: #F7FAFC;">這是一個內容區塊</h4><p class="mt-2" style="color: #F7FAFC;">您可以在這裡放置描述，並使用<a href="#" class="font-semibold underline" style="color: #EC4899;">霓虹色連結</a>。</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 區塊 6: 夢幻馬卡龍 -->
+            <div class="p-8 space-y-6 rounded-2xl shadow-lg" style="background-color: #F5F3FF;">
+                <div class="bg-white rounded-2xl p-8">
+                    <h2 class="text-2xl font-bold" style="color: #5B21B6;">6. 夢幻馬卡龍</h2>
+                    <p class="mt-2 text-gray-600">溫柔、甜美、富有童趣。</p>
+                    <div class="mt-6 grid grid-cols-3 sm:grid-cols-5 gap-4 text-center">
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #D6BCFA;"></div><p class="mt-2 text-sm font-medium">主色</p><p class="text-xs text-gray-500">#D6BCFA</p></div>
+                        <div><div class="w-full h-16 rounded-lg border" style="background-color: #FEFBF6;"></div><p class="mt-2 text-sm font-medium">輔助色</p><p class="text-xs text-gray-500">#FEFBF6</p></div>
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #A7F3D0;"></div><p class="mt-2 text-sm font-medium">點綴色</p><p class="text-xs text-gray-500">#A7F3D0</p></div>
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #5B21B6;"></div><p class="mt-2 text-sm font-medium">文字</p><p class="text-xs text-gray-500">#5B21B6</p></div>
+                        <div><div class="w-full h-16 rounded-lg border" style="background-color: #F5F3FF;"></div><p class="mt-2 text-sm font-medium">底色</p><p class="text-xs text-gray-500">#F5F3FF</p></div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4" style="color: #5B21B6;">UI 元素預覽</h3>
+                    <div class="space-y-4">
+                        <button data-modal-toggle="modal-6" class="w-full font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #D6BCFA; color: #5B21B6;">取得配色代碼</button>
+                        <div class="p-6 rounded-lg" style="background-color: #FEFBF6;"><h4 class="font-bold" style="color: #5B21B6;">這是一個內容區塊</h4><p class="mt-2" style="color: #5B21B6;">您可以在這裡放置描述，並使用<a href="#" class="font-semibold underline" style="color: #A7F3D0;">點綴色連結</a>。</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 區塊 7: 奢華金箔 -->
+            <div class="p-8 space-y-6 rounded-2xl shadow-lg" style="background-color: #FDFBF5;">
+                <div class="bg-white rounded-2xl p-8">
+                    <h2 class="text-2xl font-bold" style="color: #B8860B;">7. 奢華金箔</h2>
+                    <p class="mt-2 text-gray-600">高貴、典雅、精緻。</p>
+                    <div class="mt-6 grid grid-cols-3 sm:grid-cols-5 gap-4 text-center">
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #111111;"></div><p class="mt-2 text-sm font-medium">主色</p><p class="text-xs text-gray-500">#111111</p></div>
+                        <div><div class="w-full h-16 rounded-lg border" style="background-color: #F8F8F8;"></div><p class="mt-2 text-sm font-medium">輔助色</p><p class="text-xs text-gray-500">#F8F8F8</p></div>
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #B8860B;"></div><p class="mt-2 text-sm font-medium">點綴色</p><p class="text-xs text-gray-500">#B8860B</p></div>
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #111111;"></div><p class="mt-2 text-sm font-medium">文字</p><p class="text-xs text-gray-500">#111111</p></div>
+                        <div><div class="w-full h-16 rounded-lg border" style="background-color: #FDFBF5;"></div><p class="mt-2 text-sm font-medium">底色</p><p class="text-xs text-gray-500">#FDFBF5</p></div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4" style="color: #B8860B;">UI 元素預覽</h3>
+                    <div class="space-y-4">
+                        <button data-modal-toggle="modal-7" class="w-full font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #111111; color: #B8860B;">取得配色代碼</button>
+                        <div class="p-6 rounded-lg" style="background-color: #F8F8F8;"><h4 class="font-bold" style="color: #111111;">這是一個內容區塊</h4><p class="mt-2" style="color: #111111;">您可以在這裡放置描述，並使用<a href="#" class="font-semibold underline" style="color: #B8860B;">金色連結</a>。</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 區塊 8: 復古時光 -->
+            <div class="p-8 space-y-6 rounded-2xl shadow-lg" style="background-color: #FDF6E3;">
+                <div class="bg-white rounded-2xl p-8">
+                    <h2 class="text-2xl font-bold" style="color: #C05621;">8. 復古時光</h2>
+                    <p class="mt-2 text-gray-600">懷舊、溫暖、具人文氣息。</p>
+                    <div class="mt-6 grid grid-cols-3 sm:grid-cols-5 gap-4 text-center">
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #C05621;"></div><p class="mt-2 text-sm font-medium">主色</p><p class="text-xs text-gray-500">#C05621</p></div>
+                        <div><div class="w-full h-16 rounded-lg border" style="background-color: #FFFFFF;"></div><p class="mt-2 text-sm font-medium">輔助色</p><p class="text-xs text-gray-500">#FFFFFF</p></div>
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #319795;"></div><p class="mt-2 text-sm font-medium">點綴色</p><p class="text-xs text-gray-500">#319795</p></div>
+                        <div><div class="w-full h-16 rounded-lg" style="background-color: #422D20;"></div><p class="mt-2 text-sm font-medium">文字</p><p class="text-xs text-gray-500">#422D20</p></div>
+                        <div><div class="w-full h-16 rounded-lg border" style="background-color: #FDF6E3;"></div><p class="mt-2 text-sm font-medium">底色</p><p class="text-xs text-gray-500">#FDF6E3</p></div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4" style="color: #C05621;">UI 元素預覽</h3>
+                    <div class="space-y-4">
+                        <button data-modal-toggle="modal-8" class="w-full font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #C05621; color: #FDF6E3;">取得配色代碼</button>
+                        <div class="p-6 rounded-lg bg-white"><h4 class="font-bold" style="color: #422D20;">這是一個內容區塊</h4><p class="mt-2" style="color: #422D20;">您可以在這裡放置描述，並使用<a href="#" class="font-semibold underline" style="color: #319795;">藍綠色連結</a>。</p></div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- 網格結束 -->
+
+    </div> <!-- 容器結束 -->
+
+    <!-- Modals (彈出視窗) -->
+    <!-- Modal 1: 寧靜藍海 -->
+    <div id="modal-1" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50 modal-transition">
+        <div class="w-full max-w-md mx-auto">
+            <div class="rounded-2xl shadow-2xl flex flex-col" style="background-color: #F8F9FA;">
+                <div class="flex justify-between items-center p-5 border-b" style="border-color: #EBF4F8;">
+                    <h3 class="text-xl font-bold" style="color: #0A2463;">配色: 寧靜藍海</h3>
+                    <button data-modal-close="modal-1" class="text-gray-400 hover:text-gray-600 transition text-3xl font-light">&times;</button>
+                </div>
+                <div class="p-5">
+                    <p class="text-sm mb-2" style="color: #212529;">複製下方的文字，直接貼給 AI 使用：</p>
+                    <textarea readonly id="palette-text-1" class="w-full h-36 p-3 bg-gray-100 rounded-lg text-sm font-mono whitespace-pre" style="background-color: #EBF4F8; color: #212529; resize: none;">UI Palette: "寧靜藍海"
+- Background: #EBF4F8
+- Primary: #0A2463
+- Secondary: #F8F9FA
+- Accent: #3E92CC
+- Text: #212529</textarea>
+                </div>
+                <div class="flex justify-end items-center gap-4 p-5 bg-white rounded-b-2xl">
+                    <button data-copy-target="palette-text-1" class="font-bold py-2 px-5 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #3E92CC; color: white;">複製文字</button>
+                    <button data-modal-close="modal-1" class="font-bold py-2 px-5 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #0A2463; color: white;">關閉</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal 2: 活力珊瑚 -->
+    <div id="modal-2" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50 modal-transition">
+        <div class="w-full max-w-md mx-auto">
+            <div class="rounded-2xl shadow-2xl flex flex-col bg-white">
+                <div class="flex justify-between items-center p-5 border-b" style="border-color: #FFF8F0;">
+                    <h3 class="text-xl font-bold" style="color: #FF6F61;">配色: 活力珊瑚</h3>
+                    <button data-modal-close="modal-2" class="text-gray-400 hover:text-gray-600 transition text-3xl font-light">&times;</button>
+                </div>
+                <div class="p-5">
+                    <p class="text-sm mb-2" style="color: #4A251D;">複製下方的文字，直接貼給 AI 使用：</p>
+                    <textarea readonly id="palette-text-2" class="w-full h-36 p-3 rounded-lg text-sm font-mono whitespace-pre" style="background-color: #FFF8F0; color: #4A251D; resize: none;">UI Palette: "活力珊瑚"
+- Background: #FFF8F0
+- Primary: #FF6F61
+- Secondary: #FFFFFF
+- Accent: #FFD166
+- Text: #4A251D</textarea>
+                </div>
+                <div class="flex justify-end items-center gap-4 p-5 bg-white rounded-b-2xl border-t" style="border-color: #FFF8F0;">
+                    <button data-copy-target="palette-text-2" class="font-bold py-2 px-5 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #FFD166; color: #4A251D;">複製文字</button>
+                    <button data-modal-close="modal-2" class="font-bold py-2 px-5 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #FF6F61; color: white;">關閉</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal 3: 現代灰階 -->
+    <div id="modal-3" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50 modal-transition">
+        <div class="w-full max-w-md mx-auto">
+            <div class="rounded-2xl shadow-2xl flex flex-col" style="background-color: #F7FAFC;">
+                <div class="flex justify-between items-center p-5 border-b" style="border-color: #F1F5F9;">
+                    <h3 class="text-xl font-bold" style="color: #2D3748;">配色: 現代灰階</h3>
+                    <button data-modal-close="modal-3" class="text-gray-400 hover:text-gray-600 transition text-3xl font-light">&times;</button>
+                </div>
+                <div class="p-5">
+                    <p class="text-sm mb-2" style="color: #1A202C;">複製下方的文字，直接貼給 AI 使用：</p>
+                    <textarea readonly id="palette-text-3" class="w-full h-36 p-3 rounded-lg text-sm font-mono whitespace-pre" style="background-color: #F1F5F9; color: #1A202C; resize: none;">UI Palette: "現代灰階"
+- Background: #F1F5F9
+- Primary: #2D3748
+- Secondary: #F7FAFC
+- Accent: #48BB78
+- Text: #1A202C</textarea>
+                </div>
+                <div class="flex justify-end items-center gap-4 p-5 bg-white rounded-b-2xl">
+                    <button data-copy-target="palette-text-3" class="font-bold py-2 px-5 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #48BB78; color: white;">複製文字</button>
+                    <button data-modal-close="modal-3" class="font-bold py-2 px-5 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #2D3748; color: white;">關閉</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 4: 森林之息 -->
+    <div id="modal-4" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50 modal-transition">
+        <div class="w-full max-w-md mx-auto">
+            <div class="rounded-2xl shadow-2xl flex flex-col bg-white">
+                <div class="flex justify-between items-center p-5 border-b" style="border-color: #E8EAE3;">
+                    <h3 class="text-xl font-bold" style="color: #2F4858;">配色: 森林之息</h3>
+                    <button data-modal-close="modal-4" class="text-gray-400 hover:text-gray-600 transition text-3xl font-light">&times;</button>
+                </div>
+                <div class="p-5">
+                    <p class="text-sm mb-2" style="color: #362419;">複製下方的文字，直接貼給 AI 使用：</p>
+                    <textarea readonly id="palette-text-4" class="w-full h-36 p-3 rounded-lg text-sm font-mono whitespace-pre" style="background-color: #E8EAE3; color: #362419; resize: none;">UI Palette: "森林之息"
+- Background: #E8EAE3
+- Primary: #2F4858
+- Secondary: #FFFFFF
+- Accent: #B07D62
+- Text: #362419</textarea>
+                </div>
+                <div class="flex justify-end items-center gap-4 p-5 bg-white rounded-b-2xl border-t" style="border-color: #E8EAE3;">
+                    <button data-copy-target="palette-text-4" class="font-bold py-2 px-5 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #B07D62; color: white;">複製文字</button>
+                    <button data-modal-close="modal-4" class="font-bold py-2 px-5 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #2F4858; color: #E8EAE3;">關閉</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal 5: 科技霓虹 -->
+    <div id="modal-5" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 hidden z-50 modal-transition">
+        <div class="w-full max-w-md mx-auto">
+            <div class="rounded-2xl shadow-2xl flex flex-col border border-gray-700" style="background-color: #1F2937;">
+                <div class="flex justify-between items-center p-5 border-b" style="border-color: #2D3748;">
+                    <h3 class="text-xl font-bold" style="color: #EC4899;">配色: 科技霓虹</h3>
+                    <button data-modal-close="modal-5" class="text-gray-500 hover:text-gray-300 transition text-3xl font-light">&times;</button>
+                </div>
+                <div class="p-5">
+                    <p class="text-sm mb-2" style="color: #F7FAFC;">複製下方的文字，直接貼給 AI 使用：</p>
+                    <textarea readonly id="palette-text-5" class="w-full h-36 p-3 rounded-lg text-sm font-mono whitespace-pre" style="background-color: #111827; color: #F7FAFC; resize: none; border-color: #2D3748;">UI Palette: "科技霓虹"
+- Background: #111827
+- Primary: #1A202C
+- Secondary: #2D3748
+- Accent: #EC4899
+- Text: #F7FAFC</textarea>
+                </div>
+                <div class="flex justify-end items-center gap-4 p-5 border-t" style="border-color: #2D3748;">
+                    <button data-copy-target="palette-text-5" class="font-bold py-2 px-5 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #EC4899; color: #111827;">複製文字</button>
+                    <button data-modal-close="modal-5" class="font-bold py-2 px-5 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #2D3748; color: #F7FAFC;">關閉</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 6: 夢幻馬卡龍 -->
+    <div id="modal-6" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50 modal-transition">
+        <div class="w-full max-w-md mx-auto">
+            <div class="rounded-2xl shadow-2xl flex flex-col" style="background-color: #FEFBF6;">
+                <div class="flex justify-between items-center p-5 border-b" style="border-color: #F5F3FF;">
+                    <h3 class="text-xl font-bold" style="color: #5B21B6;">配色: 夢幻馬卡龍</h3>
+                    <button data-modal-close="modal-6" class="text-gray-400 hover:text-gray-600 transition text-3xl font-light">&times;</button>
+                </div>
+                <div class="p-5">
+                    <p class="text-sm mb-2" style="color: #5B21B6;">複製下方的文字，直接貼給 AI 使用：</p>
+                    <textarea readonly id="palette-text-6" class="w-full h-36 p-3 rounded-lg text-sm font-mono whitespace-pre" style="background-color: #F5F3FF; color: #5B21B6; resize: none;">UI Palette: "夢幻馬卡龍"
+- Background: #F5F3FF
+- Primary: #D6BCFA
+- Secondary: #FEFBF6
+- Accent: #A7F3D0
+- Text: #5B21B6</textarea>
+                </div>
+                <div class="flex justify-end items-center gap-4 p-5 bg-white rounded-b-2xl">
+                    <button data-copy-target="palette-text-6" class="font-bold py-2 px-5 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #A7F3D0; color: #5B21B6;">複製文字</button>
+                    <button data-modal-close="modal-6" class="font-bold py-2 px-5 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #D6BCFA; color: #5B21B6;">關閉</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal 7: 奢華金箔 -->
+    <div id="modal-7" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50 modal-transition">
+        <div class="w-full max-w-md mx-auto">
+            <div class="rounded-2xl shadow-2xl flex flex-col" style="background-color: #F8F8F8;">
+                <div class="flex justify-between items-center p-5 border-b" style="border-color: #FDFBF5;">
+                    <h3 class="text-xl font-bold" style="color: #B8860B;">配色: 奢華金箔</h3>
+                    <button data-modal-close="modal-7" class="text-gray-400 hover:text-gray-600 transition text-3xl font-light">&times;</button>
+                </div>
+                <div class="p-5">
+                    <p class="text-sm mb-2" style="color: #111111;">複製下方的文字，直接貼給 AI 使用：</p>
+                    <textarea readonly id="palette-text-7" class="w-full h-36 p-3 rounded-lg text-sm font-mono whitespace-pre" style="background-color: #FDFBF5; color: #111111; resize: none;">UI Palette: "奢華金箔"
+- Background: #FDFBF5
+- Primary: #111111
+- Secondary: #F8F8F8
+- Accent: #B8860B
+- Text: #111111</textarea>
+                </div>
+                <div class="flex justify-end items-center gap-4 p-5 bg-white rounded-b-2xl">
+                    <button data-copy-target="palette-text-7" class="font-bold py-2 px-5 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #B8860B; color: white;">複製文字</button>
+                    <button data-modal-close="modal-7" class="font-bold py-2 px-5 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #111111; color: #B8860B;">關閉</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal 8: 復古時光 -->
+    <div id="modal-8" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50 modal-transition">
+        <div class="w-full max-w-md mx-auto">
+            <div class="rounded-2xl shadow-2xl flex flex-col bg-white">
+                <div class="flex justify-between items-center p-5 border-b" style="border-color: #FDF6E3;">
+                    <h3 class="text-xl font-bold" style="color: #C05621;">配色: 復古時光</h3>
+                    <button data-modal-close="modal-8" class="text-gray-400 hover:text-gray-600 transition text-3xl font-light">&times;</button>
+                </div>
+                <div class="p-5">
+                    <p class="text-sm mb-2" style="color: #422D20;">複製下方的文字，直接貼給 AI 使用：</p>
+                    <textarea readonly id="palette-text-8" class="w-full h-36 p-3 rounded-lg text-sm font-mono whitespace-pre" style="background-color: #FDF6E3; color: #422D20; resize: none;">UI Palette: "復古時光"
+- Background: #FDF6E3
+- Primary: #C05621
+- Secondary: #FFFFFF
+- Accent: #319795
+- Text: #422D20</textarea>
+                </div>
+                <div class="flex justify-end items-center gap-4 p-5 bg-white rounded-b-2xl border-t" style="border-color: #FDF6E3;">
+                    <button data-copy-target="palette-text-8" class="font-bold py-2 px-5 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #319795; color: white;">複製文字</button>
+                    <button data-modal-close="modal-8" class="font-bold py-2 px-5 rounded-lg shadow-md transition-transform transform hover:scale-105" style="background-color: #C05621; color: #FDF6E3;">關閉</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Modal Toggling ---
+            const openModalButtons = document.querySelectorAll('[data-modal-toggle]');
+            openModalButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const modalId = button.getAttribute('data-modal-toggle');
+                    const modal = document.getElementById(modalId);
+                    if (modal) {
+                        modal.classList.remove('hidden');
+                        modal.classList.remove('opacity-0');
+                    }
+                });
+            });
+
+            // --- Closing Modals ---
+            const closeModalElements = document.querySelectorAll('[data-modal-close]');
+            closeModalElements.forEach(element => {
+                element.addEventListener('click', () => {
+                    const modal = element.closest('.fixed.inset-0');
+                    if (modal) {
+                         modal.classList.add('hidden');
+                    }
+                });
+            });
+
+            // --- Close on backdrop click ---
+            const modals = document.querySelectorAll('.fixed.inset-0');
+            modals.forEach(modal => {
+                modal.addEventListener('click', (event) => {
+                    // event.currentTarget is the modal background
+                    // event.target is the element that was clicked
+                    if (event.target === event.currentTarget) {
+                        modal.classList.add('hidden');
+                    }
+                });
+            });
+
+            // --- Copy to Clipboard ---
+            const copyButtons = document.querySelectorAll('[data-copy-target]');
+            copyButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.getAttribute('data-copy-target');
+                    const textElement = document.getElementById(targetId);
+                    
+                    if (textElement) {
+                        // Use the Clipboard API for modern browsers
+                        navigator.clipboard.writeText(textElement.value).then(() => {
+                            const originalText = button.textContent;
+                            button.textContent = '已複製!';
+                            button.disabled = true;
+                            setTimeout(() => {
+                                button.textContent = originalText;
+                                button.disabled = false;
+                            }, 2000);
+                        }).catch(err => {
+                            console.error('無法複製文字: ', err);
+                            // Fallback for older browsers
+                            try {
+                                textElement.select();
+                                document.execCommand('copy');
+                                const originalText = button.textContent;
+                                button.textContent = '已複製!';
+                                button.disabled = true;
+                                setTimeout(() => {
+                                    button.textContent = originalText;
+                                    button.disabled = false;
+                                }, 2000);
+                            } catch (e) {
+                                console.error('Fallback copy failed:', e)
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
+
