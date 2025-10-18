@@ -190,7 +190,7 @@
     </div>
 
     <footer class="fixed-bottom bg-dark text-white text-center py-1 d-flex justify-content-center align-items-center">
-        <small>程式最後更新：2025-08-29 11:26:00</small>
+        <small>程式最後更新：2025-10-18 16:40:00</small>
         <button class="btn btn-sm btn-outline-light ms-2" onclick="forceUpdateAndReload();" style="padding: 0.1rem 0.4rem; font-size: 0.8rem;" title="檢查更新並重新載入">
             <i class="bi bi-arrow-clockwise"></i>
         </button>
@@ -360,7 +360,8 @@
         }
 
         function handleEpisodeClick(seriesId, sourceId, episodeId) {
-            window.open(`https://gimy.ai/eps/${seriesId}-${sourceId}-${episodeId}.html`, '_blank');
+            //window.open(`https://gimy.ai/eps/${seriesId}-${sourceId}-${episodeId}.html`, '_blank');
+            window.open(`https://play.777tv.ai/vod/play/id/${seriesId}/sid/${sourceId}/nid/${episodeId}.html`, '_blank');
             const payload = { action: 'updateWatchStatus', userId: appState.currentUser.userId, seriesId, sourceId, episodeId };
             
             const statusId = `${appState.currentUser.userId}_${seriesId}`;
