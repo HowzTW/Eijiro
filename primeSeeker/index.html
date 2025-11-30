@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>質數計算器 | Prime Number Calculator</title>
+  <meta name="description" content="輸入正整數，快速計算大於該數的三個最接近質數。簡單易用的數學工具。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+      width: 100%;
+      max-width: 640px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .card-header {
+      padding: 1.5rem 1.5rem 0;
+      text-align: center;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .icon {
+      width: 32px;
+      height: 32px;
+      color: #3b82f6;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .description {
+      color: #64748b;
+      font-size: 1rem;
+    }
+
+    .card-content {
+      padding: 1.5rem;
+    }
+
+    .input-section {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+      color: #374151;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      min-width: 150px;
+      padding: 0.625rem 0.875rem;
+      font-size: 1.125rem;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    button {
+      padding: 0.625rem 1.25rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+      border: none;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background-color: #3b82f6;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #2563eb;
+    }
+
+    .btn-primary:disabled {
+      background-color: #93c5fd;
+      cursor: not-allowed;
+    }
+
+    .btn-outline {
+      background-color: white;
+      color: #374151;
+      border: 1px solid #d1d5db;
+    }
+
+    .btn-outline:hover {
+      background-color: #f9fafb;
+    }
+
+    .error-alert {
+      display: none;
+      padding: 0.875rem 1rem;
+      background-color: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 6px;
+      color: #dc2626;
+      font-size: 0.875rem;
+      margin-bottom: 1.5rem;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .error-alert.show {
+      display: flex;
+    }
+
+    .error-icon {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    .results-section {
+      display: none;
+    }
+
+    .results-section.show {
+      display: block;
+    }
+
+    .results-label {
+      text-align: center;
+      font-size: 0.875rem;
+      color: #64748b;
+      margin-bottom: 1rem;
+    }
+
+    .results-label span {
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .primes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 480px) {
+      .primes-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .prime-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+
+    .prime-label {
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-bottom: 0.25rem;
+    }
+
+    .prime-number {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #3b82f6;
+    }
+
+    .footer {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e2e8f0;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-header">
+      <div class="title-row">
+        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="16" height="20" x="4" y="2" rx="2"/>
+          <line x1="8" x2="16" y1="6" y2="6"/>
+          <line x1="16" x2="16" y1="14" y2="18"/>
+          <path d="M16 10h.01"/>
+          <path d="M12 10h.01"/>
+          <path d="M8 10h.01"/>
+          <path d="M12 14h.01"/>
+          <path d="M8 14h.01"/>
+          <path d="M12 18h.01"/>
+          <path d="M8 18h.01"/>
+        </svg>
+        <h1>質數計算器</h1>
+      </div>
+      <p class="description">輸入正整數，計算大於該數的三個最接近質數</p>
+    </div>
+    
+    <div class="card-content">
+      <div class="input-section">
+        <label for="number-input">輸入正整數</label>
+        <div class="input-row">
+          <input type="text" id="number-input" inputmode="numeric" placeholder="例如：10" autofocus>
+          <button class="btn-primary" id="calculate-btn">計算質數</button>
+          <button class="btn-outline" id="clear-btn">清除</button>
+        </div>
+      </div>
+
+      <div class="error-alert" id="error-alert">
+        <svg class="error-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" x2="12" y1="8" y2="12"/>
+          <line x1="12" x2="12.01" y1="16" y2="16"/>
+        </svg>
+        <span id="error-message"></span>
+      </div>
+
+      <div class="results-section" id="results-section">
+        <p class="results-label">大於 <span id="input-display"></span> 的三個最接近質數：</p>
+        <div class="primes-grid">
+          <div class="prime-card">
+            <p class="prime-label">第 1 個質數</p>
+            <p class="prime-number" id="prime-1"></p>
+          </div>
+          <div class="prime-card">
+            <p class="prime-label">第 2 個質數</p>
+            <p class="prime-number" id="prime-2"></p>
+          </div>
+          <div class="prime-card">
+            <p class="prime-label">第 3 個質數</p>
+            <p class="prime-number" id="prime-3"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>質數是只能被 1 和自身整除的正整數（大於 1）</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function isPrime(num) {
+      if (num < 2) return false;
+      if (num === 2) return true;
+      if (num % 2 === 0) return false;
+      for (let i = 3; i <= Math.sqrt(num); i += 2) {
+        if (num % i === 0) return false;
+      }
+      return true;
+    }
+
+    function findNextPrimes(start, count) {
+      const primes = [];
+      let current = start + 1;
+      while (primes.length < count) {
+        if (isPrime(current)) {
+          primes.push(current);
+        }
+        current++;
+      }
+      return primes;
+    }
+
+    function formatNumber(num) {
+      return num.toLocaleString('zh-TW');
+    }
+
+    const input = document.getElementById('number-input');
+    const calculateBtn = document.getElementById('calculate-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const errorAlert = document.getElementById('error-alert');
+    const errorMessage = document.getElementById('error-message');
+    const resultsSection = document.getElementById('results-section');
+    const inputDisplay = document.getElementById('input-display');
+    const prime1 = document.getElementById('prime-1');
+    const prime2 = document.getElementById('prime-2');
+    const prime3 = document.getElementById('prime-3');
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorAlert.classList.add('show');
+      resultsSection.classList.remove('show');
+    }
+
+    function hideError() {
+      errorAlert.classList.remove('show');
+    }
+
+    function showResults(inputNum, primes) {
+      inputDisplay.textContent = formatNumber(inputNum);
+      prime1.textContent = formatNumber(primes[0]);
+      prime2.textContent = formatNumber(primes[1]);
+      prime3.textContent = formatNumber(primes[2]);
+      resultsSection.classList.add('show');
+    }
+
+    function hideResults() {
+      resultsSection.classList.remove('show');
+    }
+
+    function validateAndCalculate() {
+      hideError();
+      hideResults();
+
+      const trimmed = input.value.trim();
+
+      if (trimmed === '') {
+        showError('請輸入一個數字');
+        return;
+      }
+
+      if (!/^-?\d+(\.\d+)?$/.test(trimmed)) {
+        showError('請輸入有效的數字');
+        return;
+      }
+
+      const num = parseFloat(trimmed);
+
+      if (!Number.isFinite(num)) {
+        showError('數值超出範圍');
+        return;
+      }
+
+      if (!Number.isInteger(num)) {
+        showError('請輸入整數，不接受小數');
+        return;
+      }
+
+      if (num <= 0) {
+        showError('請輸入正整數（大於 0 的整數）');
+        return;
+      }
+
+      if (num > Number.MAX_SAFE_INTEGER) {
+        showError('數值過大，請輸入較小的正整數');
+        return;
+      }
+
+      calculateBtn.disabled = true;
+      calculateBtn.innerHTML = '<span class="spinner"></span>';
+
+      setTimeout(() => {
+        const primes = findNextPrimes(num, 3);
+        showResults(num, primes);
+        calculateBtn.disabled = false;
+        calculateBtn.textContent = '計算質數';
+      }, 300);
+    }
+
+    function clearAll() {
+      input.value = '';
+      hideError();
+      hideResults();
+      input.focus();
+    }
+
+    calculateBtn.addEventListener('click', validateAndCalculate);
+    clearBtn.addEventListener('click', clearAll);
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        validateAndCalculate();
+      }
+    });
+  </script>
+</body>
+</html>
