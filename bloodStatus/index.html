@@ -189,6 +189,13 @@
             appearance: none;
             min-width: 0;
             /* Allow shrinking in flex entries */
+            color: var(--dark);
+            -webkit-text-fill-color: var(--dark);
+            /* Force color on iOS */
+            text-align: left;
+            /* Force left alignment */
+            opacity: 1;
+            /* Fix disabled-like appearance on some iOS */
         }
 
         input:focus {
