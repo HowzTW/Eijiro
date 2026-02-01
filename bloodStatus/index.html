@@ -175,13 +175,20 @@
         input[type="date"],
         input[type="time"] {
             width: 100%;
-            padding: 12px 15px;
+            padding: 12px 10px;
+            /* Reduced side padding slightly */
             border: 2px solid #E0E0E0;
             border-radius: 12px;
-            font-size: 1.1rem;
+            font-size: 1rem;
+            /* Standard size to prevent zoom and sizing issues */
             outline: none;
             transition: border-color 0.2s;
             background-color: #FAFAFA;
+            /* iOS Fixes */
+            -webkit-appearance: none;
+            appearance: none;
+            min-width: 0;
+            /* Allow shrinking in flex entries */
         }
 
         input:focus {
@@ -192,10 +199,15 @@
         .row {
             display: flex;
             gap: 15px;
+            flex-wrap: wrap;
+            /* Allow wrapping on small screens */
         }
 
         .row .form-group {
-            flex: 1;
+            flex: 1 1 140px;
+            /* Grow, Shrink, Basis 140px (min width before wrapping) */
+            min-width: 0;
+            /* CSS Grid/Flex hack for inputs */
         }
 
         button.primary-btn {
