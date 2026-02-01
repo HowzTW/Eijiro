@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>血壓紀錄小幫手</title>
+    <!-- Chart.js for trends -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Fredoka:wght@400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --dark: #2C3E50;
+            --light: #F7F9FC;
+            --white: #FFFFFF;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --radius: 16px;
+            --nav-height: 70px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            /* Prevent body scroll, handle in views */
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary), #FF8E8E);
+            color: var(--white);
+            padding: 15px 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        /* Main Container */
+        main {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            max-width: 600px;
+            /* Tablet/Desktop limit */
+            margin: 0 auto;
+        }
+
+        /* Views */
+        .view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+            padding-bottom: calc(var(--nav-height) + 20px);
+            opacity: 0;
+            transform: translateX(20px);
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            background-color: var(--light);
+        }
+
+        .view.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+            z-index: 1;
+        }
+
+        /* Navigation */
+        nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: var(--nav-height);
+            background: var(--white);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.05);
+            z-index: 20;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #95A5A6;
+            text-decoration: none;
+            font-size: 0.8rem;
+            width: 33%;
+            height: 100%;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .nav-item i {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+
+        /* === INPUT VIEW === */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        input[type="number"],
+        input[type="date"],
+        input[type="time"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #E0E0E0;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            outline: none;
+            transition: border-color 0.2s;
+            background-color: #FAFAFA;
+        }
+
+        input:focus {
+            border-color: var(--secondary);
+            background-color: var(--white);
+        }
+
+        .row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .row .form-group {
+            flex: 1;
+        }
+
+        button.primary-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--secondary), #20B2AA);
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(78, 205, 196, 0.3);
+            transition: transform 0.1s;
+        }
+
+        button.primary-btn:active {
+            transform: scale(0.98);
+        }
+
+        button.primary-btn:disabled {
+            background: #CCCCCC;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* === HISTORY VIEW === */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .record-item {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid var(--secondary);
+        }
+
+        .record-item.high {
+            border-left-color: var(--primary);
+        }
+
+        .record-info {
+            flex: 1;
+        }
+
+        .record-date {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .record-values {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .record-values span {
+            margin-right: 15px;
+        }
+
+        .record-values .pulse {
+            color: #888;
+            font-size: 0.9rem;
+            font-weight: normal;
+        }
+
+        .record-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .edit-btn {
+            background-color: #ECF0F1;
+            color: var(--dark);
+        }
+
+        .delete-btn {
+            background-color: #FFEBEE;
+            color: var(--primary);
+        }
+
+        /* === TRENDS VIEW === */
+        .chart-container {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 15px;
+            box-shadow: var(--shadow);
+            height: 350px;
+            position: relative;
+        }
+
+        .filter-scroll {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
+        .filter-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-chip {
+            padding: 8px 16px;
+            background: #EDF2F7;
+            border-radius: 20px;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-chip.active {
+            background: var(--secondary);
+            color: var(--white);
+            box-shadow: 0 2px 5px rgba(78, 205, 196, 0.3);
+        }
+
+        .custom-range {
+            background: var(--white);
+            padding: 15px;
+            border-radius: var(--radius);
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .custom-range.show {
+            display: block;
+            animation: slideDown 0.3s;
+        }
+
+        /* Utils */
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #AAA;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            z-index: 100;
+            display: none;
+            font-size: 0.9rem;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--white);
+            width: 100%;
+            max-width: 400px;
+            border-radius: var(--radius);
+            padding: 20px;
+            animation: scaleIn 0.2s;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>血壓紀錄小幫手</h1>
+    </header>
+
+    <main>
+        <!-- INPUT VIEW -->
+        <div id="view-input" class="view active">
+            <div class="card">
+                <h2>📝 新增紀錄</h2>
+                <form id="add-form">
+                    <div class="row">
+                        <div class="form-group">
+                            <label>日期</label>
+                            <input type="date" id="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>時間</label>
+                            <input type="time" id="time" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group">
+                            <label>收縮壓 (Sys)</label>
+                            <input type="number" id="systolic" placeholder="120" required min="30" max="300">
+                        </div>
+                        <div class="form-group">
+                            <label>舒張壓 (Dia)</label>
+                            <input type="number" id="diastolic" placeholder="80" required min="30" max="300">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>脈搏 (Pulse)</label>
+                        <input type="number" id="pulse" placeholder="72" required min="30" max="250">
+                    </div>
+
+                    <button type="submit" class="primary-btn" id="submit-btn">儲存紀錄</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>💡 健康小知識</h2>
+                <p style="color: #666; line-height: 1.6; font-size: 0.95rem;">
+                    正常血壓範圍通常指收縮壓 < 120 mmHg 且舒張壓 < 80 mmHg。 保持健康飲食與規律運動有助於維持血壓穩定。 </p>
+            </div>
+        </div>
+
+        <!-- HISTORY VIEW -->
+        <div id="view-history" class="view">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2>📜 歷史紀錄</h2>
+                <button onclick="fetchData()"
+                    style="border:none; background:none; color:var(--secondary); font-weight:bold;">
+                    🔄 重新整理
+                </button>
+            </div>
+            <div id="history-loading" class="loading">載入中...</div>
+            <div id="history-container" class="history-list"></div>
+        </div>
+
+        <!-- TRENDS VIEW -->
+        <div id="view-trends" class="view">
+            <h2>📊 趨勢分析</h2>
+
+            <div class="filter-scroll">
+                <div class="filter-chip active" onclick="setFilter('week', this)">最近7天</div>
+                <div class="filter-chip" onclick="setFilter('2weeks', this)">最近2週</div>
+                <div class="filter-chip" onclick="setFilter('month', this)">最近1月</div>
+                <div class="filter-chip" onclick="setFilter('3months', this)">最近3月</div>
+                <div class="filter-chip" onclick="setFilter('6months', this)">最近半年</div>
+                <div class="filter-chip" onclick="setFilter('year', this)">最近1年</div>
+                <div class="filter-chip" onclick="setFilter('custom', this)">自訂區間</div>
+            </div>
+
+            <div id="custom-range-picker" class="custom-range">
+                <div class="row">
+                    <div class="form-group">
+                        <label>開始日期</label>
+                        <input type="date" id="filter-start">
+                    </div>
+                    <div class="form-group">
+                        <label>結束日期</label>
+                        <input type="date" id="filter-end">
+                    </div>
+                </div>
+                <button class="primary-btn" style="padding: 10px;" onclick="applyCustomFilter()">套用</button>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="trendChart"></canvas>
+            </div>
+            <div style="margin-top: 20px; text-align: center; color: #888; font-size: 0.9rem;">
+                點擊上方標籤可切換時間區間
+            </div>
+        </div>
+    </main>
+
+    <nav>
+        <div class="nav-item active" onclick="switchView('input', this)">
+            <i>✏️</i>
+            <span>輸入</span>
+        </div>
+        <div class="nav-item" onclick="switchView('history', this)">
+            <i>📜</i>
+            <span>歷史</span>
+        </div>
+        <div class="nav-item" onclick="switchView('trends', this)">
+            <i>📊</i>
+            <span>趨勢</span>
+        </div>
+    </nav>
+
+    <div id="toast" class="toast">訊息提示</div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal-overlay">
+        <div class="modal">
+            <h2>✏️ 修改紀錄</h2>
+            <form id="edit-form">
+                <input type="hidden" id="edit-id">
+                <div class="row">
+                    <div class="form-group">
+                        <label>日期</label>
+                        <input type="date" id="edit-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>時間</label>
+                        <input type="time" id="edit-time" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label>收縮壓</label>
+                        <input type="number" id="edit-systolic" required>
+                    </div>
+                    <div class="form-group">
+                        <label>舒張壓</label>
+                        <input type="number" id="edit-diastolic" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>脈搏</label>
+                    <input type="number" id="edit-pulse" required>
+                </div>
+                <div class="row">
+                    <button type="button" class="primary-btn" style="background:#CCC; color:#333;"
+                        onclick="closeModal()">取消</button>
+                    <button type="submit" class="primary-btn">更新</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbzlK_XchZ8O3AA1aOrmJmN0Y3pSk6IQuFwDTrDcebf-GBAS9-Ir2JiXGSgsh2j2Ow0TdQ/exec";
+
+        // State
+        let allData = [];
+        let currentFilter = 'week';
+        let chartInstance = null;
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set default date/time for input
+            setDefaultDateTime();
+
+            // Setup Date inputs limits? Maybe not strictly needed.
+
+            // Initial Fetch
+            fetchData();
+        });
+
+        function setDefaultDateTime() {
+            const now = new Date();
+            document.getElementById('date').valueAsDate = now;
+            document.getElementById('time').value = now.toTimeString().slice(0, 5);
+        }
+
+        // View Switching
+        function switchView(viewName, navEl) {
+            // Nav active state
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            if (navEl) navEl.classList.add('active');
+
+            // View visibility
+            document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+            document.getElementById(`view-${viewName}`).classList.add('active');
+
+            if (viewName === 'trends') {
+                updateChart();
+            }
+        }
+
+        // Toast Notification
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.display = 'block';
+            toast.style.animation = 'fadeIn 0.3s';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Data Operations
+        async function fetchData() {
+            const loading = document.getElementById('history-loading');
+            const container = document.getElementById('history-container');
+
+            loading.style.display = 'block';
+            container.innerHTML = '';
+
+            try {
+                const response = await fetch(GAS_URL);
+                const data = await response.json();
+
+                if (Array.isArray(data)) {
+                    // Pre-process data to normalize dates/times for Sorting and Display
+                    allData = data.map(item => {
+                        // Normalize Date to YYYY-MM-DD
+                        let dStr = item.date;
+                        if (dStr && typeof dStr === 'string' && dStr.includes('T')) {
+                            dStr = dStr.split('T')[0];
+                        }
+
+                        // Normalize Time to HH:mm
+                        let tStr = item.time;
+                        if (tStr && typeof tStr === 'string' && tStr.includes('T')) {
+                            // Extract time part from ISO string "YYYY-MM-DDTHH:mm:ss.sssZ"
+                            let timePart = tStr.split('T')[1];
+                            if (timePart) tStr = timePart.substring(0, 5); // HH:mm
+                        } else if (tStr && typeof tStr === 'string' && tStr.length > 5) {
+                            tStr = tStr.substring(0, 5); // Ensure HH:mm
+                        }
+
+                        return {
+                            ...item,
+                            _normalizedDate: dStr, // YYYY-MM-DD
+                            _normalizedTime: tStr  // HH:mm
+                        };
+                    });
+
+                    // Sort by Date + Time Descending
+                    allData.sort((a, b) => {
+                        const dateA = (a._normalizedDate || '') + 'T' + (a._normalizedTime || '00:00');
+                        const dateB = (b._normalizedDate || '') + 'T' + (b._normalizedTime || '00:00');
+                        if (dateB > dateA) return 1;
+                        if (dateB < dateA) return -1;
+                        return 0;
+                    });
+
+                    renderHistory();
+                    if (document.getElementById('view-trends').classList.contains('active')) {
+                        updateChart();
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+                showToast("無法讀取資料，請檢查網路或是 GAS 設定");
+                // MOCK DATA FOR DEMO
+                console.warn("Using mock data due to error");
+                allData = generateMockData();
+                renderHistory();
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        function generateMockData() {
+            const data = [];
+            for (let i = 0; i < 30; i++) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const dStr = d.toISOString().split('T')[0];
+                data.push({
+                    id: 'mock-' + i,
+                    date: dStr,
+                    time: "08:00",
+                    _normalizedDate: dStr,
+                    _normalizedTime: "08:00",
+                    systolic: 110 + Math.floor(Math.random() * 30),
+                    diastolic: 70 + Math.floor(Math.random() * 20),
+                    pulse: 60 + Math.floor(Math.random() * 20),
+                    timestamp: new Date().toISOString()
+                });
+            }
+            return data;
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('history-container');
+            container.innerHTML = '';
+
+            if (allData.length === 0) {
+                container.innerHTML = '<div class="empty-state">尚無紀錄 📭</div>';
+                return;
+            }
+
+            allData.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `record-item ${item.systolic > 140 ? 'high' : ''}`;
+
+                // Display Date: YYYY-MM-DD
+                const dateStr = item._normalizedDate || item.date;
+
+                // Display Time: HH:mm
+                const timeStr = item._normalizedTime || item.time;
+
+                // Format Timestamp: YYYY-MM-DD HH:mm:ss
+                let tsStr = "";
+                if (item.timestamp) {
+                    const ts = new Date(item.timestamp);
+                    if (!isNaN(ts)) {
+                        const y = ts.getFullYear();
+                        const m = String(ts.getMonth() + 1).padStart(2, '0');
+                        const d = String(ts.getDate()).padStart(2, '0');
+                        const h = String(ts.getHours()).padStart(2, '0');
+                        const min = String(ts.getMinutes()).padStart(2, '0');
+                        const s = String(ts.getSeconds()).padStart(2, '0');
+                        tsStr = `${y}-${m}-${d} ${h}:${min}:${s}`;
+                    }
+                }
+
+                div.innerHTML = `
+                    <div class="record-info">
+                        <div class="record-date">
+                            ${dateStr} <span style="font-weight:bold; margin-left:5px;">${timeStr}</span>
+                        </div>
+                        <div class="record-values">
+                            <span style="color:var(--primary)">SYS ${item.systolic}</span>
+                            <span style="color:var(--secondary)">DIA ${item.diastolic}</span>
+                            <span class="pulse">❤️ ${item.pulse}</span>
+                        </div>
+                        ${tsStr ? `<div style="font-size:0.75rem; color:#AAA; margin-top:4px;">建立於: ${tsStr}</div>` : ''}
+                    </div>
+                    <div class="record-actions">
+                        <button class="action-btn edit-btn" onclick='openEditModal(${JSON.stringify(item)})'>✎</button>
+                        <button class="action-btn delete-btn" onclick="deleteRecord('${item.id}')">🗑️</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Submit New
+        document.getElementById('add-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = "傳送中...";
+
+            const payload = {
+                action: 'create',
+                date: document.getElementById('date').value,
+                time: document.getElementById('time').value,
+                systolic: document.getElementById('systolic').value,
+                diastolic: document.getElementById('diastolic').value,
+                pulse: document.getElementById('pulse').value
+            };
+
+            try {
+                await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+
+                showToast("新增成功！🎉");
+                document.getElementById('add-form').reset();
+                setDefaultDateTime();
+
+                // Refetch
+                await fetchData();
+                switchView('history', document.querySelectorAll('.nav-item')[1]);
+
+            } catch (error) {
+                console.error(error);
+                showToast("發生錯誤，請稍後再試 😓");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "儲存紀錄";
+            }
+        });
+
+        // Delete
+        async function deleteRecord(id) {
+            if (!confirm("確定要刪除這筆紀錄嗎？")) return;
+
+            if (id.startsWith('mock')) {
+                allData = allData.filter(d => d.id !== id);
+                renderHistory();
+                showToast("已刪除 (模擬)");
+                return;
+            }
+
+            showToast("刪除中...");
+            try {
+                await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'delete', id: id })
+                });
+                await fetchData();
+                showToast("刪除成功");
+            } catch (e) {
+                showToast("刪除失敗");
+            }
+        }
+
+        // Edit Interaction
+        function openEditModal(item) {
+            document.getElementById('edit-id').value = item.id;
+
+            let d = item.date;
+            if (d instanceof Date) d = d.toISOString().split('T')[0];
+            // Ensure format YYYY-MM-DD
+            if (d.includes('T')) d = d.split('T')[0];
+
+            document.getElementById('edit-date').value = d;
+            document.getElementById('edit-time').value = item.time; // assumes HH:mm format
+            document.getElementById('edit-systolic').value = item.systolic;
+            document.getElementById('edit-diastolic').value = item.diastolic;
+            document.getElementById('edit-pulse').value = item.pulse;
+
+            document.getElementById('edit-modal').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('edit-modal').classList.remove('open');
+        }
+
+        document.getElementById('edit-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            btn.textContent = "更新中...";
+            btn.disabled = true;
+
+            const id = document.getElementById('edit-id').value;
+            const payload = {
+                action: 'update',
+                id: id,
+                date: document.getElementById('edit-date').value,
+                time: document.getElementById('edit-time').value,
+                systolic: document.getElementById('edit-systolic').value,
+                diastolic: document.getElementById('edit-diastolic').value,
+                pulse: document.getElementById('edit-pulse').value
+            };
+
+            if (id.startsWith('mock')) {
+                const idx = allData.findIndex(x => x.id === id);
+                if (idx >= 0) {
+                    allData[idx] = { ...allData[idx], ...payload };
+                }
+                closeModal();
+                renderHistory();
+                btn.textContent = originalText;
+                btn.disabled = false;
+                return;
+            }
+
+            try {
+                await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                await fetchData();
+                closeModal();
+                showToast("更新成功");
+            } catch (e) {
+                showToast("更新失敗");
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        });
+
+
+        // === CHARTS & TRENDS ===
+        function setFilter(range, el) {
+            currentFilter = range;
+
+            // UI
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+
+            const picker = document.getElementById('custom-range-picker');
+            if (range === 'custom') {
+                picker.classList.add('show');
+            } else {
+                picker.classList.remove('show');
+                updateChart();
+            }
+        }
+
+        function applyCustomFilter() {
+            updateChart();
+        }
+
+        function filterDataByRange(data) {
+            const now = new Date();
+            const start = new Date();
+
+            // Reset start time to 00:00:00 for accurate day comparison
+            start.setHours(0, 0, 0, 0);
+
+            switch (currentFilter) {
+                case 'week': start.setDate(now.getDate() - 7); break;
+                case '2weeks': start.setDate(now.getDate() - 14); break;
+                case 'month': start.setMonth(now.getMonth() - 1); break;
+                case '3months': start.setMonth(now.getMonth() - 3); break;
+                case '6months': start.setMonth(now.getMonth() - 6); break;
+                case 'year': start.setFullYear(now.getFullYear() - 1); break;
+                case 'custom':
+                    const s = document.getElementById('filter-start').value;
+                    const e = document.getElementById('filter-end').value;
+                    if (!s) return data; // fallback
+                    const startDate = new Date(s);
+                    const endDate = e ? new Date(e) : new Date();
+                    endDate.setHours(23, 59, 59, 999);
+                    return data.filter(item => {
+                        const dStr = item._normalizedDate || item.date;
+                        const tStr = item._normalizedTime || item.time || '00:00';
+                        const d = new Date(dStr + 'T' + tStr);
+                        return d >= startDate && d <= endDate;
+                    });
+            }
+
+            return data.filter(item => {
+                const dStr = item._normalizedDate || item.date;
+                const tStr = item._normalizedTime || item.time || '00:00';
+                const d = new Date(dStr + 'T' + tStr);
+                return d >= start;
+            });
+        }
+
+        function updateChart() {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            let filtered = filterDataByRange(allData);
+
+            // Sort Ascending for Chart
+            filtered.sort((a, b) => {
+                const dateA = (a._normalizedDate || '') + 'T' + (a._normalizedTime || '00:00');
+                const dateB = (b._normalizedDate || '') + 'T' + (b._normalizedTime || '00:00');
+                if (dateA > dateB) return 1;
+                if (dateA < dateB) return -1;
+                return 0;
+            });
+
+            // Prepare Data Points for Time Scale
+            // Each point is { x: DateObject, y: Value }
+            const sysData = filtered.map(d => {
+                const dStr = d._normalizedDate || d.date;
+                const tStr = d._normalizedTime || d.time;
+                return { x: new Date(dStr + 'T' + tStr), y: d.systolic };
+            });
+
+            const diaData = filtered.map(d => {
+                const dStr = d._normalizedDate || d.date;
+                const tStr = d._normalizedTime || d.time;
+                return { x: new Date(dStr + 'T' + tStr), y: d.diastolic };
+            });
+
+            const pulseData = filtered.map(d => {
+                const dStr = d._normalizedDate || d.date;
+                const tStr = d._normalizedTime || d.time;
+                return { x: new Date(dStr + 'T' + tStr), y: d.pulse };
+            });
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: '收縮壓',
+                            data: sysData,
+                            borderColor: '#FF6B6B', // var(--primary)
+                            backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            pointRadius: 3
+                        },
+                        {
+                            label: '舒張壓',
+                            data: diaData,
+                            borderColor: '#4ECDC4', // var(--secondary)
+                            backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            pointRadius: 3
+                        },
+                        {
+                            label: '脈搏',
+                            data: pulseData,
+                            borderColor: '#FFE66D', // var(--accent)
+                            // borderDash: [5, 5],
+                            borderWidth: 2,
+                            tension: 0.3,
+                            hidden: true // Hidden by default to avoid clutter
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function (context) {
+                                    // Format tooltip title
+                                    const date = new Date(context[0].parsed.x);
+                                    return date.toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: false });
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'day',
+                                displayFormats: {
+                                    day: 'MM/dd',
+                                    hour: 'HH:mm'
+                                },
+                                tooltipFormat: 'MM/dd HH:mm'
+                            },
+                            title: {
+                                display: false
+                            },
+                            adapters: {
+                                date: {
+                                    // locale: 'zh-TW' // Removing locale to prevent crash if not loaded
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: false,
+                            suggestedMin: 50,
+                            suggestedMax: 160
+                        }
+                    }
+                }
+            });
+        }
+
+    </script>
+
+</body>
+
+</html>
