@@ -649,7 +649,7 @@
     <script>
         // Configuration
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzlK_XchZ8O3AA1aOrmJmN0Y3pSk6IQuFwDTrDcebf-GBAS9-Ir2JiXGSgsh2j2Ow0TdQ/exec";
-        const APP_VERSION_DATE = "2026-02-01 13:10";
+        const APP_VERSION_DATE = "2026-02-01 13:20";
 
         function showVersionInfo() {
             alert("版本最後更新時間: " + APP_VERSION_DATE);
@@ -671,9 +671,62 @@
             document.getElementById('filter-start').value = dateStr;
             document.getElementById('filter-end').value = dateStr;
 
+            // Setup Swipe Gestures
+            setupSwipeGestures();
+
             // Initial Fetch
             fetchData();
         });
+
+        // Swipe Gestures
+        function setupSwipeGestures() {
+            let touchStartX = 0;
+            let touchEndX = 0;
+            const threshold = 50; // min distance for swipe
+            const mainContent = document.querySelector('main');
+
+            mainContent.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            mainContent.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+
+            function handleSwipe() {
+                const diff = touchEndX - touchStartX;
+                if (Math.abs(diff) < threshold) return;
+
+                const views = ['input', 'history', 'trends'];
+                let currentIndex = -1;
+
+                // Find active view
+                views.forEach((v, i) => {
+                    if (document.getElementById(`view-${v}`).classList.contains('active')) {
+                        currentIndex = i;
+                    }
+                });
+
+                if (currentIndex === -1) return;
+
+                if (diff < 0) {
+                    // Swipe Left -> Next View
+                    if (currentIndex < views.length - 1) {
+                        const nextView = views[currentIndex + 1];
+                        const navItems = document.querySelectorAll('.nav-item');
+                        switchView(nextView, navItems[currentIndex + 1]);
+                    }
+                } else {
+                    // Swipe Right -> Prev View
+                    if (currentIndex > 0) {
+                        const prevView = views[currentIndex - 1];
+                        const navItems = document.querySelectorAll('.nav-item');
+                        switchView(prevView, navItems[currentIndex - 1]);
+                    }
+                }
+            }
+        }
 
         function setDefaultDateTime() {
             const now = new Date();
