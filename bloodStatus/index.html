@@ -665,7 +665,7 @@
     <script>
         // Configuration
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzlK_XchZ8O3AA1aOrmJmN0Y3pSk6IQuFwDTrDcebf-GBAS9-Ir2JiXGSgsh2j2Ow0TdQ/exec";
-        const APP_VERSION_DATE = "2026-02-01 14:45";
+        const APP_VERSION_DATE = "2026-02-01 20:10";
 
         function showVersionInfo() {
             alert("版本最後更新時間: " + APP_VERSION_DATE);
@@ -933,18 +933,26 @@
             };
 
             try {
+                // Using mode: 'no-cors' for mobile robustness. 
+                // We won't be able to read the JSON response, so we rely on refetching.
                 await fetch(GAS_URL, {
                     method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        "Content-Type": "text/plain;charset=utf-8",
+                    },
                     body: JSON.stringify(payload)
                 });
 
-                showToast("新增成功！🎉");
+                showToast("請求已送出... ⏳");
                 document.getElementById('add-form').reset();
                 setDefaultDateTime();
 
-                // Refetch
-                await fetchData();
-                switchView('history', document.querySelectorAll('.nav-item')[1]);
+                // Wait a bit for GAS to process before refetching
+                setTimeout(async () => {
+                    await fetchData();
+                    switchView('history', document.querySelectorAll('.nav-item')[1]);
+                }, 1500);
 
             } catch (error) {
                 console.error(error);
@@ -970,10 +978,17 @@
             try {
                 await fetch(GAS_URL, {
                     method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        "Content-Type": "text/plain;charset=utf-8",
+                    },
                     body: JSON.stringify({ action: 'delete', id: id })
                 });
-                await fetchData();
-                showToast("刪除成功");
+
+                setTimeout(async () => {
+                    await fetchData();
+                    showToast("刪除成功");
+                }, 1500);
             } catch (e) {
                 showToast("刪除失敗");
             }
@@ -1034,11 +1049,18 @@
             try {
                 await fetch(GAS_URL, {
                     method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        "Content-Type": "text/plain;charset=utf-8",
+                    },
                     body: JSON.stringify(payload)
                 });
-                await fetchData();
-                closeModal();
-                showToast("更新成功");
+
+                setTimeout(async () => {
+                    await fetchData();
+                    closeModal();
+                    showToast("更新成功");
+                }, 1500);
             } catch (e) {
                 showToast("更新失敗");
             } finally {
