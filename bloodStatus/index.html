@@ -649,7 +649,7 @@
     <script>
         // Configuration
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzlK_XchZ8O3AA1aOrmJmN0Y3pSk6IQuFwDTrDcebf-GBAS9-Ir2JiXGSgsh2j2Ow0TdQ/exec";
-        const APP_VERSION_DATE = "2026-02-01 13:00";
+        const APP_VERSION_DATE = "2026-02-01 13:10";
 
         function showVersionInfo() {
             alert("版本最後更新時間: " + APP_VERSION_DATE);
@@ -665,7 +665,11 @@
             // Set default date/time for input
             setDefaultDateTime();
 
-            // Setup Date inputs limits? Maybe not strictly needed.
+            // Set default date for filter
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0];
+            document.getElementById('filter-start').value = dateStr;
+            document.getElementById('filter-end').value = dateStr;
 
             // Initial Fetch
             fetchData();
