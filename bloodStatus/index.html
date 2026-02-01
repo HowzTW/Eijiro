@@ -500,7 +500,10 @@
         <!-- INPUT VIEW -->
         <div id="view-input" class="view active">
             <div class="card">
-                <h2>📝 新增紀錄</h2>
+                <h2>
+                    <span class="material-icons-round">note_add</span>
+                    新增紀錄
+                </h2>
                 <form id="add-form">
                     <div class="row">
                         <div class="form-group">
@@ -534,7 +537,10 @@
             </div>
 
             <div class="card">
-                <h2>💡 健康小知識</h2>
+                <h2>
+                    <span class="material-icons-round">lightbulb</span>
+                    健康小知識
+                </h2>
                 <p style="color: #666; line-height: 1.6; font-size: 0.95rem;">
                     正常血壓範圍通常指收縮壓 < 120 mmHg 且舒張壓 < 80 mmHg。 保持健康飲食與規律運動有助於維持血壓穩定。 </p>
             </div>
@@ -543,10 +549,14 @@
         <!-- HISTORY VIEW -->
         <div id="view-history" class="view">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h2>📜 歷史紀錄</h2>
+                <h2>
+                    <span class="material-icons-round">history</span>
+                    歷史紀錄
+                </h2>
                 <button onclick="fetchData()"
-                    style="border:none; background:none; color:var(--secondary); font-weight:bold;">
-                    🔄 重新整理
+                    style="border:none; background:none; color:var(--secondary); font-weight:bold; font-size: large; vertical-align:text-top">
+                    <span class="material-icons-round">change_circle</span>
+
                 </button>
             </div>
             <div id="history-loading" class="loading">載入中...</div>
@@ -555,7 +565,10 @@
 
         <!-- TRENDS VIEW -->
         <div id="view-trends" class="view">
-            <h2>📊 趨勢分析</h2>
+            <h2>
+                <span class="material-icons-round">area_chart</span>
+                趨勢分析
+            </h2>
 
             <div class="filter-scroll">
                 <div class="filter-chip active" onclick="setFilter('week', this)">最近7天</div>
@@ -592,15 +605,15 @@
 
     <nav>
         <div class="nav-item active" onclick="switchView('input', this)">
-            <i>✏️</i>
+            <i><span class="material-icons-round">note_add</span></i>
             <span>輸入</span>
         </div>
         <div class="nav-item" onclick="switchView('history', this)">
-            <i>📜</i>
+            <i><span class="material-icons-round">history</span></i>
             <span>歷史</span>
         </div>
         <div class="nav-item" onclick="switchView('trends', this)">
-            <i>📊</i>
+            <i><span class="material-icons-round">area_chart</span></i>
             <span>趨勢</span>
         </div>
     </nav>
@@ -610,7 +623,10 @@
     <!-- Edit Modal -->
     <div id="edit-modal" class="modal-overlay">
         <div class="modal">
-            <h2>✏️ 修改紀錄</h2>
+            <h2>
+                <span class="material-icons-round">edit_note</span>
+                修改紀錄
+            </h2>
             <form id="edit-form">
                 <input type="hidden" id="edit-id">
                 <div class="row">
@@ -649,7 +665,7 @@
     <script>
         // Configuration
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzlK_XchZ8O3AA1aOrmJmN0Y3pSk6IQuFwDTrDcebf-GBAS9-Ir2JiXGSgsh2j2Ow0TdQ/exec";
-        const APP_VERSION_DATE = "2026-02-01 13:20";
+        const APP_VERSION_DATE = "2026-02-01 14:45";
 
         function showVersionInfo() {
             alert("版本最後更新時間: " + APP_VERSION_DATE);
@@ -892,8 +908,8 @@
                         ${tsStr ? `<div style="font-size:0.75rem; color:#AAA; margin-top:4px;">建立於: ${tsStr}</div>` : ''}
                     </div>
                     <div class="record-actions">
-                        <button class="action-btn edit-btn" onclick='openEditModal(${JSON.stringify(item)})'>✎</button>
-                        <button class="action-btn delete-btn" onclick="deleteRecord('${item.id}')">🗑️</button>
+                        <button class="action-btn edit-btn" onclick='openEditModal(${JSON.stringify(item)})'><span class="material-icons-round">edit</span></button>
+                        <button class="action-btn delete-btn" onclick="deleteRecord('${item.id}')"><span class="material-icons-round">delete</span></button>
                     </div>
                 `;
                 container.appendChild(div);
