@@ -17,6 +17,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Fredoka:wght@400;600&display=swap"
         rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
         :root {
             --primary: #FF6B6B;
@@ -49,13 +50,32 @@
         }
 
         /* Header */
+        /* Header */
         header {
             background: linear-gradient(135deg, var(--primary), #FF8E8E);
             color: var(--white);
             padding: 15px 20px;
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             z-index: 10;
+        }
+
+        .info-icon {
+            position: absolute;
+            right: 20px;
+            font-size: 24px;
+            /* Standard Material Icon size */
+            cursor: pointer;
+            opacity: 0.9;
+            color: rgba(255, 255, 255, 0.9);
+            transition: opacity 0.2s;
+        }
+
+        .info-icon:active {
+            opacity: 0.6;
         }
 
         header h1 {
@@ -196,6 +216,12 @@
             /* Force left alignment */
             opacity: 1;
             /* Fix disabled-like appearance on some iOS */
+        }
+
+        /* Specific fix for iOS Date/Time content alignment */
+        input[type="date"]::-webkit-date-and-time-value,
+        input[type="time"]::-webkit-date-and-time-value {
+            text-align: left;
         }
 
         input:focus {
@@ -467,6 +493,7 @@
 
     <header>
         <h1>血壓紀錄小幫手</h1>
+        <span class="material-icons-round info-icon" onclick="showVersionInfo()">info</span>
     </header>
 
     <main>
@@ -622,6 +649,11 @@
     <script>
         // Configuration
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzlK_XchZ8O3AA1aOrmJmN0Y3pSk6IQuFwDTrDcebf-GBAS9-Ir2JiXGSgsh2j2Ow0TdQ/exec";
+        const APP_VERSION_DATE = "2026-02-01 13:00 (Taipei)";
+
+        function showVersionInfo() {
+            alert("版本最後更新時間: " + APP_VERSION_DATE);
+        }
 
         // State
         let allData = [];
