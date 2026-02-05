@@ -9,312 +9,353 @@
     <link rel="apple-touch-icon" href="icon.jpg">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap"
         rel="stylesheet">
     <style>
-        body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background-color: #fafaf9;
-            /* Stone-50 */
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --accent: #f59e0b;
+            /* amber-500 */
+            --accent-dark: #d97706;
+            /* amber-600 */
+            --stone-50: #fafaf9;
+            --stone-900: #1c1917;
         }
 
-        /* Custom Scrollbar for better UX */
+        body {
+            font-family: 'Outfit', 'Noto Sans TC', sans-serif;
+            background-color: var(--stone-50);
+            background-image: radial-gradient(circle at top right, rgba(245, 158, 11, 0.05), transparent 40%),
+                radial-gradient(circle at bottom left, rgba(245, 158, 11, 0.05), transparent 40%);
+            min-height: 100vh;
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+
+        .glass-dark {
+            background: rgba(28, 25, 23, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Custom Scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 6px;
         }
 
         ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: transparent;
         }
 
         ::-webkit-scrollbar-thumb {
             background: #d6d3d1;
-            border-radius: 4px;
+            border-radius: 10px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
             background: #a8a29e;
         }
 
-        /* Markdown Preview Styles to simulate rendered content */
+        /* Markdown Preview Styling */
         .md-preview h1 {
-            font-size: 2em;
-            font-weight: bold;
-            margin-bottom: 0.5em;
-            border-bottom: 1px solid #e5e7eb;
-            padding-bottom: 0.3em;
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--stone-900);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e7e5e4;
+            padding-bottom: 0.5rem;
         }
 
         .md-preview h2 {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-bottom: 0.5em;
-            border-bottom: 1px solid #e5e7eb;
-            padding-bottom: 0.3em;
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.75rem;
         }
 
         .md-preview h3 {
-            font-size: 1.25em;
-            font-weight: bold;
-            margin-bottom: 0.5em;
-        }
-
-        .md-preview h4 {
-            font-size: 1.1em;
-            font-weight: bold;
-            margin-bottom: 0.5em;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 1.25rem 0 0.5rem;
         }
 
         .md-preview p {
-            margin-bottom: 1em;
-            line-height: 1.6;
-        }
-
-        .md-preview ul {
-            list-style-type: disc;
-            padding-left: 1.5em;
-            margin-bottom: 1em;
-        }
-
-        .md-preview ol {
-            list-style-type: decimal;
-            padding-left: 1.5em;
-            margin-bottom: 1em;
-        }
-
-        .md-preview blockquote {
-            border-left: 4px solid #d1d5db;
-            padding-left: 1em;
-            color: #4b5563;
-            margin-bottom: 1em;
-            background: #f3f4f6;
-            padding: 0.5rem;
-        }
-
-        .md-preview code {
-            background-color: #f3f4f6;
-            padding: 0.2em 0.4em;
-            border-radius: 3px;
-            font-family: monospace;
-            color: #ef4444;
+            line-height: 1.75;
+            margin-bottom: 1.25rem;
+            color: #44403c;
         }
 
         .md-preview pre {
-            background-color: #1f2937;
-            color: #f9fafb;
-            padding: 1em;
-            border-radius: 0.5em;
+            background: #1c1917;
+            color: #f5f5f4;
+            padding: 1.25rem;
+            border-radius: 1rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.875rem;
             overflow-x: auto;
-            margin-bottom: 1em;
+            margin: 1.5rem 0;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .md-preview code {
+            background: #f3f2f1;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.375rem;
+            color: var(--accent-dark);
+            font-size: 0.9em;
         }
 
         .md-preview pre code {
-            background-color: transparent;
+            background: transparent;
             color: inherit;
             padding: 0;
         }
 
-        .md-preview a {
-            color: #3b82f6;
-            text-decoration: underline;
-        }
-
-        .md-preview img {
-            max-width: 100%;
-            border-radius: 0.5em;
-            margin: 1em 0;
+        .md-preview blockquote {
+            border-left: 4px solid var(--accent);
+            background: rgba(245, 158, 11, 0.05);
+            padding: 1rem 1.5rem;
+            border-radius: 0 0.75rem 0.75rem 0;
+            margin-bottom: 1.5rem;
+            font-style: italic;
         }
 
         .md-preview table {
             width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 1em;
-        }
-
-        .md-preview th,
-        .md-preview td {
-            border: 1px solid #d1d5db;
-            padding: 0.5em;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e7e5e4;
+            border-radius: 0.75rem;
+            overflow: hidden;
         }
 
         .md-preview th {
-            background-color: #f3f4f6;
-            font-weight: bold;
+            background: #f5f5f4;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid #e7e5e4;
         }
 
-        .md-preview hr {
-            border: 0;
-            border-top: 2px solid #e5e7eb;
-            margin: 1.5em 0;
+        .md-preview td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #f5f5f4;
         }
 
-        .md-preview del {
-            text-decoration: line-through;
-            color: #9ca3af;
-        }
-
-        /* Task list specific */
-        .task-list-item {
-            list-style-type: none;
-            margin-left: -1.5em;
-        }
-
-        .task-list-item input {
-            margin-right: 0.5em;
-        }
-
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 300px;
-            max-height: 300px;
-        }
-
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 320px;
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .mobile-drawer {
+                transform: translateX(-100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             }
+
+            .mobile-drawer.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                padding-top: 5rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .chart-container-inner {
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.05));
         }
     </style>
 </head>
 
-<body class="text-stone-800">
+<body class="text-stone-800 antialiased">
 
-    <!-- Chosen Palette: Warm Neutrals (Stone) with Amber Accents. Creates a calm, paper-like reading environment suitable for documentation. -->
-    <!-- Application Structure Plan: 
-         1. Dashboard Layout: The content is structured into a dashboard rather than a long document.
-         2. Overview Section: A Chart.js visualization categorizes syntax by "Frequency of Use" vs "Complexity" to help users prioritize what to learn.
-         3. Interactive Learning Area: A split-pane design with navigation on the left (desktop) or top (mobile). 
-         4. Dynamic Playground: A "Try It" section allows users to type raw markdown and see a simulated real-time preview, reinforcing the "syntax -> result" concept.
-         5. Logical Grouping: Content is grouped into "Typography", "Structure", "Media", "Technical" for better IA than a linear 1-9 list.
-    -->
-    <!-- Visualization & Content Choices:
-         - Bubble Chart: Visualizes the "Syntax Landscape". X-axis=Complexity, Y-axis=Frequency, Size=Importance. Helps users distinguish between core syntax (Headers) and niche syntax (Escaping).
-         - Interactive Preview: Essential for a syntax guide. Allows users to see the direct cause-and-effect of markdown tags.
-         - Tabular Navigation: Replaces the linear TOC, allowing random access to specific rules.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <!-- Mobile Header -->
+    <header class="md:hidden fixed top-0 left-0 right-0 glass z-50 px-4 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-amber-500 overflow-hidden shadow-sm">
+                <img src="icon.jpg" alt="Icon" class="w-full h-full object-cover">
+            </div>
+            <span class="font-bold text-lg tracking-tight">MD Guide</span>
+        </div>
+        <button onclick="toggleMobileMenu()" class="p-2 hover:bg-stone-100 rounded-xl transition-colors">
+            <svg id="menu-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+        </button>
+    </header>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Sidebar / Desktop Navigation -->
+    <aside id="sidebar"
+        class="fixed inset-y-0 left-0 w-72 glass border-r border-stone-200 z-40 mobile-drawer md:translate-x-0 p-6 flex flex-col">
+        <div class="hidden md:flex items-center gap-4 mb-10 px-2">
+            <div class="w-10 h-10 rounded-xl bg-amber-500 overflow-hidden shadow-md ring-4 ring-amber-100">
+                <img src="icon.jpg" alt="Icon" class="w-full h-full object-cover">
+            </div>
+            <div>
+                <h1 class="font-bold text-xl leading-tight">Markdown</h1>
+                <p class="text-xs text-stone-400 font-medium tracking-widest uppercase">Quick Reference</p>
+            </div>
+        </div>
 
-        <!-- Header Section -->
-        <header class="mb-8 text-center sm:text-left border-b border-stone-200 pb-6">
-            <h1 class="text-3xl sm:text-4xl font-bold text-stone-900 mb-2">Markdown 語法互動速查指南</h1>
-            <p class="text-lg text-stone-600 max-w-3xl">
-                這是一個基於 Markdown 語法的互動式學習工具。
-                透過下方的儀表板與即時預覽器，您可以快速掌握輕量級標記語言的核心概念，從基礎標題到進階表格，一目瞭然。
+        <nav class="flex-1 overflow-y-auto pr-2">
+            <h2 class="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] mb-6 px-2">Syntax Categories</h2>
+            <div id="nav-container" class="space-y-6">
+                <!-- Nav items will be injected here by JS -->
+            </div>
+        </nav>
+
+        <div class="mt-auto pt-6 border-t border-stone-100">
+            <a href="#playground"
+                class="flex items-center gap-3 p-4 bg-stone-900 text-white rounded-2xl shadow-lg hover:bg-stone-800 transition-all hover:scale-[1.02] active:scale-95 group">
+                <span class="text-xl group-hover:rotate-12 transition-transform">⚡</span>
+                <span class="font-semibold" onclick="if(window.innerWidth < 768) toggleMobileMenu()">Live
+                    Playground</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Overlay for Mobile Menu -->
+    <div id="overlay" onclick="toggleMobileMenu()"
+        class="fixed inset-0 bg-stone-900/40 backdrop-blur-sm z-30 opacity-0 pointer-events-none transition-opacity duration-300">
+    </div>
+
+    <!-- Main Content -->
+    <main class="md:ml-72 main-content p-4 md:p-8 lg:p-12 max-w-6xl">
+
+        <!-- Welcome Section -->
+        <header class="mb-12">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-stone-900 tracking-tight mb-4">
+                掌握 <span
+                    class="bg-clip-text text-transparent bg-gradient-to-r from-amber-500 to-orange-600">Markdown</span>
+                藝術
+            </h1>
+            <p class="text-lg text-stone-500 max-w-2xl leading-relaxed">
+                這是一份為創作者、工程師設計的互動指南。透過左側導覽深入了解各項語法，並在下方練習場即時驗證你的想法。
             </p>
         </header>
 
-        <!-- Analytics Dashboard Section -->
-        <section class="mb-12 bg-white rounded-2xl shadow-sm border border-stone-200 p-6">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
-                <div class="lg:col-span-1 space-y-4">
-                    <h2 class="text-2xl font-bold text-stone-800">語法全景分析</h2>
-                    <p class="text-stone-600">
-                        本圖表分析了 Markdown 各種語法的<strong class="text-amber-600">常用頻率</strong>與<strong
-                            class="text-amber-600">記憶複雜度</strong>。
-                        <br><br>
-                        建議初學者優先掌握左上角（高頻率、低複雜度）的語法，如標題與文字樣式。
+        <!-- Visualization Card -->
+        <section class="mb-12 glass rounded-[2.5rem] p-8 md:p-10">
+            <div class="flex flex-col lg:flex-row gap-12">
+                <div class="lg:w-1/3 space-y-6">
+                    <div
+                        class="inline-flex items-center gap-2 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold uppercase tracking-wider">
+                        Insights
+                    </div>
+                    <h2 class="text-3xl font-bold tracking-tight">語法全景分析</h2>
+                    <p class="text-stone-500 leading-relaxed">
+                        我們根據學習曲線與實用價值，將語法視覺化為氣泡圖。
                     </p>
-                    <div class="bg-stone-50 p-4 rounded-xl">
-                        <h3 class="font-semibold text-stone-700 mb-2">快速統計</h3>
-                        <ul class="space-y-2 text-sm text-stone-600">
-                            <li class="flex justify-between"><span>核心語法類別</span><span class="font-bold">4 大類</span></li>
-                            <li class="flex justify-between"><span>收錄語法項目</span><span class="font-bold">9 項</span></li>
-                            <li class="flex justify-between"><span>學習曲線</span><span
-                                    class="text-green-600 font-bold">極低</span></li>
-                        </ul>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white/50 p-4 rounded-2xl border border-stone-100">
+                            <p class="text-xs text-stone-400 font-bold uppercase mb-1">Total Items</p>
+                            <p class="text-2xl font-bold">11 項</p>
+                        </div>
+                        <div class="bg-white/50 p-4 rounded-2xl border border-stone-100">
+                            <p class="text-xs text-stone-400 font-bold uppercase mb-1">Learning</p>
+                            <p class="text-2xl font-bold text-green-600">Beginner</p>
+                        </div>
                     </div>
                 </div>
-                <div class="lg:col-span-2 flex flex-col justify-center items-center">
-                    <div class="chart-container">
+                <div class="lg:w-2/3 h-[300px] md:h-[400px] flex items-center justify-center relative">
+                    <div class="w-full h-full chart-container-inner">
                         <canvas id="syntaxChart"></canvas>
                     </div>
-                    <p class="text-xs text-stone-400 mt-2 text-center">氣泡大小代表該語法在文件撰寫中的重要性權重</p>
                 </div>
             </div>
         </section>
 
-        <!-- Main Interactive Content -->
-        <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Detail Content Section -->
+        <section id="content-display" class="mb-12 transition-all duration-300 min-h-[400px]">
+            <!-- Dynamic Content Loaded Here -->
+        </section>
 
-            <!-- Navigation Sidebar -->
-            <nav class="lg:col-span-3 space-y-2">
-                <h3 class="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-4 px-2">語法類別導覽</h3>
-                <div id="nav-container" class="flex flex-col space-y-1">
-                    <!-- Nav items will be injected here by JS -->
-                </div>
-            </nav>
-
-            <!-- Content Area -->
-            <div class="lg:col-span-9 space-y-8">
-
-                <!-- Definition Card -->
-                <div id="content-display"
-                    class="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 transition-all duration-300">
-                    <!-- Dynamic Content Loaded Here -->
-                </div>
-
-                <!-- Interactive Playground -->
-                <div class="bg-stone-900 rounded-2xl shadow-lg overflow-hidden text-stone-100">
-                    <div class="bg-stone-800 px-6 py-3 border-b border-stone-700 flex justify-between items-center">
-                        <h3 class="font-bold text-stone-100 flex items-center gap-2">
-                            <span>⌨️</span> 即時練習場 (Live Playground)
-                        </h3>
-                        <span class="text-xs text-stone-400">在左側輸入，右側即時預覽</span>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 h-96">
-                        <textarea id="markdown-input"
-                            class="w-full h-full bg-stone-900 p-6 font-mono text-sm resize-none focus:outline-none focus:bg-stone-800/50 transition-colors text-stone-300"
-                            placeholder="# 請在此輸入 Markdown..."></textarea>
-                        <div id="html-preview"
-                            class="w-full h-full bg-white p-6 overflow-y-auto text-stone-800 md-preview border-l border-stone-700">
-                            <!-- Preview Rendered Here -->
+        <!-- Playground Section -->
+        <section id="playground" class="scroll-mt-24">
+            <div class="glass-dark rounded-[2.5rem] overflow-hidden shadow-2xl">
+                <div
+                    class="px-8 py-6 border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="flex gap-1.5">
+                            <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                            <div class="w-3 h-3 rounded-full bg-amber-400"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-400"></div>
                         </div>
+                        <h3 class="font-bold text-white ml-2 tracking-wide uppercase text-sm">Live Playground</h3>
+                    </div>
+                    <span class="text-xs font-medium text-stone-400 bg-white/5 px-3 py-1.5 rounded-full">
+                        Powered by Antigravity Parser v1.0
+                    </span>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 min-h-[500px]">
+                    <div class="relative group">
+                        <div
+                            class="absolute top-4 left-6 text-[10px] font-bold text-stone-500 uppercase tracking-widest hidden group-focus-within:block">
+                            Editor</div>
+                        <textarea id="markdown-input"
+                            class="w-full h-full bg-transparent p-10 font-mono text-sm resize-none focus:outline-none text-stone-300 leading-relaxed"
+                            placeholder="# Type something awesome here..."></textarea>
+                    </div>
+                    <div id="html-preview"
+                        class="w-full h-full bg-white p-10 overflow-y-auto text-stone-800 md-preview border-t lg:border-t-0 lg:border-l border-white/10">
+                        <!-- Preview Rendered Here -->
                     </div>
                 </div>
-
             </div>
-        </main>
+        </section>
 
-        <footer class="mt-16 pt-8 border-t border-stone-200 text-center text-stone-500 text-sm">
-            <p>&copy; 2026 Markdown 語法互動速查指南 - 基於所提供的 Markdown 語法手冊生成</p>
+        <footer class="mt-20 py-10 border-t border-stone-200 text-center">
+            <p class="text-stone-400 text-sm font-medium">
+                &copy; 2026 Markdown Syntax Interactive Guide. Crafted for Excellence.
+            </p>
         </footer>
 
-    </div>
+    </main>
 
     <script>
-        // --- Data Model: Synthesizing the Source Report ---
-        // Categories created based on the logical grouping of the 9 sections in the source.
+        // --- Data Model ---
         const syntaxData = [
             {
                 id: 'typography',
                 title: '文字與標題',
                 icon: '📝',
-                description: '文件的基礎骨架，包含各級標題與強調文字的樣式。',
                 items: [
                     {
                         title: '標題 (Headings)',
                         desc: '使用 # 符號來表示標題，數量越多層級越小 (H1-H6)。',
                         syntax: '# H1 第一層標題\n## H2 第二層標題\n### H3 第三層標題',
                         preview: '<h1>H1 第一層標題</h1><h2>H2 第二層標題</h2><h3>H3 第三層標題</h3>',
-                        complexity: 1, // Low
-                        frequency: 10, // High
-                        importance: 10
+                        complexity: 1, frequency: 10, importance: 10
                     },
                     {
                         title: '文字樣式 (Styling)',
-                        desc: '常用的粗體、斜體與刪除線。',
+                        desc: '常用的粗體、斜體與刪除線，讓文章重點更清晰。',
                         syntax: '**粗體文字**\n*斜體文字*\n~~刪除內容~~\n***粗斜體***',
                         preview: '<p><strong>粗體文字</strong></p><p><em>斜體文字</em></p><p><del>刪除內容</del></p><p><strong><em>粗斜體</em></strong></p>',
-                        complexity: 2,
-                        frequency: 9,
-                        importance: 8
+                        complexity: 2, frequency: 9, importance: 8
                     }
                 ]
             },
@@ -322,52 +363,41 @@
                 id: 'structure',
                 title: '結構與清單',
                 icon: '📋',
-                description: '用於整理資訊的條列式清單、引用區塊與分隔線。',
                 items: [
                     {
                         title: '無序清單 (Unordered List)',
-                        desc: '使用 *、+ 或 - 皆可建立點狀清單。支援縮排。',
+                        desc: '使用 *、+ 或 - 皆可建立點狀清單。支援縮排層級。',
                         syntax: '- 蘋果\n- 香蕉\n  - 縮排子項目\n- 橘子',
                         preview: '<ul><li>蘋果</li><li>香蕉<ul><li>縮排子項目</li></ul></li><li>橘子</li></ul>',
-                        complexity: 2,
-                        frequency: 8,
-                        importance: 9
+                        complexity: 2, frequency: 8, importance: 9
                     },
                     {
                         title: '有序清單 (Ordered List)',
-                        desc: '使用數字加點 1. 建立編號清單。',
+                        desc: '使用數字加點 1. 建立具有順序感的編號清單。',
                         syntax: '1. 第一步\n2. 第二步\n3. 第三步',
                         preview: '<ol><li>第一步</li><li>第二步</li><li>第三步</li></ol>',
-                        complexity: 2,
-                        frequency: 7,
-                        importance: 7
+                        complexity: 2, frequency: 7, importance: 7
                     },
                     {
                         title: '待辦清單 (Task List)',
-                        desc: '建立帶有核取方塊的清單。',
+                        desc: '建立帶有核取方塊的清單，適合專案追蹤。',
                         syntax: '- [x] 已完成事項\n- [ ] 未完成事項',
-                        preview: '<ul style="list-style:none; padding-left:0;"><li><input type="checkbox" checked disabled> 已完成事項</li><li><input type="checkbox" disabled> 未完成事項</li></ul>',
-                        complexity: 3,
-                        frequency: 5,
-                        importance: 6
+                        preview: '<ul style="list-style:none; padding-left:0;"><li><input type="checkbox" checked disabled class="mr-2"> 已完成事項</li><li><input type="checkbox" disabled class="mr-2"> 未完成事項</li></ul>',
+                        complexity: 3, frequency: 5, importance: 6
                     },
                     {
                         title: '引用 (Blockquotes)',
-                        desc: '使用 > 符號，可多層嵌套。',
+                        desc: '使用 > 符號。可用於標註金句或補充說明。',
                         syntax: '> 這是引用的文字\n> > 這是第二層引用',
                         preview: '<blockquote>這是引用的文字<blockquote>這是第二層引用</blockquote></blockquote>',
-                        complexity: 3,
-                        frequency: 4,
-                        importance: 5
+                        complexity: 3, frequency: 4, importance: 5
                     },
                     {
                         title: '分隔線 (Horizontal Rule)',
-                        desc: '使用三個以上的 -、* 或 _。',
+                        desc: '使用三個以上的 -、* 或 _，幫助內容斷句。',
                         syntax: '---\n***\n___',
                         preview: '<hr><hr><hr>',
-                        complexity: 1,
-                        frequency: 3,
-                        importance: 2
+                        complexity: 1, frequency: 3, importance: 2
                     }
                 ]
             },
@@ -375,16 +405,13 @@
                 id: 'media',
                 title: '多媒體與連結',
                 icon: '🔗',
-                description: '插入超連結與圖片，豐富文件內容。',
                 items: [
                     {
                         title: '連結與圖片',
-                        desc: '連結與圖片語法相似，圖片前多一個驚嘆號 !。',
-                        syntax: '[Google](https://www.google.com)\n\n![Logo](https://via.placeholder.com/150 "範例圖片")',
-                        preview: '<p><a href="https://www.google.com" target="_blank">Google</a></p><p><img src="https://via.placeholder.com/150" alt="Logo" title="範例圖片"></p>',
-                        complexity: 4,
-                        frequency: 8,
-                        importance: 9
+                        desc: '連結與圖片語法相似，圖片語法前需加驚嘆號 !。',
+                        syntax: '[Google](https://www.google.com)\n\n![Icon](icon.jpg)',
+                        preview: '<p><a href="https://www.google.com" target="_blank" class="text-amber-600 underline">Google</a></p><p><img src="icon.jpg" alt="Icon" class="rounded-xl shadow-lg max-w-[200px]"></p>',
+                        complexity: 4, frequency: 8, importance: 9
                     }
                 ]
             },
@@ -392,182 +419,219 @@
                 id: 'technical',
                 title: '技術與進階',
                 icon: '💻',
-                description: '程式碼區塊、表格繪製與特殊字元跳脫。',
                 items: [
                     {
                         title: '程式碼 (Code)',
-                        desc: '行內程式碼使用單個反引號 `，區塊使用三個反引號 ```。',
-                        syntax: '這裡有 `Inline Code`。\n\n```javascript\nconsole.log("Block Code");\n```',
-                        preview: '<p>這裡有 <code>Inline Code</code>。</p><pre><code>console.log("Block Code");</code></pre>',
-                        complexity: 5,
-                        frequency: 6,
-                        importance: 8
+                        desc: '行內使用 `，區塊則使用三個反引號 ``` 包圍。',
+                        syntax: '這裡有 `Inline Code`。\n\n```javascript\nconsole.log("Hello World");\n```',
+                        preview: '<p>這裡有 <code>Inline Code</code>。</p><pre><code>console.log("Hello World");</code></pre>',
+                        complexity: 5, frequency: 6, importance: 8
                     },
                     {
                         title: '表格 (Tables)',
-                        desc: '使用 | 分隔欄位，冒號 : 控制對齊。',
+                        desc: '使用 | 分隔欄位，並透過冒號 : 控制對齊方向。',
                         syntax: '| 左對齊 | 置中 | 右對齊 |\n| :--- | :---: | ---: |\n| A | B | C |',
                         preview: '<table><thead><tr><th align="left">左對齊</th><th align="center">置中</th><th align="right">右對齊</th></tr></thead><tbody><tr><td align="left">A</td><td align="center">B</td><td align="right">C</td></tr></tbody></table>',
-                        complexity: 8,
-                        frequency: 4,
-                        importance: 6
+                        complexity: 8, frequency: 4, importance: 6
                     },
                     {
                         title: '跳脫字元 (Escaping)',
-                        desc: '使用反斜線 \\ 顯示 Markdown 保留符號。',
+                        desc: '使用反斜線 \\ 顯示 Markdown 原本的保留符號。',
                         syntax: '\\# 不是標題\n\\**不是粗體\\**',
                         preview: '<p># 不是標題</p><p>**不是粗體**</p>',
-                        complexity: 6,
-                        frequency: 2,
-                        importance: 3
+                        complexity: 6, frequency: 2, importance: 3
                     }
                 ]
             }
         ];
 
-        // Flatten data for chart
-        const allRules = syntaxData.flatMap(cat => cat.items.map(item => ({
-            ...item,
-            category: cat.title
-        })));
-
-        // --- State Management ---
+        // --- State ---
         let currentCategoryIndex = 0;
         let currentItemIndex = 0;
 
-        // --- Initialization ---
+        // --- Init ---
         document.addEventListener('DOMContentLoaded', () => {
             initChart();
             renderNav();
-            renderContent(0, 0); // Start with Typography -> Headings
+            renderContent(0, 0);
             setupPlayground();
         });
 
-        // --- Visualization Logic (Chart.js) ---
-        function initChart() {
-            const ctx = document.getElementById('syntaxChart').getContext('2d');
+        // --- Mobile Menu Logic ---
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
 
-            // Map data to bubble format
-            const dataPoints = allRules.map(rule => ({
-                x: rule.frequency, // X-axis: Frequency (How often used)
-                y: rule.complexity, // Y-axis: Complexity (How hard to remember)
-                r: rule.importance, // Bubble Size: Importance
-                label: rule.title
-            }));
-
-            new Chart(ctx, {
-                type: 'bubble',
-                data: {
-                    datasets: [{
-                        label: 'Markdown 語法分佈',
-                        data: dataPoints,
-                        backgroundColor: 'rgba(217, 119, 6, 0.6)', // amber-600 with opacity
-                        borderColor: 'rgba(217, 119, 6, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            title: { display: true, text: '使用頻率 (Frequency) →' },
-                            min: 0, max: 12,
-                            grid: { display: false }
-                        },
-                        y: {
-                            title: { display: true, text: '複雜度 (Complexity) →' },
-                            min: 0, max: 10,
-                            grid: { color: '#f5f5f4' }
-                        }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function (context) {
-                                    return context.raw.label;
-                                }
-                            }
-                        },
-                        legend: { display: false }
-                    }
-                }
-            });
+            sidebar.classList.toggle('open');
+            if (sidebar.classList.contains('open')) {
+                overlay.classList.add('opacity-100', 'pointer-events-auto');
+                overlay.classList.remove('opacity-0', 'pointer-events-none');
+            } else {
+                overlay.classList.remove('opacity-100', 'pointer-events-auto');
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+            }
         }
 
-        // --- UI Logic ---
+        // --- Navigation ---
         function renderNav() {
             const container = document.getElementById('nav-container');
             container.innerHTML = '';
 
             syntaxData.forEach((cat, catIdx) => {
-                // Category Header
-                const catHeader = document.createElement('div');
-                catHeader.className = 'px-4 py-2 mt-2 font-bold text-stone-700 flex items-center gap-2';
-                catHeader.innerHTML = `<span>${cat.icon}</span> ${cat.title}`;
-                container.appendChild(catHeader);
+                const section = document.createElement('div');
+                section.innerHTML = `
+                    <div class="flex items-center gap-2 px-2 mb-3 mt-4 first:mt-0">
+                        <span class="text-lg">${cat.icon}</span>
+                        <span class="font-bold text-stone-700 text-sm tracking-tight">${cat.title}</span>
+                    </div>
+                `;
 
-                // Items
+                const list = document.createElement('div');
+                list.className = 'space-y-1';
+
                 cat.items.forEach((item, itemIdx) => {
                     const btn = document.createElement('button');
-                    btn.className = `w-full text-left px-8 py-2 text-sm rounded-lg transition-colors duration-200 ${(catIdx === currentCategoryIndex && itemIdx === currentItemIndex)
-                        ? 'bg-amber-100 text-amber-800 font-medium'
-                        : 'text-stone-500 hover:bg-stone-100 hover:text-stone-800'
+                    const isActive = catIdx === currentCategoryIndex && itemIdx === currentItemIndex;
+                    btn.className = `w-full text-left px-4 py-3 text-sm rounded-xl transition-all duration-300 flex items-center justify-between group ${isActive
+                            ? 'bg-amber-100 text-amber-900 font-bold shadow-sm'
+                            : 'text-stone-500 hover:bg-white hover:text-stone-900'
                         }`;
-                    btn.textContent = item.title;
+
+                    btn.innerHTML = `
+                        <span>${item.title}</span>
+                        <svg class="w-4 h-4 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    `;
+
                     btn.onclick = () => {
                         currentCategoryIndex = catIdx;
                         currentItemIndex = itemIdx;
-                        renderNav(); // Re-render to update active state
+                        renderNav();
                         renderContent(catIdx, itemIdx);
+                        if (window.innerWidth < 768) toggleMobileMenu();
                     };
-                    container.appendChild(btn);
+                    list.appendChild(btn);
                 });
+                section.appendChild(list);
+                container.appendChild(section);
             });
         }
 
+        // --- Content Rendering ---
         function renderContent(catIdx, itemIdx) {
             const data = syntaxData[catIdx].items[itemIdx];
             const container = document.getElementById('content-display');
 
-            // Add fade animation effect
-            container.classList.add('opacity-0');
-            setTimeout(() => {
-                container.innerHTML = `
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-2xl font-bold text-stone-900">${data.title}</h2>
-                        <span class="px-3 py-1 bg-stone-100 text-stone-500 rounded-full text-xs font-mono">語法類別: ${syntaxData[catIdx].title}</span>
+            container.innerHTML = `
+                <div class="animate-fade space-y-8">
+                    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-stone-200 pb-8">
+                        <div>
+                            <span class="inline-block px-3 py-1 bg-stone-100 text-stone-500 rounded-full text-[10px] font-bold uppercase tracking-widest mb-3">
+                                Category: ${syntaxData[catIdx].title}
+                            </span>
+                            <h2 class="text-4xl font-extrabold text-stone-900 tracking-tight">${data.title}</h2>
+                        </div>
+                        <div class="flex items-center gap-2 text-stone-400 text-sm">
+                            <span class="w-12 h-[2px] bg-stone-100"></span>
+                            Reference Guide
+                        </div>
                     </div>
                     
-                    <p class="text-stone-700 text-lg mb-6 leading-relaxed border-l-4 border-amber-500 pl-4">
-                        ${data.desc}
-                    </p>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-2">
-                            <div class="flex justify-between items-end">
-                                <span class="text-xs font-bold text-stone-400 uppercase">Raw Markdown (原始碼)</span>
-                            </div>
-                            <pre class="bg-stone-800 text-stone-100 p-4 rounded-xl font-mono text-sm overflow-x-auto whitespace-pre-wrap leading-relaxed shadow-inner">${data.syntax}</pre>
+                    <div class="bg-amber-50/50 p-8 rounded-[2rem] border border-amber-100/50 relative overflow-hidden group">
+                        <div class="absolute -right-4 -top-4 text-8xl opacity-[0.03] group-hover:scale-110 transition-transform duration-700 pointer-events-none">
+                            ${syntaxData[catIdx].icon}
                         </div>
-                        <div class="space-y-2">
-                            <span class="text-xs font-bold text-stone-400 uppercase">Rendered (顯示結果)</span>
-                            <div class="bg-stone-50 p-4 rounded-xl border border-stone-200 md-preview h-full shadow-inner overflow-y-auto max-h-64">
+                        <p class="text-xl text-stone-700 leading-relaxed font-medium">
+                            ${data.desc}
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-stone-300"></span>
+                                <span class="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Source Syntax</span>
+                            </div>
+                            <div class="bg-stone-900 rounded-2xl p-6 shadow-xl relative group overflow-hidden">
+                                <pre class="font-mono text-sm text-stone-300 leading-relaxed font-semibold">${data.syntax}</pre>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-stone-300"></span>
+                                <span class="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Rendered Preview</span>
+                            </div>
+                            <div class="bg-white rounded-2xl p-8 border border-stone-100 shadow-sm md-preview h-full">
                                 ${data.preview}
                             </div>
                         </div>
                     </div>
-                `;
-                container.classList.remove('opacity-0');
+                </div>
+            `;
 
-                // Update playground with current example
-                const playground = document.getElementById('markdown-input');
-                playground.value = data.syntax;
-                updatePreview(); // Trigger playground update
-            }, 150);
+            // Sync with playground
+            document.getElementById('markdown-input').value = data.syntax;
+            updatePreview();
         }
 
-        // --- Playground Logic (Simple Parser) ---
+        // --- Chart Optimization ---
+        let syntaxChart;
+        function initChart() {
+            const ctx = document.getElementById('syntaxChart').getContext('2d');
+            const allRules = syntaxData.flatMap(cat => cat.items.map(item => ({ ...item, label: item.title })));
+
+            const dataPoints = allRules.map(rule => ({
+                x: rule.frequency,
+                y: rule.complexity,
+                r: rule.importance * 1.5,
+                label: rule.title
+            }));
+
+            if (syntaxChart) syntaxChart.destroy();
+
+            syntaxChart = new Chart(ctx, {
+                type: 'bubble',
+                data: {
+                    datasets: [{
+                        label: 'Markdown Map',
+                        data: dataPoints,
+                        backgroundColor: 'rgba(245, 158, 11, 0.5)',
+                        borderColor: 'rgba(245, 158, 11, 1)',
+                        borderWidth: 2,
+                        hoverBackgroundColor: 'rgba(245, 158, 11, 0.8)',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: { padding: 20 },
+                    scales: {
+                        x: {
+                            title: { display: true, text: '使用頻率 Frequency', color: '#a8a29e', font: { size: 10, weight: 'bold' } },
+                            min: 0, max: 12, grid: { display: false }
+                        },
+                        y: {
+                            title: { display: true, text: '複雜度 Complexity', color: '#a8a29e', font: { size: 10, weight: 'bold' } },
+                            min: 0, max: 10, grid: { color: 'rgba(0,0,0,0.03)' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1c1917',
+                            padding: 12,
+                            titleFont: { size: 14, weight: 'bold' },
+                            callbacks: {
+                                label: (ctx) => ` 項目: ${ctx.raw.label} (重要性: ${ctx.raw.r / 1.5})`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Playground Logic ---
         function setupPlayground() {
             const input = document.getElementById('markdown-input');
             input.addEventListener('input', updatePreview);
@@ -579,53 +643,29 @@
             preview.innerHTML = simpleMarkdownParse(text);
         }
 
-        // A very basic Markdown parser for the playground demo
-        // Note: This is simplified for demonstration purposes to avoid heavy external libraries.
         function simpleMarkdownParse(text) {
             let html = text
-                // Escape HTML tags to prevent injection in demo
                 .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-
-                // Headers
                 .replace(/^# (.*$)/gim, '<h1>$1</h1>')
                 .replace(/^## (.*$)/gim, '<h2>$1</h2>')
                 .replace(/^### (.*$)/gim, '<h3>$1</h3>')
                 .replace(/^#### (.*$)/gim, '<h4>$1</h4>')
-
-                // Bold & Italic
                 .replace(/\*\*\*(.*)\*\*\*/gim, '<strong><em>$1</em></strong>')
                 .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
                 .replace(/\*(.*)\*/gim, '<em>$1</em>')
                 .replace(/~~(.*)~~/gim, '<del>$1</del>')
-
-                // Blockquotes
                 .replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>')
-
-                // Lists (Basic handling)
-                .replace(/^- (.*$)/gim, '<ul><li>$1</li></ul>') // Naive list, will create multiple ULs but visually okay for demo
+                .replace(/^- (.*$)/gim, '<ul><li>$1</li></ul>')
                 .replace(/^\d\. (.*$)/gim, '<ol><li>$1</li></ol>')
-
-                // Code Blocks
                 .replace(/```(.*)\n([\s\S]*?)\n```/gim, '<pre><code>$2</code></pre>')
                 .replace(/`(.*)`/gim, '<code>$1</code>')
-
-                // Horizontal Rule
                 .replace(/^---$/gim, '<hr>')
-
-                // Links & Images
-                .replace(/!\[(.*?)\]\((.*?)\)/gim, "<img alt='$1' src='$2' />")
-                .replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2' target='_blank'>$1</a>")
-
-                // Line breaks
+                .replace(/!\[(.*?)\]\((.*?)\)/gim, "<img alt='$1' src='$2' class='rounded-xl shadow-md max-w-full my-4' />")
+                .replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2' target='_blank' class='text-amber-600 underline'>$1</a>")
                 .replace(/\n/gim, '<br>');
 
-            // Cleanup naive lists (Combine adjacent UL/OL) - simplified regex for demo visual
-            html = html.replace(/<\/ul><br><ul>/gim, '');
-            html = html.replace(/<\/ol><br><ol>/gim, '');
-
-            return html;
+            return html.replace(/<\/ul><br><ul>/gim, '').replace(/<\/ol><br><ol>/gim, '');
         }
-
     </script>
 </body>
 
