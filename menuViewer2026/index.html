@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>翠庭 (JADE) 點餐系統</title>
+    <!-- Google Fonts: Noto Sans TC -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap"
+        rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --primary-color: #d32f2f;
+            /* Imperial Red */
+            --secondary-color: #00897b;
+            /* Jade Green */
+            --accent-color: #ffb300;
+            /* Gold */
+            --bg-color: #fff9f0;
+            /* Warm paper color */
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-light: #7f8c8d;
+            --spacing-base: 16px;
+            --radius: 16px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            overflow-x: hidden;
+            /* Elderly friendly basics */
+            font-size: 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        header p {
+            margin: 5px 0 0;
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+
+        .category-section {
+            margin-bottom: 40px;
+            translate: 0 20px;
+            opacity: 0;
+            animation: slideUp 0.6s forwards;
+        }
+
+        @keyframes slideUp {
+            to {
+                translate: 0 0;
+                opacity: 1;
+            }
+        }
+
+        .category-title {
+            font-size: 28px;
+            color: var(--secondary-color);
+            border-left: 8px solid var(--primary-color);
+            padding-left: 15px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(to right, #fde8e8, transparent);
+            padding-top: 5px;
+            padding-bottom: 5px;
+            border-radius: 4px;
+        }
+
+        .dish-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border-left: 1px solid #eee;
+            transition: var(--transition);
+        }
+
+        .dish-card:active {
+            scale: 0.98;
+        }
+
+        .dish-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .size-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .size-option:last-child {
+            border-bottom: none;
+        }
+
+        .size-info {
+            flex: 1;
+        }
+
+        .size-label {
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .size-price {
+            display: block;
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .stepper {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 30px;
+            padding: 4px;
+            border: 2px solid #edeff0;
+        }
+
+        .stepper button {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background: white;
+            color: var(--secondary-color);
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+        }
+
+        .stepper button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .stepper button:active:not(:disabled) {
+            background: var(--secondary-color);
+            color: white;
+            scale: 0.9;
+        }
+
+        .stepper .count {
+            width: 40px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0 5px;
+        }
+
+        /* Floating Button */
+        #cart-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            background-color: var(--secondary-color);
+            color: white;
+            border-radius: 50%;
+            border: none;
+            box-shadow: 0 8px 30px rgba(0, 137, 123, 0.4);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        #cart-btn:active {
+            scale: 0.85;
+            box-shadow: 0 4px 15px rgba(0, 137, 123, 0.4);
+        }
+
+        #cart-btn i {
+            font-size: 32px;
+        }
+
+        #cart-btn .badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: var(--primary-color);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+        }
+
+        #cart-btn .label {
+            font-size: 14px;
+            font-weight: 700;
+            margin-top: -2px;
+        }
+
+        /* Modal */
+        #cart-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 300;
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        #cart-modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 30px 30px 0 0;
+            padding: 30px 20px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            animation: slideFromBottom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideFromBottom {
+            from {
+                translate: 0 100%;
+            }
+
+            to {
+                translate: 0 0%;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 28px;
+            color: var(--primary-color);
+        }
+
+        #close-cart {
+            background: #f0f0f0;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .cart-items {
+            overflow-y: auto;
+            flex: 1;
+            margin-bottom: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            gap: 10px;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .cart-item-sub {
+            font-size: 16px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        .cart-item-price {
+            text-align: right;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .cart-total {
+            background: #fff8f8;
+            padding: 20px;
+            border-radius: var(--radius);
+            margin-top: 10px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--primary-color);
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+        }
+
+        .empty-cart i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        /* Footer Action */
+        footer {
+            margin-top: 40px;
+            padding: 40px 20px;
+            text-align: center;
+            background: #eee;
+            border-radius: var(--radius);
+        }
+
+        .pdf-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            color: var(--primary-color);
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 20px;
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+        }
+
+        .pdf-btn:active {
+            scale: 0.95;
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Custom Scrollbar for elderly */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+
+        /* Micro-animations */
+        .pulse {
+            animation: pulse-animation 2s infinite;
+        }
+
+        @keyframes pulse-animation {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>翠庭 JADE</h1>
+        <p>精緻粵式料理 • 暖心服務</p>
+    </header>
+
+    <div class="container" id="menu-container">
+        <!-- Menu categories and items will be rendered here -->
+    </div>
+
+    <footer>
+        <p style="margin-bottom: 20px;">想看完整實體菜單嗎？</p>
+        <a href="menu.pdf" target="_blank" class="pdf-btn">
+            <i class="ph-bold ph-file-pdf"></i>
+            開啟 PDF 完整菜單
+        </a>
+    </footer>
+
+    <button id="cart-btn">
+        <div class="badge" id="cart-badge">0</div>
+        <i class="ph-fill ph-shopping-cart"></i>
+        <span class="label">點菜單</span>
+    </button>
+
+    <div id="cart-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>我的點菜單</h2>
+                <button id="close-cart"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <div class="cart-items" id="cart-items-list">
+                <!-- Cart items will be rendered here -->
+            </div>
+            <div id="cart-footer">
+                <!-- Grand total will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const menuData = [
+            {
+                category: "冷盤類",
+                items: [
+                    { name: "玫瑰油雞", options: [{ size: "小份", price: 460 }, { size: "中份", price: 580 }, { size: "大份", price: 780 }] },
+                    { name: "明爐燒鴨", options: [{ size: "小份", price: 820 }, { size: "中份", price: 1080 }, { size: "大份", price: 1580 }] },
+                    { name: "蜜汁叉燒肉", options: [{ size: "小份", price: 460 }, { size: "中份", price: 580 }, { size: "大份", price: 820 }] },
+                    { name: "脆皮乳豬", options: [{ size: "小份", price: 1540 }, { size: "中份", price: 1780 }, { size: "大份", price: 2260 }] },
+                    { name: "鎮江肴肉", options: [{ size: "小份", price: 340 }, { size: "中份", price: 460 }, { size: "大份", price: 780 }] },
+                    { name: "雙拼 (任選兩種)", options: [{ size: "小份", price: 780 }, { size: "中份", price: 960 }, { size: "大份", price: 1180 }] },
+                    { name: "脆皮乳豬雙拼 (任選兩種)", options: [{ size: "小份", price: 1060 }, { size: "中份", price: 1660 }, { size: "大份", price: 2020 }] }
+                ]
+            },
+            {
+                category: "農曆新年限定版",
+                items: [
+                    { name: "鳳梨蝦球", options: [{ size: "小份", price: 580 }, { size: "中份", price: 780 }, { size: "大份", price: 980 }] },
+                    { name: "糖醋魚片", options: [{ size: "小份", price: 580 }, { size: "中份", price: 780 }, { size: "大份", price: 980 }] },
+                    { name: "蔥香石斑魚", options: [{ size: "一隻", price: 2300 }] },
+                    { name: "清蒸比目魚", options: [{ size: "小份", price: 980 }, { size: "中份", price: 1580 }, { size: "大份", price: 1800 }] },
+                    { name: "蘆筍XO醬帶子", options: [{ size: "小份", price: 880 }, { size: "中份", price: 1080 }, { size: "大份", price: 1280 }] },
+                    { name: "蘆筍蝦球", options: [{ size: "小份", price: 960 }, { size: "中份", price: 1080 }, { size: "大份", price: 1180 }] }
+                ]
+            },
+            {
+                category: "肉類",
+                items: [
+                    { name: "東坡肉", options: [{ size: "小份", price: 1080 }, { size: "大份", price: 2080 }] },
+                    { name: "無錫燒玉排", options: [{ size: "小份", price: 780 }, { size: "中份", price: 960 }, { size: "大份", price: 1180 }] },
+                    { name: "紅燒虎掌", options: [{ size: "小份", price: 960 }, { size: "中份", price: 1180 }, { size: "大份", price: 1560 }] },
+                    { name: "尖椒牛肉絲", options: [{ size: "小份", price: 580 }, { size: "中份", price: 780 }, { size: "大份", price: 1128 }] },
+                    { name: "XO醬雞丁", options: [{ size: "小份", price: 460 }, { size: "中份", price: 580 }, { size: "大份", price: 780 }] },
+                    { name: "江浙炒雞丁", options: [{ size: "小份", price: 460 }, { size: "中份", price: 580 }, { size: "大份", price: 780 }] },
+                    { name: "橙汁排骨", options: [{ size: "小份", price: 580 }, { size: "中份", price: 780 }, { size: "大份", price: 1080 }] }
+                ]
+            },
+            {
+                category: "海鮮類",
+                items: [
+                    { name: "上海油爆蝦", options: [{ size: "小份", price: 480 }, { size: "中份", price: 680 }, { size: "大份", price: 880 }] },
+                    { name: "虎掌美蔘", options: [{ size: "小份", price: 980 }, { size: "中份", price: 1480 }, { size: "大份", price: 1880 }] },
+                    { name: "生菜蝦鬆", options: [{ size: "小份", price: 880 }, { size: "中份", price: 1380 }, { size: "大份", price: 1880 }] },
+                    { name: "干燒蝦球", options: [{ size: "小份", price: 580 }, { size: "中份", price: 780 }, { size: "大份", price: 960 }] },
+                    { name: "雪菜魚片", options: [{ size: "小份", price: 580 }, { size: "中份", price: 780 }, { size: "大份", price: 1060 }] },
+                    { name: "糟香魚片", options: [{ size: "小份", price: 580 }, { size: "中份", price: 880 }, { size: "大份", price: 1060 }] },
+                    { name: "寧式炒鱔糊", options: [{ size: "小份", price: 580 }, { size: "中份", price: 880 }, { size: "大份", price: 1080 }] },
+                    { name: "清炒鱔糊", options: [{ size: "小份", price: 580 }, { size: "中份", price: 980 }, { size: "大份", price: 1180 }] }
+                ]
+            },
+            {
+                category: "青菜素炒類",
+                items: [
+                    { name: "雪菜豆腐", options: [{ size: "小份", price: 380 }, { size: "中份", price: 460 }, { size: "大份", price: 580 }] },
+                    { name: "雪菜百頁", options: [{ size: "小份", price: 480 }, { size: "中份", price: 680 }, { size: "大份", price: 960 }] },
+                    { name: "蝦皮青花菜", options: [{ size: "小份", price: 380 }, { size: "中份", price: 480 }, { size: "大份", price: 580 }] },
+                    { name: "老燒蛋", options: [{ size: "小份", price: 380 }, { size: "中份", price: 480 }, { size: "大份", price: 680 }] },
+                    { name: "金銀杏菜", options: [{ size: "小份", price: 480 }, { size: "中份", price: 580 }, { size: "大份", price: 780 }] },
+                    { name: "干貝蛤蠣角瓜", options: [{ size: "小份", price: 580 }, { size: "中份", price: 780 }, { size: "大份", price: 1080 }] }
+                ]
+            },
+            {
+                category: "鮑魚類",
+                items: [
+                    { name: "生菜鮑魚 (位上)", options: [{ size: "一客", price: 480 }] }
+                ]
+            },
+            {
+                category: "煲仔類",
+                items: [
+                    { name: "鮮蝦粉絲煲", options: [{ size: "小份", price: 680 }, { size: "中份", price: 820 }, { size: "大份", price: 1180 }] },
+                    { name: "砂鍋臭豆腐", options: [{ size: "一份", price: 480 }] },
+                    { name: "蟹粉海鮮豆腐煲", options: [{ size: "小份", price: 780 }, { size: "中份", price: 960 }, { size: "大份", price: 1280 }] }
+                ]
+            },
+            {
+                category: "湯品類",
+                items: [
+                    { name: "砂鍋醃鮮湯", options: [{ size: "小份", price: 960 }, { size: "中份", price: 1460 }, { size: "大份", price: 1680 }] },
+                    { name: "魚片蛤蠣湯", options: [{ size: "小份", price: 480 }, { size: "中份", price: 580 }, { size: "大份", price: 780 }] }
+                ]
+            },
+            {
+                category: "麵飯類",
+                items: [
+                    { name: "揚州炒飯", options: [{ size: "一份", price: 380 }] },
+                    { name: "烏魚子炒飯", options: [{ size: "一份", price: 480 }] },
+                    { name: "白菜炒年糕", options: [{ size: "小份", price: 380 }] },
+                    { name: "牛肉炒飯", options: [{ size: "一份", price: 380 }] }
+                ]
+            },
+            {
+                category: "港點類",
+                items: [
+                    { name: "魚翅灌湯包", options: [{ size: "一份", price: 280 }] },
+                    { name: "天成蝦餃皇", options: [{ size: "三個", price: 240 }] },
+                    { name: "鮮蝦腐皮捲", options: [{ size: "三條", price: 240 }] },
+                    { name: "魚子蒸燒賣", options: [{ size: "三個", price: 220 }] },
+                    { name: "脆皮韭菜餃", options: [{ size: "三個", price: 240 }] },
+                    { name: "天成奶皇包", options: [{ size: "三個", price: 240 }] },
+                    { name: "原味小籠包", options: [{ size: "八個", price: 380 }] },
+                    { name: "臘味蘿蔔糕", options: [{ size: "三片", price: 180 }] },
+                    { name: "港式炸春捲", options: [{ size: "三條", price: 180 }] },
+                    { name: "豉汁蒸排骨", options: [{ size: "一份", price: 180 }] },
+                    { name: "鮮蝦腸粉", options: [{ size: "一份", price: 220 }] },
+                    { name: "XO醬炆鳳爪", options: [{ size: "一份", price: 180 }] },
+                    { name: "芝麻球", options: [{ size: "三個", price: 180 }] },
+                    { name: "鮮青蔥酥餅", options: [{ size: "三個", price: 220 }] },
+                    { name: "冰心綠豆糕", options: [{ size: "三個", price: 180 }] },
+                    { name: "香蘋雪蓮子", options: [{ size: "一份", price: 180 }] },
+                    { name: "芋香西米露", options: [{ size: "一份", price: 150 }] },
+                    { name: "椰果西米露", options: [{ size: "一份", price: 150 }] },
+                    { name: "杏仁凍豆腐", options: [{ size: "一份", price: 150 }] }
+                ]
+            }
+        ];
+
+        let cart = {}; // Key format: "DishName-Size"
+
+        function renderMenu() {
+            const container = document.getElementById('menu-container');
+            container.innerHTML = '';
+
+            menuData.forEach((cat, catIdx) => {
+                const section = document.createElement('div');
+                section.className = 'category-section';
+                section.style.animationDelay = `${catIdx * 0.1}s`;
+
+                const title = document.createElement('div');
+                title.className = 'category-title';
+                title.innerHTML = `<span>${cat.category}</span>`;
+                section.appendChild(title);
+
+                cat.items.forEach(dish => {
+                    const card = document.createElement('div');
+                    card.className = 'dish-card';
+
+                    const dishName = document.createElement('div');
+                    dishName.className = 'dish-name';
+                    dishName.textContent = dish.name;
+                    card.appendChild(dishName);
+
+                    dish.options.forEach(opt => {
+                        const row = document.createElement('div');
+                        row.className = 'size-option';
+
+                        const info = document.createElement('div');
+                        info.className = 'size-info';
+                        info.innerHTML = `
+                        <span class="size-label">${opt.size}</span>
+                        <span class="size-price">$${opt.price}</span>
+                    `;
+                        row.appendChild(info);
+
+                        const stepper = document.createElement('div');
+                        stepper.className = 'stepper';
+
+                        const cartKey = `${dish.name}-${opt.size}`;
+                        const count = cart[cartKey] ? cart[cartKey].qty : 0;
+
+                        stepper.innerHTML = `
+                        <button onclick="updateQty('${dish.name}', '${opt.size}', ${opt.price}, -1)" ${count === 0 ? 'disabled' : ''}>-</button>
+                        <div class="count">${count}</div>
+                        <button onclick="updateQty('${dish.name}', '${opt.size}', ${opt.price}, 1)" ${count === 5 ? 'disabled' : ''}>+</button>
+                    `;
+                        row.appendChild(stepper);
+                        card.appendChild(row);
+                    });
+
+                    section.appendChild(card);
+                });
+                container.appendChild(section);
+            });
+        }
+
+        function updateQty(name, size, price, delta) {
+            const key = `${name}-${size}`;
+            if (!cart[key]) {
+                cart[key] = { name, size, price, qty: 0 };
+            }
+
+            cart[key].qty += delta;
+
+            if (cart[key].qty <= 0) {
+                delete cart[key];
+            } else if (cart[key].qty > 5) {
+                cart[key].qty = 5;
+            }
+
+            renderMenu();
+            updateCartUI();
+
+            // Add a little pop effect to the cart button
+            const btn = document.getElementById('cart-btn');
+            btn.classList.add('pulse');
+            setTimeout(() => btn.classList.remove('pulse'), 500);
+        }
+
+        function updateCartUI() {
+            const badge = document.getElementById('cart-badge');
+            const list = document.getElementById('cart-items-list');
+            const footer = document.getElementById('cart-footer');
+
+            let totalItems = 0;
+            let grandTotal = 0;
+
+            list.innerHTML = '';
+
+            const cartKeys = Object.keys(cart);
+
+            if (cartKeys.length === 0) {
+                badge.style.display = 'none';
+                list.innerHTML = `
+                <div class="empty-cart">
+                    <i class="ph-bold ph-shopping-cart"></i>
+                    <p>尚未點選任何菜色</p>
+                </div>
+            `;
+                footer.innerHTML = '';
+            } else {
+                badge.style.display = 'flex';
+                cartKeys.forEach(key => {
+                    const item = cart[key];
+                    totalItems += item.qty;
+                    const subtotal = item.price * item.qty;
+                    grandTotal += subtotal;
+
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'cart-item';
+                    itemEl.innerHTML = `
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${item.name}</div>
+                        <div class="cart-item-sub">${item.size} ($${item.price}) x ${item.qty}</div>
+                    </div>
+                    <div class="cart-item-price">
+                        $${subtotal}
+                    </div>
+                `;
+                    list.appendChild(itemEl);
+                });
+
+                badge.textContent = totalItems;
+                footer.innerHTML = `
+                <div class="cart-total">
+                    <div class="total-row">
+                        <span>總計</span>
+                        <span>$${grandTotal}</span>
+                    </div>
+                </div>
+            `;
+            }
+        }
+
+        // Modal Control
+        document.getElementById('cart-btn').addEventListener('click', () => {
+            document.getElementById('cart-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        document.getElementById('close-cart').addEventListener('click', () => {
+            document.getElementById('cart-modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+
+        // Initial Render
+        renderMenu();
+        updateCartUI();
+    </script>
+
+</body>
+
+</html>
