@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>體驗課程預約紀錄</title>
+    <!-- 引入 Google Material Symbols -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --required-empty: #fff1f1;
+            --required-filled: #f0f7ff;
+            --optional: #f2fff2;
+            --border-color: #e0e0e0;
+            --primary-color: #4a90e2;
+            --text-color: #2c3e50;
+            --pill-radius: 30px;
+            --nav-height: 80px;
+            --input-height: 48px;
+            /* 統一輸入框高度 */
+        }
+
+        body {
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding-top: var(--nav-height);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sticky-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--nav-height);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            overflow-x: auto;
+            padding: 0 20px;
+            border-bottom: 1px solid var(--border-color);
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .sticky-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-pills {
+            display: flex;
+            gap: 12px;
+            white-space: nowrap;
+            margin: 0 auto;
+        }
+
+        .nav-pill {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            background: white;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-pill.active {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .nav-pill.required-empty {
+            background-color: var(--required-empty);
+            border-color: #ffcdd2;
+        }
+
+        .nav-pill.required-filled {
+            background-color: var(--required-filled);
+            border-color: #bbdefb;
+        }
+
+        .nav-pill.optional {
+            background-color: var(--optional);
+            border-color: #c8e6c9;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--pill-radius);
+            padding: 28px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            border: 1px solid var(--border-color);
+            scroll-margin-top: calc(var(--nav-height) + 20px);
+        }
+
+        label.required::after {
+            content: " *";
+            color: #d32f2f;
+            font-weight: bold;
+        }
+
+        .card.required-empty {
+            background-color: var(--required-empty);
+            border-color: #ffcdd2;
+        }
+
+        .card.required-filled {
+            background-color: var(--required-filled);
+            border-color: #bbdefb;
+        }
+
+        .card.optional {
+            background-color: var(--optional);
+            border-color: #c8e6c9;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 1.35rem;
+            color: #444;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #555;
+        }
+
+        /* 統一輸入框與下拉選單樣式 */
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            height: var(--input-height);
+            padding: 0 18px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 16px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+            background-color: white;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            -webkit-appearance: none;
+            /* 移除 Safari 原生樣式 */
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        textarea {
+            height: auto;
+            padding-top: 12px;
+            padding-bottom: 12px;
+        }
+
+        /* 專門為 select 加入自定義箭頭圖示 */
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24' fill='%23666'%3E%3Cpath d='M480-345 240-585l56-56 184 184 184-184 56 56-240 240Z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 40px;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary-color);
+        }
+
+        .number-input-container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .number-btn {
+            width: 44px;
+            height: 44px;
+            border: none;
+            background: white;
+            color: var(--primary-color);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            flex-shrink: 0;
+        }
+
+        .number-input-container input {
+            text-align: center;
+            padding: 0;
+        }
+
+        .other-input {
+            margin-top: 12px;
+            display: none !important;
+            /* 強制隱藏，防止被通用輸入框樣式覆蓋 */
+        }
+
+        .other-input.visible {
+            display: flex !important;
+            /* 顯示時使用 flex 以符合整體造型 */
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+                padding-top: var(--nav-height);
+            }
+
+            .card {
+                padding: 20px;
+                border-radius: 20px;
+            }
+
+            .sticky-nav {
+                padding: 0 10px;
+            }
+
+            :root {
+                --input-height: 44px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="sticky-nav">
+        <div class="nav-pills" id="navPills"></div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>體驗課程預約紀錄</h1>
+        </header>
+
+        <form id="appointmentForm">
+            <!-- 家長資訊卡片 -->
+            <div class="card required-empty" id="parentCard">
+                <div class="card-header">
+                    <span class="material-symbols-outlined">person</span>
+                    <h2>家長資訊</h2>
+                </div>
+
+                <div class="form-group">
+                    <label class="required"><span class="material-symbols-outlined" style="font-size: 18px">call</span>
+                        聯絡電話</label>
+                    <input type="text" name="parentPhone" required placeholder="請輸入聯絡電話"
+                        oninput="validateCard('parentCard')">
+                </div>
+
+                <div class="form-group">
+                    <label class="required"><span class="material-symbols-outlined" style="font-size: 18px">mail</span>
+                        Email</label>
+                    <input type="email" name="parentEmail" required placeholder="example@mail.com"
+                        oninput="validateCard('parentCard')">
+                </div>
+
+                <div class="form-group">
+                    <label class="required"><span class="material-symbols-outlined"
+                            style="font-size: 18px">assignment_ind</span> 稱謂</label>
+                    <select name="parentTitle" required
+                        onchange="handleDropdownOther(this, 'parentTitleOther'); validateCard('parentCard')">
+                        <option value="">請選擇稱謂</option>
+                    </select>
+                    <input type="text" id="parentTitleOther" class="other-input" placeholder="請輸入其他稱謂"
+                        oninput="validateCard('parentCard')">
+                </div>
+
+                <div class="form-group">
+                    <label class="required"><span class="material-symbols-outlined" style="font-size: 18px">group</span>
+                        預約學員人數</label>
+                    <div class="number-input-container">
+                        <button type="button" class="number-btn" onclick="stepNumber('studentCount', -1)">
+                            <span class="material-symbols-outlined">remove_circle_outline</span>
+                        </button>
+                        <input type="number" id="studentCount" name="studentCount" value="0" min="0" required
+                            oninput="syncStudentCards(); validateCard('parentCard')">
+                        <button type="button" class="number-btn" onclick="stepNumber('studentCount', 1)">
+                            <span class="material-symbols-outlined">add_circle_outline</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><span class="material-symbols-outlined" style="font-size: 18px">notes</span> 備註 (家長)</label>
+                    <textarea name="parentNote" rows="2" placeholder="備註資訊..."></textarea>
+                </div>
+            </div>
+
+            <div id="studentCardsContainer"></div>
+
+            <div class="card optional" id="noteCard">
+                <div class="card-header">
+                    <span class="material-symbols-outlined">sticky_note_2</span>
+                    <h2>備註</h2>
+                </div>
+                <div class="form-group">
+                    <label>備註內容</label>
+                    <textarea name="mainNote" rows="3" placeholder="請輸入額外聯絡紀錄..."></textarea>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let configData = null;
+        const navPills = document.getElementById('navPills');
+        const observerOptions = { root: null, threshold: 0.6 };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) updateActiveNav(entry.target.id);
+            });
+        }, observerOptions);
+
+        async function loadConfig() {
+            try {
+                const response = await fetch('config.json');
+                if (!response.ok) throw new Error('Network response was not ok');
+                configData = await response.json();
+                populateDropdowns();
+                initNav();
+            } catch (error) {
+                console.error('無法載入參數紀錄檔:', error);
+            }
+        }
+
+        function populateDropdowns() {
+            if (!configData) return;
+            const parentSelect = document.querySelector('select[name="parentTitle"]');
+            parentSelect.innerHTML = '<option value="">請選擇稱謂</option>';
+            configData.titles.forEach(title => {
+                const opt = document.createElement('option');
+                opt.value = title;
+                opt.textContent = title;
+                parentSelect.appendChild(opt);
+            });
+        }
+
+        function initNav() {
+            refreshNav();
+            document.querySelectorAll('.card').forEach(card => observer.observe(card));
+        }
+
+        function refreshNav() {
+            navPills.innerHTML = '';
+            addNavPill('parentCard', 'person', '家長資訊');
+            const studentCards = document.querySelectorAll('[id^="studentCard_"]');
+            studentCards.forEach(card => {
+                const index = card.id.split('_')[1];
+                addNavPill(card.id, 'face', `學員 (${index})`);
+            });
+            addNavPill('noteCard', 'sticky_note_2', '備註');
+            document.querySelectorAll('.card').forEach(card => updateNavPillColor(card.id));
+        }
+
+        function addNavPill(cardId, icon, text) {
+            const pill = document.createElement('div');
+            pill.className = 'nav-pill';
+            pill.id = `nav_${cardId}`;
+            pill.innerHTML = `<span class="material-symbols-outlined">${icon}</span> ${text}`;
+            pill.onclick = () => document.getElementById(cardId).scrollIntoView({ behavior: 'smooth' });
+            navPills.appendChild(pill);
+        }
+
+        function updateActiveNav(cardId) {
+            document.querySelectorAll('.nav-pill').forEach(pill => pill.classList.remove('active'));
+            const activePill = document.getElementById(`nav_${cardId}`);
+            if (activePill) {
+                activePill.classList.add('active');
+                centerNavPill(activePill);
+            }
+        }
+
+        function centerNavPill(pill) {
+            const nav = document.querySelector('.sticky-nav');
+            const navWidth = nav.offsetWidth;
+            const pillLeft = pill.offsetLeft;
+            const pillWidth = pill.offsetWidth;
+            nav.scrollTo({ left: pillLeft - (navWidth / 2) + (pillWidth / 2), behavior: 'smooth' });
+        }
+
+        function stepNumber(id, delta) {
+            const input = document.getElementById(id);
+            let val = parseInt(input.value) || 0;
+            val = Math.max(0, val + delta);
+            input.value = val;
+            if (id === 'studentCount') syncStudentCards();
+            else if (id.startsWith('courseCount')) validateCard(input.closest('.card').id);
+            validateCard('parentCard');
+        }
+
+        function syncStudentCards() {
+            const count = parseInt(document.getElementById('studentCount').value) || 0;
+            const container = document.getElementById('studentCardsContainer');
+            const currentCardsCount = container.querySelectorAll('.card').length;
+            if (count > currentCardsCount) {
+                for (let i = currentCardsCount + 1; i <= count; i++) addStudentCard(i);
+            } else if (count < currentCardsCount) {
+                for (let i = currentCardsCount; i > count; i--) {
+                    const card = document.getElementById(`studentCard_${i}`);
+                    if (card) { observer.unobserve(card); card.remove(); }
+                }
+            }
+            refreshNav();
+        }
+
+        function addStudentCard(index) {
+            const container = document.getElementById('studentCardsContainer');
+            const card = document.createElement('div');
+            card.className = 'card required-empty';
+            card.id = `studentCard_${index}`;
+            let gradeOptions = '<option value="">請選擇年級</option>';
+            if (configData) configData.grades.forEach(grade => gradeOptions += `<option value="${grade}">${grade}</option>`);
+            card.innerHTML = `
+                <div class="card-header"><span class="material-symbols-outlined">face</span><h2>學員 (${index})</h2></div>
+                <div class="form-group"><label class="required"><span class="material-symbols-outlined" style="font-size: 18px">person_edit</span> 姓名</label><input type="text" name="studentName_${index}" required placeholder="學員姓名" oninput="validateCard('studentCard_${index}')"></div>
+                <div class="form-group"><label class="required"><span class="material-symbols-outlined" style="font-size: 18px">school</span> 年級</label><select name="studentGrade_${index}" required onchange="handleDropdownOther(this, 'studentGradeOther_${index}'); validateCard('studentCard_${index}')">${gradeOptions}</select><input type="text" id="studentGradeOther_${index}" class="other-input" placeholder="請輸入其他年級資訊" oninput="validateCard('studentCard_${index}')"></div>
+                <div class="form-group"><label class="required"><span class="material-symbols-outlined" style="font-size: 18px">auto_stories</span> 體驗課程數</label><div class="number-input-container"><button type="button" class="number-btn" onclick="stepNumber('courseCount_${index}', -1)"><span class="material-symbols-outlined">remove_circle_outline</span></button><input type="number" id="courseCount_${index}" name="courseCount_${index}" value="0" min="0" required oninput="validateCard('studentCard_${index}')"><button type="button" class="number-btn" onclick="stepNumber('courseCount_${index}', 1)"><span class="material-symbols-outlined">add_circle_outline</span></button></div></div>
+            `;
+            container.appendChild(card);
+            observer.observe(card);
+        }
+
+        function handleDropdownOther(select, otherId) {
+            const otherInput = document.getElementById(otherId);
+            if (select.value === '其他') { otherInput.classList.add('visible'); otherInput.required = true; }
+            else { otherInput.classList.remove('visible'); otherInput.required = false; otherInput.value = ''; }
+        }
+
+        function validateCard(cardId) {
+            const card = document.getElementById(cardId);
+            if (!card) return;
+            const inputs = card.querySelectorAll('input[required], select[required]');
+            let allFilled = true;
+            inputs.forEach(input => {
+                if (input.type === 'number') { if (input.value === '' || isNaN(input.value) || parseInt(input.value) < 0) allFilled = false; }
+                else if (input.classList.contains('other-input')) { if (input.classList.contains('visible') && !input.value.trim()) allFilled = false; }
+                else { if (!input.value.trim()) allFilled = false; if (input.type === 'email' && !input.validity.valid) allFilled = false; }
+            });
+            if (allFilled) { card.classList.remove('required-empty'); card.classList.add('required-filled'); }
+            else { card.classList.remove('required-filled'); card.classList.add('required-empty'); }
+            updateNavPillColor(cardId);
+        }
+
+        function updateNavPillColor(cardId) {
+            const card = document.getElementById(cardId);
+            const pill = document.getElementById(`nav_${cardId}`);
+            if (!card || !pill) return;
+            pill.classList.remove('required-empty', 'required-filled', 'optional');
+            if (card.classList.contains('required-empty')) pill.classList.add('required-empty');
+            else if (card.classList.contains('required-filled')) pill.classList.add('required-filled');
+            else if (card.classList.contains('optional')) pill.classList.add('optional');
+        }
+
+        window.onload = loadConfig;
+    </script>
+</body>
+
+</html>
