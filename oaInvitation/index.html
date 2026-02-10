@@ -311,6 +311,89 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Call Record Floating Button & Modal */
+        .floating-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            transition: transform 0.2s;
+        }
+
+        .floating-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .floating-btn .material-symbols-outlined {
+            font-size: 32px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 3000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: var(--pill-radius);
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
     </style>
 </head>
 
@@ -352,6 +435,17 @@
                         <option value="">請選擇稱謂</option>
                     </select>
                     <input type="text" id="parentTitleOther" class="other-input" placeholder="請輸入其他稱謂"
+                        oninput="validateCard('parentCard')">
+                </div>
+                <div class="form-group">
+                    <label class="required"><span class="material-symbols-outlined"
+                            style="font-size: 18px">psychology_alt</span>
+                        留單動機</label>
+                    <select name="leaveMotivation" required
+                        onchange="handleDropdownOther(this, 'leaveMotivationOther'); validateCard('parentCard')">
+                        <option value="">請選擇動機</option>
+                    </select>
+                    <input type="text" id="leaveMotivationOther" class="other-input" placeholder="請輸入其他留單動機"
                         oninput="validateCard('parentCard')">
                 </div>
                 <div class="form-group">
@@ -413,6 +507,59 @@
 
             <div id="studentCardsContainer"></div>
 
+            <!-- 其他資訊卡片 -->
+            <div class="card required-empty" id="otherInfoCard">
+                <div class="card-header">
+                    <span class="material-symbols-outlined">info</span>
+                    <h2>其他資訊</h2>
+                </div>
+                <div class="form-group">
+                    <label class="required">說明會出席</label>
+                    <select name="briefingAttend" required
+                        onchange="handleDropdownOther(this, 'briefingAttendOther'); validateCard('otherInfoCard')">
+                        <option value="">請選擇出席狀況</option>
+                    </select>
+                    <input type="text" id="briefingAttendOther" class="other-input" placeholder="請輸入其他出席資訊"
+                        oninput="validateCard('otherInfoCard')">
+                </div>
+                <div class="form-group">
+                    <label class="required">報價反應</label>
+                    <select name="priceReaction" required
+                        onchange="handleDropdownOther(this, 'priceReactionOther'); validateCard('otherInfoCard')">
+                        <option value="">請選擇報價反應</option>
+                    </select>
+                    <input type="text" id="priceReactionOther" class="other-input" placeholder="請輸入其他報價反應"
+                        oninput="validateCard('otherInfoCard')">
+                </div>
+                <div class="form-group">
+                    <label class="required">決策者</label>
+                    <select name="decisionMaker" required
+                        onchange="handleDropdownOther(this, 'decisionMakerOther'); validateCard('otherInfoCard')">
+                        <option value="">請選擇決策者</option>
+                    </select>
+                    <input type="text" id="decisionMakerOther" class="other-input" placeholder="請輸入其他決策者"
+                        oninput="validateCard('otherInfoCard')">
+                </div>
+                <div class="form-group">
+                    <label class="required">預約與否</label>
+                    <select name="reservationStatus" required onchange="validateCard('otherInfoCard')">
+                        <option value="">請選擇預約與否</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="required">客戶等級</label>
+                    <select name="customerLevel" required onchange="validateCard('otherInfoCard')">
+                        <option value="">請選擇客戶等級</option>
+                    </select>
+                </div>
+
+
+            </div>
+
+            <!-- 其他資訊卡片 -->
+            <!-- ... -->
+
+
             <!-- 總體備註 -->
             <div class="card optional" id="noteCard">
                 <div class="card-header">
@@ -426,16 +573,80 @@
         </form>
     </div>
 
+    <!-- Call Record Button -->
+    <button class="floating-btn" onclick="toggleCallRecord()" title="撥打紀錄">
+        <span class="material-symbols-outlined">call_log</span>
+    </button>
+
+    <!-- Call Record Modal -->
+    <div id="callRecordModal" class="modal" onclick="if(event.target === this) toggleCallRecord()">
+        <div class="modal-content">
+            <button class="close-btn" onclick="toggleCallRecord()">&times;</button>
+            <div class="card-header">
+                <span class="material-symbols-outlined">history</span>
+                <h2>撥打紀錄</h2>
+            </div>
+            <div class="form-group">
+                <label>預約課程</label>
+                <textarea id="callRecordText" rows="5" readonly
+                    style="background-color: var(--required-filled);"></textarea>
+            </div>
+            <div class="form-group">
+                <label>紀錄</label>
+                <textarea id="fullRecordText" rows="12" readonly
+                    style="background-color: var(--required-filled);"></textarea>
+            </div>
+        </div>
+    </div>
+
     <script>
         let configData = null;
         const navPills = document.getElementById('navPills');
-        const observerOptions = { root: null, threshold: 0.2 };
+        const observerOptions = { root: null, threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1] };
+
+        // Use a Set to track all currently visible cards
+        const visibleCards = new Set();
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) updateActiveNav(entry.target.id);
+                if (entry.isIntersecting) visibleCards.add(entry.target.id);
+                else visibleCards.delete(entry.target.id);
             });
+            determineActiveCard();
         }, observerOptions);
+
+        function determineActiveCard() {
+            if (visibleCards.size === 0) return;
+
+            const navHeight = 80;
+            const targetLine = navHeight + 20; // Trigger point slightly below nav
+
+            const cards = Array.from(visibleCards).map(id => {
+                const el = document.getElementById(id);
+                if (!el) return null;
+                const rect = el.getBoundingClientRect();
+
+                // If a card's bottom is above the target line, it's effectively scrolled past
+                if (rect.bottom < targetLine) return null;
+
+                return {
+                    id,
+                    rect,
+                    // Calculate distance of the card's top edge to the target line.
+                    // We prioritize the card whose top is closest to the target line (trigger point).
+                    // This works for both scrolling down (next card approaches line) 
+                    // and scrolling up (previous card approaches line from top).
+                    dist: Math.abs(rect.top - targetLine)
+                };
+            }).filter(c => c !== null);
+
+            if (cards.length === 0) return;
+
+            // Sort by distance to target line
+            cards.sort((a, b) => a.dist - b.dist);
+
+            updateActiveNav(cards[0].id);
+        }
 
         async function loadConfig() {
             try {
@@ -459,6 +670,12 @@
                 else if (name === 'networkType') placeholderText = "請選擇網路";
                 else if (name === 'osType') placeholderText = "請選擇系統";
                 else if (name.startsWith('testType')) placeholderText = "請選擇測驗（選填）";
+                else if (name === 'leaveMotivation') placeholderText = "請選擇動機";
+                else if (name === 'briefingAttend') placeholderText = "請選擇出席狀況";
+                else if (name === 'priceReaction') placeholderText = "請選擇報價反應";
+                else if (name === 'decisionMaker') placeholderText = "請選擇決策者";
+                else if (name === 'reservationStatus') placeholderText = "請選擇預約與否";
+                else if (name === 'customerLevel') placeholderText = "請選擇客戶等級";
 
                 select.innerHTML = `<option value="">${placeholderText}</option>`;
                 options.forEach(opt => {
@@ -474,9 +691,15 @@
         function populateDropdowns() {
             if (!configData) return;
             populateSelect('parentTitle', configData.titles);
+            populateSelect('leaveMotivation', configData.leaveMotivation);
             populateSelect('equipmentType', configData.equipment);
             populateSelect('networkType', configData.network);
             populateSelect('osType', configData.os);
+            populateSelect('briefingAttend', configData.briefingAttend);
+            populateSelect('priceReaction', configData.priceReaction);
+            populateSelect('decisionMaker', configData.decisionMaker);
+            populateSelect('reservationStatus', configData.reservationStatus);
+            populateSelect('customerLevel', configData.customerLevel);
         }
 
         function initNav() {
@@ -504,6 +727,7 @@
                 });
             });
 
+            addNavPill('otherInfoCard', 'info', '其他資訊');
             addNavPill('noteCard', 'sticky_note_2', '備註');
             document.querySelectorAll('.card').forEach(card => updateNavPillColor(card.id));
         }
@@ -616,7 +840,7 @@
             card.id = `courseCard_${sIdx}_${cIdx}`;
 
             const today = new Date().toISOString().split('T')[0];
-            const courseOpts = configData.trialCourses.map(c => `<option value="${c}">${c}</option>`).join('');
+            const courseOpts = configData.trialCourses.map(c => `<option value="${c.name}" data-abbr="${c.abbr}">${c.name}</option>`).join('');
             const timeOpts = configData.timeSlots.map(t => `<option value="${t}">${t}</option>`).join('');
             const testOpts = configData.testSending.map(t => `<option value="${t}">${t}</option>`).join('');
             const pExp = configData.programmingExp.map(e => `<option value="${e}">${e}</option>`).join('');
@@ -757,8 +981,28 @@
                 if (!hasExp) allFilled = false;
             }
 
-            card.classList.toggle('required-empty', !allFilled);
-            card.classList.toggle('required-filled', allFilled);
+            // Student Card Logic: Name and Grade filled -> blue
+            if (card.id.startsWith('studentCard_')) {
+                const sIdx = card.id.split('_')[1];
+                const sName = document.querySelector(`[name="studentName_${sIdx}"]`).value.trim();
+                const sGrade = document.querySelector(`[name="studentGrade_${sIdx}"]`).value;
+                if (sGrade === '其他') {
+                    const sGradeOther = document.getElementById(`studentGradeOther_${sIdx}`).value.trim();
+                    if (!sGradeOther) allFilled = false; // still need "Other" to be filled if selected
+                }
+
+                // Override allFilled for color status if name and grade are present
+                if (sName && sGrade && (sGrade !== '其他' || document.getElementById(`studentGradeOther_${sIdx}`).value.trim())) {
+                    card.classList.remove('required-empty');
+                    card.classList.add('required-filled');
+                } else {
+                    card.classList.remove('required-filled');
+                    card.classList.add('required-empty');
+                }
+            } else {
+                card.classList.toggle('required-empty', !allFilled);
+                card.classList.toggle('required-filled', allFilled);
+            }
             updateNavPillColor(cardId);
         }
 
@@ -766,10 +1010,181 @@
             const card = document.getElementById(cardId);
             const pill = document.getElementById(`nav_${cardId}`);
             if (!card || !pill) return;
+
+            // Determine status based on card classes
+            let status = '';
+            if (card.classList.contains('required-empty')) {
+                status = 'required-empty';
+            } else if (card.classList.contains('required-filled')) {
+                status = 'required-filled';
+            } else if (card.classList.contains('optional')) {
+                status = 'optional';
+            }
+            updateNavPillStatus(cardId, status);
+        }
+
+        function updateNavPillStatus(cardId, status) {
+            const pill = document.getElementById(`nav_${cardId}`);
+            if (!pill) return;
             pill.classList.remove('required-empty', 'required-filled', 'optional');
-            if (card.classList.contains('required-empty')) pill.classList.add('required-empty');
-            else if (card.classList.contains('required-filled')) pill.classList.add('required-filled');
-            else if (card.classList.contains('optional')) pill.classList.add('optional');
+            if (status) {
+                pill.classList.add(status);
+            }
+        }
+
+        // Call Record Modal Logic
+        function toggleCallRecord() {
+            const modal = document.getElementById('callRecordModal');
+            if (modal.classList.contains('show')) {
+                modal.classList.remove('show');
+                setTimeout(() => modal.style.display = 'none', 300); // Wait for transition
+            } else {
+                generateCallRecord();
+                modal.style.display = 'flex';
+                // Trigger reflow
+                modal.offsetHeight;
+                modal.classList.add('show');
+            }
+        }
+
+        function generateCallRecord() {
+            let records = [];
+            const studentCount = parseInt(document.getElementById('studentCount').value) || 0;
+
+            // For full record
+            let courseDetails = [];
+            let experiences = [];
+
+            for (let i = 1; i <= studentCount; i++) {
+                const sName = document.querySelector(`[name="studentName_${i}"]`).value.trim();
+                let sGrade = document.querySelector(`[name="studentGrade_${i}"]`).value;
+                if (sGrade === '其他') sGrade = document.getElementById(`studentGradeOther_${i}`).value.trim();
+
+                const courseCount = parseInt(document.getElementById(`courseCount_${i}`).value) || 0;
+                for (let j = 1; j <= courseCount; j++) {
+                    const cTypeSelect = document.querySelector(`[name="courseType_${i}_${j}"]`);
+                    const cType = cTypeSelect.value;
+                    const cAbbr = cTypeSelect.selectedOptions[0]?.dataset.abbr || cType;
+
+                    const date = document.querySelector(`[name="dateText_${i}_${j}"]`).value.trim();
+                    let time = document.querySelector(`[name="timeSlot_${i}_${j}"]`).value;
+                    if (time === '其他') time = document.getElementById(`timeOther_${i}_${j}`).value.trim();
+
+                    // Only add if all fields are valid
+                    if (sName && sGrade && cType && date && time) {
+                        records.push({
+                            date: date,
+                            time: time,
+                            text: `${sGrade}${sName} ${date} ${time} ${cAbbr}`
+                        });
+
+                        // Collect for full record
+                        courseDetails.push(`${cType}`); // Logic implies collecting course names
+                    }
+
+                    // Collect Experiences
+                    const pExp = document.getElementById(`progText_${i}_${j}`).value.trim();
+                    const mExp = document.getElementById(`mathText_${i}_${j}`).value.trim();
+                    const gExp = document.getElementById(`gameText_${i}_${j}`).value.trim();
+                    let expStr = [];
+                    if (pExp) expStr.push(pExp);
+                    if (mExp) expStr.push(mExp);
+                    if (gExp) expStr.push(gExp);
+                    if (expStr.length > 0 && sName && sGrade) {
+                        experiences.push(`（${sGrade}）（${sName}）（${expStr.join('/')}）`);
+                    }
+                }
+            }
+
+            // Sort by Date then Time
+            records.sort((a, b) => {
+                if (a.date !== b.date) return a.date.localeCompare(b.date);
+                return a.time.localeCompare(b.time);
+            });
+
+            const textarea = document.getElementById('callRecordText');
+            textarea.value = records.map(r => r.text).join('\n');
+
+            // --- Generate Full Record ---
+
+            // 1. Gather Data
+            let motivation = document.querySelector('[name="leaveMotivation"]').value;
+            if (motivation === '其他') motivation = document.getElementById('leaveMotivationOther').value.trim();
+
+            let equipment = document.querySelector('[name="equipmentType"]').value;
+            if (equipment === '其他') equipment = document.getElementById('equipmentOther').value.trim();
+
+            let network = document.querySelector('[name="networkType"]').value;
+            if (network === '其他') network = document.getElementById('networkOther').value.trim();
+
+            let os = document.querySelector('[name="osType"]').value;
+            if (os === '其他') os = document.getElementById('osOther').value.trim();
+
+            let decision = document.querySelector('[name="decisionMaker"]').value;
+            if (decision === '其他') decision = document.getElementById('decisionMakerOther').value.trim();
+
+            let briefing = document.querySelector('[name="briefingAttend"]').value;
+            if (briefing === '其他') briefing = document.getElementById('briefingAttendOther').value.trim();
+
+            let price = document.querySelector('[name="priceReaction"]').value;
+            if (price === '其他') price = document.getElementById('priceReactionOther').value.trim();
+
+            let level = document.querySelector('[name="customerLevel"]').value;
+
+            let parentPhone = document.querySelector('[name="parentPhone"]').value.trim();
+            let parentEmail = document.querySelector('[name="parentEmail"]').value.trim();
+
+            // Collect all notes
+            let allNotes = [];
+            const parentNote = document.querySelector('[name="parentNote"]').value.trim();
+            if (parentNote) allNotes.push(`家長備註：${parentNote}`);
+
+            const equipNote = document.querySelector('[name="equipmentNote"]').value.trim();
+            if (equipNote) allNotes.push(`設備備註：${equipNote}`);
+
+            // Loop for student/course notes
+            for (let i = 1; i <= studentCount; i++) {
+                const sName = document.querySelector(`[name="studentName_${i}"]`).value.trim();
+                const sNote = document.querySelector(`[name="studentNote_${i}"]`).value.trim();
+                if (sName && sNote) allNotes.push(`${sName}備註：${sNote}`);
+
+                const courseCount = parseInt(document.getElementById(`courseCount_${i}`).value) || 0;
+                for (let j = 1; j <= courseCount; j++) {
+                    const cNote = document.querySelector(`[name="courseNote_${i}_${j}"]`).value.trim();
+                    if (cNote) allNotes.push(`課程(${i}-${j})備註：${cNote}`);
+                }
+            }
+
+            const mainNote = document.querySelector('[name="mainNote"]').value.trim();
+            if (mainNote) allNotes.push(`總體備註：${mainNote}`);
+
+
+            // 2. Format String
+            // Use unique course names for line 1? user said "預約課程", usually implies list. 
+            // The requirement says: Age+Time/Course: (Reserved Courses). 
+            // Re-reading format: ① 年級+體驗時間/課程：（預約課程）
+            // I will join the abbreviated lines from the top box for "Reserved Courses" or just list types.
+            // Let's use the summary text generated above.
+
+            const reservedCoursesStr = records.map(r => r.text).join('、');
+
+            const fullRecord =
+                `① 年級+體驗時間/課程：${reservedCoursesStr}
+② 動機：${motivation}
+③ 經驗：${experiences.join('')}
+④ 桌/筆+有無Wifi：（${equipment}）（${network}）。
+⑤ Mac/Windows：（${os}）。
+⑥ 決策者：（${decision}）。
+⑦ 出席家長：（${briefing}）。
+⑧ 報價反應：（${price}）。
+⑨ A/B/C：（${level}）。
+⑩ 其他備註：
+${allNotes.join('\n')}
+
+家長Email：${parentEmail}
+家長電話：${parentPhone}`;
+
+            document.getElementById('fullRecordText').value = fullRecord;
         }
 
         window.onload = loadConfig;
