@@ -622,15 +622,19 @@
                 <span class="material-symbols-outlined">history</span>
                 <h2>撥打紀錄</h2>
             </div>
-            <div class="form-group">
+            <div class="form-group" style="display: none;">
                 <label>預約課程</label>
-                <textarea id="callRecordText" rows="5" readonly
-                    style="background-color: var(--required-filled);"></textarea>
+                <textarea id="callRecordText" rows="5"
+                    style="background-color: var(--required-filled); border: 1.5px solid var(--border-color);"></textarea>
             </div>
             <div class="form-group">
                 <label>紀錄</label>
-                <textarea id="fullRecordText" rows="12" readonly
-                    style="background-color: var(--required-filled);"></textarea>
+                <textarea id="fullRecordText" rows="12"
+                    style="background-color: var(--required-filled); border: 1.5px solid var(--border-color);"></textarea>
+                <button class="copy-btn" onclick="copyToClipboard('fullRecordText', this)">
+                    <span class="material-symbols-outlined">content_copy</span>
+                    複製內容
+                </button>
             </div>
         </div>
     </div>
@@ -647,7 +651,7 @@
                 <label>罐頭簡訊</label>
                 <textarea id="smsTemplateText" rows="12"
                     style="background-color: #fff; border: 1.5px solid var(--border-color);"></textarea>
-                <button class="copy-btn" onclick="copySmsTemplate()">
+                <button class="copy-btn" onclick="copyToClipboard('smsTemplateText', this)">
                     <span class="material-symbols-outlined">content_copy</span>
                     複製內容
                 </button>
@@ -1127,17 +1131,17 @@
             document.getElementById('smsTemplateText').value = template;
         }
 
-        async function copySmsTemplate() {
-            const textArea = document.getElementById('smsTemplateText');
+        async function copyToClipboard(elementId, btn) {
+            const textArea = document.getElementById(elementId);
             try {
                 await navigator.clipboard.writeText(textArea.value);
-                const copyBtn = document.querySelector('.copy-btn');
-                const originalText = copyBtn.innerHTML;
-                copyBtn.innerHTML = '<span class="material-symbols-outlined">check</span> 已複製';
-                copyBtn.style.backgroundColor = '#4caf50';
+                const originalHTML = btn.innerHTML;
+                const originalBG = btn.style.backgroundColor;
+                btn.innerHTML = '<span class="material-symbols-outlined">check</span> 已複製';
+                btn.style.backgroundColor = '#4caf50';
                 setTimeout(() => {
-                    copyBtn.innerHTML = originalText;
-                    copyBtn.style.backgroundColor = '';
+                    btn.innerHTML = originalHTML;
+                    btn.style.backgroundColor = originalBG;
                 }, 2000);
             } catch (err) {
                 console.error('無法複製文字: ', err);
@@ -1182,8 +1186,12 @@
                     if (pExp) expStr.push(pExp);
                     if (mExp) expStr.push(mExp);
                     if (gExp) expStr.push(gExp);
-                    if (expStr.length > 0 && sName && sGrade) {
-                        experiences.push(`${sGrade}${sName}${expStr.join('/')}`);
+                    if (expStr.length > 0) {
+                        experiences.push({
+                            name: sName,
+                            grade: sGrade,
+                            exp: expStr.join('、')
+                        });
                     }
                 }
             }
@@ -1221,21 +1229,20 @@
             const reservedCoursesStr = records.map(r => r.text.replace('。', '')).join('、');
 
             let allNotes = [];
-            const gatherNote = (name, label) => {
+            const gatherNote = (name) => {
                 const val = document.querySelector(`[name="${name}"]`)?.value.trim();
-                if (val) allNotes.push(`${label}：${val}`);
+                if (val) allNotes.push(val);
             };
-            gatherNote('parentNote', '家長備註');
-            gatherNote('equipmentNote', '設備備註');
+            gatherNote('parentNote');
+            gatherNote('equipmentNote');
             for (let i = 1; i <= studentCount; i++) {
-                const sName = document.querySelector(`[name="studentName_${i}"]`).value.trim();
-                gatherNote(`studentNote_${i}`, `${sName || '學員' + i}備註`);
+                gatherNote(`studentNote_${i}`);
                 const courseCount = parseInt(document.getElementById(`courseCount_${i}`).value) || 0;
                 for (let j = 1; j <= courseCount; j++) {
-                    gatherNote(`courseNote_${i}_${j}`, `課程(${i}-${j})備註`);
+                    gatherNote(`courseNote_${i}_${j}`);
                 }
             }
-            gatherNote('mainNote', '總體備註');
+            gatherNote('mainNote');
 
             const lines = [];
             const addLine = (prefix, content, suffix = "。") => {
@@ -1244,8 +1251,17 @@
 
             addLine("① 年級+體驗時間/課程：", reservedCoursesStr);
             addLine("② 動機：", motivation);
-            addLine("③ 經驗：", experiences.join(' '));
-            addLine("④ 桌/筆+有無Wifi：", (equipment || network) ? `${equipment}${network}` : "");
+
+            // Section ③ Logic
+            let expOutput = "";
+            if (experiences.length === 1) {
+                expOutput = experiences[0].exp;
+            } else if (experiences.length > 1) {
+                expOutput = experiences.map(e => `${e.grade}${e.name} ${e.exp}`).join('；');
+            }
+            addLine("③ 經驗：", expOutput);
+
+            addLine("④ 桌/筆+有無Wifi：", (equipment || network) ? `${equipment}${network ? '＋' + network : ''}` : "");
             addLine("⑤ Mac/Windows：", os);
             addLine("⑥ 決策者：", decision);
             addLine("⑦ 出席家長：", briefing);
@@ -1254,7 +1270,7 @@
 
             if (allNotes.length > 0) {
                 lines.push("⑩ 其他備註：");
-                lines.push(allNotes.join('\n') + "。");
+                lines.push(allNotes.join('\n'));
             }
 
             let fullBody = lines.join('\n');
