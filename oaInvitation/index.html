@@ -1149,7 +1149,6 @@
             let records = [];
             const studentCount = parseInt(document.getElementById('studentCount').value) || 0;
 
-            // For full record
             let courseDetails = [];
             let experiences = [];
 
@@ -1168,19 +1167,14 @@
                     let time = document.querySelector(`[name="timeSlot_${i}_${j}"]`).value;
                     if (time === '其他') time = document.getElementById(`timeOther_${i}_${j}`).value.trim();
 
-                    // Only add if all fields are valid
                     if (sName && sGrade && cType && date && time) {
                         records.push({
                             date: date,
                             time: time,
-                            text: `${sGrade}${sName} ${date} ${time} ${cAbbr}`
+                            text: `${sGrade}${sName} ${date} ${time} ${cAbbr}。`
                         });
-
-                        // Collect for full record
-                        courseDetails.push(`${cType}`); // Logic implies collecting course names
                     }
 
-                    // Collect Experiences
                     const pExp = document.getElementById(`progText_${i}_${j}`).value.trim();
                     const mExp = document.getElementById(`mathText_${i}_${j}`).value.trim();
                     const gExp = document.getElementById(`gameText_${i}_${j}`).value.trim();
@@ -1189,100 +1183,91 @@
                     if (mExp) expStr.push(mExp);
                     if (gExp) expStr.push(gExp);
                     if (expStr.length > 0 && sName && sGrade) {
-                        experiences.push(`（${sGrade}）（${sName}）（${expStr.join('/')}）`);
+                        experiences.push(`${sGrade}${sName}${expStr.join('/')}`);
                     }
                 }
             }
 
-            // Sort by Date then Time
             records.sort((a, b) => {
                 if (a.date !== b.date) return a.date.localeCompare(b.date);
                 return a.time.localeCompare(b.time);
             });
 
-            const textarea = document.getElementById('callRecordText');
-            textarea.value = records.map(r => r.text).join('\n');
+            const topTextarea = document.getElementById('callRecordText');
+            topTextarea.value = records.map(r => r.text).join('\n');
 
             // --- Generate Full Record ---
-
-            // 1. Gather Data
-            let motivation = document.querySelector('[name="leaveMotivation"]').value;
-            if (motivation === '其他') motivation = document.getElementById('leaveMotivationOther').value.trim();
-
-            let equipment = document.querySelector('[name="equipmentType"]').value;
-            if (equipment === '其他') equipment = document.getElementById('equipmentOther').value.trim();
-
-            let network = document.querySelector('[name="networkType"]').value;
-            if (network === '其他') network = document.getElementById('networkOther').value.trim();
-
-            let os = document.querySelector('[name="osType"]').value;
-            if (os === '其他') os = document.getElementById('osOther').value.trim();
-
-            let decision = document.querySelector('[name="decisionMaker"]').value;
-            if (decision === '其他') decision = document.getElementById('decisionMakerOther').value.trim();
-
-            let briefing = document.querySelector('[name="briefingAttend"]').value;
-            if (briefing === '其他') briefing = document.getElementById('briefingAttendOther').value.trim();
-
-            let price = document.querySelector('[name="priceReaction"]').value;
-            if (price === '其他') price = document.getElementById('priceReactionOther').value.trim();
-
-            let level = document.querySelector('[name="customerLevel"]').value;
-
-            let parentPhone = document.querySelector('[name="parentPhone"]').value.trim();
-            let parentEmail = document.querySelector('[name="parentEmail"]').value.trim();
-
-            // Collect all notes
-            let allNotes = [];
-            const parentNote = document.querySelector('[name="parentNote"]').value.trim();
-            if (parentNote) allNotes.push(`家長備註：${parentNote}`);
-
-            const equipNote = document.querySelector('[name="equipmentNote"]').value.trim();
-            if (equipNote) allNotes.push(`設備備註：${equipNote}`);
-
-            // Loop for student/course notes
-            for (let i = 1; i <= studentCount; i++) {
-                const sName = document.querySelector(`[name="studentName_${i}"]`).value.trim();
-                const sNote = document.querySelector(`[name="studentNote_${i}"]`).value.trim();
-                if (sName && sNote) allNotes.push(`${sName}備註：${sNote}`);
-
-                const courseCount = parseInt(document.getElementById(`courseCount_${i}`).value) || 0;
-                for (let j = 1; j <= courseCount; j++) {
-                    const cNote = document.querySelector(`[name="courseNote_${i}_${j}"]`).value.trim();
-                    if (cNote) allNotes.push(`課程(${i}-${j})備註：${cNote}`);
+            function getValue(selector, otherId = null) {
+                const el = document.querySelector(selector);
+                if (!el) return "";
+                let val = el.value;
+                if (val === '其他' && otherId) {
+                    val = document.getElementById(otherId).value.trim();
                 }
+                return (val === '請選擇內容' || val === '請選擇動機' || val === '請選擇設備' || val === '請選擇網路' || val === '請選擇系統' || val === '請選擇出席狀況' || val === '請選擇報價反應' || val === '請選擇決策者' || val === '請選擇預約與否' || val === '請選擇客戶等級') ? "" : val;
             }
 
-            const mainNote = document.querySelector('[name="mainNote"]').value.trim();
-            if (mainNote) allNotes.push(`總體備註：${mainNote}`);
+            const motivation = getValue('[name="leaveMotivation"]', 'leaveMotivationOther');
+            const equipment = getValue('[name="equipmentType"]', 'equipmentOther');
+            const network = getValue('[name="networkType"]', 'networkOther');
+            const os = getValue('[name="osType"]', 'osOther');
+            const decision = getValue('[name="decisionMaker"]', 'decisionMakerOther');
+            const briefing = getValue('[name="briefingAttend"]', 'briefingAttendOther');
+            const price = getValue('[name="priceReaction"]', 'priceReactionOther');
+            const level = getValue('[name="customerLevel"]');
+            const parentPhone = document.querySelector('[name="parentPhone"]').value.trim();
+            const parentEmail = document.querySelector('[name="parentEmail"]').value.trim();
 
+            const reservedCoursesStr = records.map(r => r.text.replace('。', '')).join('、');
 
-            // 2. Format String
-            // Use unique course names for line 1? user said "預約課程", usually implies list. 
-            // The requirement says: Age+Time/Course: (Reserved Courses). 
-            // Re-reading format: ① 年級+體驗時間/課程：（預約課程）
-            // I will join the abbreviated lines from the top box for "Reserved Courses" or just list types.
-            // Let's use the summary text generated above.
+            let allNotes = [];
+            const gatherNote = (name, label) => {
+                const val = document.querySelector(`[name="${name}"]`)?.value.trim();
+                if (val) allNotes.push(`${label}：${val}`);
+            };
+            gatherNote('parentNote', '家長備註');
+            gatherNote('equipmentNote', '設備備註');
+            for (let i = 1; i <= studentCount; i++) {
+                const sName = document.querySelector(`[name="studentName_${i}"]`).value.trim();
+                gatherNote(`studentNote_${i}`, `${sName || '學員' + i}備註`);
+                const courseCount = parseInt(document.getElementById(`courseCount_${i}`).value) || 0;
+                for (let j = 1; j <= courseCount; j++) {
+                    gatherNote(`courseNote_${i}_${j}`, `課程(${i}-${j})備註`);
+                }
+            }
+            gatherNote('mainNote', '總體備註');
 
-            const reservedCoursesStr = records.map(r => r.text).join('、');
+            const lines = [];
+            const addLine = (prefix, content, suffix = "。") => {
+                if (content && content.trim()) lines.push(`${prefix}${content}${suffix}`);
+            };
 
-            const fullRecord =
-                `① 年級+體驗時間/課程：${reservedCoursesStr}
-② 動機：${motivation}
-③ 經驗：${experiences.join('')}
-④ 桌/筆+有無Wifi：（${equipment}）（${network}）。
-⑤ Mac/Windows：（${os}）。
-⑥ 決策者：（${decision}）。
-⑦ 出席家長：（${briefing}）。
-⑧ 報價反應：（${price}）。
-⑨ A/B/C：（${level}）。
-⑩ 其他備註：
-${allNotes.join('\n')}
+            addLine("① 年級+體驗時間/課程：", reservedCoursesStr);
+            addLine("② 動機：", motivation);
+            addLine("③ 經驗：", experiences.join(' '));
+            addLine("④ 桌/筆+有無Wifi：", (equipment || network) ? `${equipment}${network}` : "");
+            addLine("⑤ Mac/Windows：", os);
+            addLine("⑥ 決策者：", decision);
+            addLine("⑦ 出席家長：", briefing);
+            addLine("⑧ 報價反應：", price);
+            addLine("⑨ A/B/C：", level);
 
-家長Email：${parentEmail}
-家長電話：${parentPhone}`;
+            if (allNotes.length > 0) {
+                lines.push("⑩ 其他備註：");
+                lines.push(allNotes.join('\n') + "。");
+            }
 
-            document.getElementById('fullRecordText').value = fullRecord;
+            let fullBody = lines.join('\n');
+
+            let contactInfo = [];
+            if (parentEmail) contactInfo.push(`家長Email：${parentEmail}。`);
+            if (parentPhone) contactInfo.push(`家長電話：${parentPhone}。`);
+
+            if (contactInfo.length > 0) {
+                fullBody += "\n\n---\n" + contactInfo.join('\n');
+            }
+
+            document.getElementById('fullRecordText').value = fullBody.trim();
         }
 
         window.onload = loadConfig;
