@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>體驗課程預約紀錄</title>
-    <!-- 引入 Google Material Symbols -->
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
         rel="stylesheet" />
@@ -101,7 +100,7 @@
 
         .container {
             width: 100%;
-            max-width: 650px;
+            max-width: 700px;
             padding: 20px;
             box-sizing: border-box;
         }
@@ -115,11 +114,19 @@
             background-color: white;
             border-radius: var(--pill-radius);
             padding: 28px;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
             transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
             border: 1px solid var(--border-color);
             scroll-margin-top: calc(var(--nav-height) + 20px);
+        }
+
+        /* 巢狀卡片樣式 */
+        .card.nested {
+            border-left: 8px solid var(--primary-color);
+            margin-left: 20px;
+            padding: 20px;
+            background-color: #ffffff;
         }
 
         label.required::after {
@@ -154,7 +161,7 @@
 
         .card-header h2 {
             margin: 0;
-            font-size: 1.35rem;
+            font-size: 1.25rem;
             color: #444;
         }
 
@@ -175,6 +182,7 @@
         input[type="text"],
         input[type="email"],
         input[type="number"],
+        input[type="date"],
         select,
         textarea {
             width: 100%;
@@ -207,10 +215,41 @@
             padding-right: 40px;
         }
 
-        input:focus,
-        select:focus,
-        textarea:focus {
-            border-color: var(--primary-color);
+        .experience-group {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .date-input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .date-input-container input[type="text"] {
+            flex: 1;
+        }
+
+        .date-picker-btn {
+            width: 48px;
+            height: 48px;
+            border: 1.5px solid var(--border-color);
+            background: white;
+            border-radius: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .date-input-container input[type="date"] {
+            position: absolute;
+            visibility: hidden;
+            width: 0;
+            height: 0;
         }
 
         .number-input-container {
@@ -241,9 +280,8 @@
         }
 
         .other-input {
-            margin-top: 12px;
+            margin-top: 8px;
             display: none !important;
-            /* 強制隱藏，防止解析 CSS 時被覆蓋 */
         }
 
         .other-input.visible {
@@ -252,8 +290,11 @@
 
         @media (max-width: 480px) {
             body {
-                padding: 10px;
                 padding-top: var(--nav-height);
+            }
+
+            .container {
+                padding: 10px;
             }
 
             .card {
@@ -261,12 +302,13 @@
                 border-radius: 20px;
             }
 
-            .sticky-nav {
-                padding: 0 10px;
+            .card.nested {
+                margin-left: 10px;
+                padding: 15px;
             }
 
-            :root {
-                --input-height: 44px;
+            .experience-group {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -288,23 +330,20 @@
             <div class="card required-empty" id="parentCard">
                 <div class="card-header">
                     <span class="material-symbols-outlined">person</span>
-                    <h2>家長資訊</h2>
+                    <h2>家長</h2>
                 </div>
-
                 <div class="form-group">
                     <label class="required"><span class="material-symbols-outlined" style="font-size: 18px">call</span>
                         聯絡電話</label>
                     <input type="text" name="parentPhone" required placeholder="請輸入聯絡電話"
                         oninput="validateCard('parentCard')">
                 </div>
-
                 <div class="form-group">
                     <label class="required"><span class="material-symbols-outlined" style="font-size: 18px">mail</span>
                         Email</label>
                     <input type="email" name="parentEmail" required placeholder="example@mail.com"
                         oninput="validateCard('parentCard')">
                 </div>
-
                 <div class="form-group">
                     <label class="required"><span class="material-symbols-outlined"
                             style="font-size: 18px">assignment_ind</span> 稱謂</label>
@@ -315,37 +354,72 @@
                     <input type="text" id="parentTitleOther" class="other-input" placeholder="請輸入其他稱謂"
                         oninput="validateCard('parentCard')">
                 </div>
-
                 <div class="form-group">
                     <label class="required"><span class="material-symbols-outlined" style="font-size: 18px">group</span>
                         預約學員人數</label>
                     <div class="number-input-container">
-                        <button type="button" class="number-btn" onclick="stepNumber('studentCount', -1)">
-                            <span class="material-symbols-outlined">remove_circle_outline</span>
-                        </button>
+                        <button type="button" class="number-btn" onclick="stepNumber('studentCount', -1)"><span
+                                class="material-symbols-outlined">remove_circle_outline</span></button>
                         <input type="number" id="studentCount" name="studentCount" value="0" min="0" required
                             oninput="syncStudentCards(); validateCard('parentCard')">
-                        <button type="button" class="number-btn" onclick="stepNumber('studentCount', 1)">
-                            <span class="material-symbols-outlined">add_circle_outline</span>
-                        </button>
+                        <button type="button" class="number-btn" onclick="stepNumber('studentCount', 1)"><span
+                                class="material-symbols-outlined">add_circle_outline</span></button>
                     </div>
                 </div>
-
                 <div class="form-group">
-                    <label><span class="material-symbols-outlined" style="font-size: 18px">notes</span> 備註 (家長)</label>
-                    <textarea name="parentNote" rows="2" placeholder="備註資訊..."></textarea>
+                    <label><span class="material-symbols-outlined" style="font-size: 18px">notes</span> 備註</label>
+                    <textarea name="parentNote" rows="2" placeholder="有關家長的備註..."></textarea>
+                </div>
+            </div>
+
+            <!-- 設備卡片 -->
+            <div class="card required-empty" id="equipmentCard">
+                <div class="card-header">
+                    <span class="material-symbols-outlined">laptop_mac</span>
+                    <h2>設備</h2>
+                </div>
+                <div class="form-group">
+                    <label class="required">設備情況</label>
+                    <select name="equipmentType" required
+                        onchange="handleDropdownOther(this, 'equipmentOther'); validateCard('equipmentCard')">
+                        <option value="">請選擇設備</option>
+                    </select>
+                    <input type="text" id="equipmentOther" class="other-input" placeholder="請輸入其他設備資訊"
+                        oninput="validateCard('equipmentCard')">
+                </div>
+                <div class="form-group">
+                    <label class="required">網路情況</label>
+                    <select name="networkType" required
+                        onchange="handleDropdownOther(this, 'networkOther'); validateCard('equipmentCard')">
+                        <option value="">請選擇網路</option>
+                    </select>
+                    <input type="text" id="networkOther" class="other-input" placeholder="請輸入其他網路資訊"
+                        oninput="validateCard('equipmentCard')">
+                </div>
+                <div class="form-group">
+                    <label class="required">作業系統</label>
+                    <select name="osType" required
+                        onchange="handleDropdownOther(this, 'osOther'); validateCard('equipmentCard')">
+                        <option value="">請選擇作業系統</option>
+                    </select>
+                    <input type="text" id="osOther" class="other-input" placeholder="請輸入其他系統資訊"
+                        oninput="validateCard('equipmentCard')">
+                </div>
+                <div class="form-group">
+                    <label>備註</label>
+                    <textarea name="equipmentNote" rows="2" placeholder="有關設備的備註..."></textarea>
                 </div>
             </div>
 
             <div id="studentCardsContainer"></div>
 
+            <!-- 總體備註 -->
             <div class="card optional" id="noteCard">
                 <div class="card-header">
                     <span class="material-symbols-outlined">sticky_note_2</span>
                     <h2>備註</h2>
                 </div>
                 <div class="form-group">
-                    <label>備註內容</label>
                     <textarea name="mainNote" rows="3" placeholder="請輸入額外聯絡紀錄..."></textarea>
                 </div>
             </div>
@@ -355,7 +429,7 @@
     <script>
         let configData = null;
         const navPills = document.getElementById('navPills');
-        const observerOptions = { root: null, threshold: 0.6 };
+        const observerOptions = { root: null, threshold: 0.2 };
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -369,21 +443,40 @@
                 configData = await response.json();
                 populateDropdowns();
                 initNav();
-            } catch (error) {
-                console.error('無法載入參數紀錄檔:', error);
-            }
+            } catch (error) { console.error('無法載入參數紀錄檔:', error); }
+        }
+
+        function populateSelect(name, options) {
+            const selects = document.querySelectorAll(`select[name="${name}"]`);
+            selects.forEach(select => {
+                const currentValue = select.value;
+                let placeholderText = "請選擇內容";
+                if (name === 'parentTitle') placeholderText = "請選擇家長稱謂";
+                else if (name === 'equipmentType') placeholderText = "請選擇設備";
+                else if (name === 'networkType') placeholderText = "請選擇網路";
+                if (name === 'parentTitle') placeholderText = "請選擇家長稱謂";
+                else if (name === 'equipmentType') placeholderText = "請選擇設備";
+                else if (name === 'networkType') placeholderText = "請選擇網路";
+                else if (name === 'osType') placeholderText = "請選擇系統";
+                else if (name.startsWith('testType')) placeholderText = "請選擇測驗（選填）";
+
+                select.innerHTML = `<option value="">${placeholderText}</option>`;
+                options.forEach(opt => {
+                    const o = document.createElement('option');
+                    o.value = opt;
+                    o.textContent = opt;
+                    select.appendChild(o);
+                });
+                select.value = currentValue;
+            });
         }
 
         function populateDropdowns() {
             if (!configData) return;
-            const parentSelect = document.querySelector('select[name="parentTitle"]');
-            parentSelect.innerHTML = '<option value="">請選擇稱謂</option>';
-            configData.titles.forEach(title => {
-                const opt = document.createElement('option');
-                opt.value = title;
-                opt.textContent = title;
-                parentSelect.appendChild(opt);
-            });
+            populateSelect('parentTitle', configData.titles);
+            populateSelect('equipmentType', configData.equipment);
+            populateSelect('networkType', configData.network);
+            populateSelect('osType', configData.os);
         }
 
         function initNav() {
@@ -393,13 +486,24 @@
 
         function refreshNav() {
             navPills.innerHTML = '';
-            addNavPill('parentCard', 'person', '家長資訊');
-            const studentCards = document.querySelectorAll('[id^="studentCard_"]');
-            studentCards.forEach(card => {
-                const index = card.id.split('_')[1];
-                const titleText = getDynamicStudentTitle(index);
-                addNavPill(card.id, 'face', titleText);
+            addNavPill('parentCard', 'person', '家長');
+            addNavPill('equipmentCard', 'laptop_mac', '設備');
+
+            document.querySelectorAll('[id^="studentCard_"]').forEach(card => {
+                const sIdx = card.id.split('_')[1];
+                const sName = document.querySelector(`[name="studentName_${sIdx}"]`).value.trim();
+                const sGrade = document.querySelector(`[name="studentGrade_${sIdx}"]`).value;
+                const label = (sName && sGrade) ? `學員：${sGrade}${sName}` : `學員 (${sIdx})`;
+                addNavPill(card.id, 'face', label);
+
+                document.querySelectorAll(`[id^="courseCard_${sIdx}_"]`).forEach(cCard => {
+                    const cIdx = cCard.id.split('_')[2];
+                    const cType = document.querySelector(`[name="courseType_${sIdx}_${cIdx}"]`).value;
+                    const cLabel = cType ? `└ ${cType}` : `└ 課程 (${cIdx})`;
+                    addNavPill(cCard.id, 'auto_stories', cLabel);
+                });
             });
+
             addNavPill('noteCard', 'sticky_note_2', '備註');
             document.querySelectorAll('.card').forEach(card => updateNavPillColor(card.id));
         }
@@ -424,135 +528,237 @@
 
         function centerNavPill(pill) {
             const nav = document.querySelector('.sticky-nav');
-            const navWidth = nav.offsetWidth;
-            const pillLeft = pill.offsetLeft;
-            const pillWidth = pill.offsetWidth;
-            nav.scrollTo({ left: pillLeft - (navWidth / 2) + (pillWidth / 2), behavior: 'smooth' });
+            nav.scrollTo({ left: pill.offsetLeft - (nav.offsetWidth / 2) + (pill.offsetWidth / 2), behavior: 'smooth' });
         }
 
         function stepNumber(id, delta) {
             const input = document.getElementById(id);
-            let val = parseInt(input.value) || 0;
-            val = Math.max(0, val + delta);
-            input.value = val;
-            if (id === 'studentCount') syncStudentCards();
-            else if (id.startsWith('courseCount')) validateCard(input.closest('.card').id);
-            validateCard('parentCard');
+            input.value = Math.max(0, (parseInt(input.value) || 0) + delta);
+            input.dispatchEvent(new Event('input'));
         }
 
         function syncStudentCards() {
             const count = parseInt(document.getElementById('studentCount').value) || 0;
             const container = document.getElementById('studentCardsContainer');
-            const currentCardsCount = container.querySelectorAll('.card').length;
-            if (count > currentCardsCount) {
-                for (let i = currentCardsCount + 1; i <= count; i++) addStudentCard(i);
-            } else if (count < currentCardsCount) {
-                for (let i = currentCardsCount; i > count; i--) {
+            const current = container.querySelectorAll('.card:not(.nested)').length;
+
+            if (count > current) {
+                for (let i = current + 1; i <= count; i++) addStudentCard(i);
+            } else {
+                for (let i = current; i > count; i--) {
                     const card = document.getElementById(`studentCard_${i}`);
+                    if (card) {
+                        document.querySelectorAll(`[id^="courseCard_${i}_"]`).forEach(c => { observer.unobserve(c); c.remove(); });
+                        observer.unobserve(card);
+                        card.remove();
+                    }
+                }
+            }
+            refreshNav();
+        }
+
+        function addStudentCard(i) {
+            const container = document.getElementById('studentCardsContainer');
+            const card = document.createElement('div');
+            card.className = 'card required-empty';
+            card.id = `studentCard_${i}`;
+
+            let gradeOpts = configData.grades.map(g => `<option value="${g}">${g}</option>`).join('');
+
+            card.innerHTML = `
+                <div class="card-header"><span class="material-symbols-outlined">face</span><h2 id="studentTitle_${i}">學員 (${i})</h2></div>
+                <div class="form-group">
+                    <label class="required">學員姓名</label>
+                    <input type="text" name="studentName_${i}" required placeholder="姓名" oninput="updateStudentHeader(${i}); validateCard('studentCard_${i}')">
+                </div>
+                <div class="form-group">
+                    <label class="required">年級</label>
+                    <select name="studentGrade_${i}" required onchange="handleDropdownOther(this, 'studentGradeOther_${i}'); updateStudentHeader(${i}); validateCard('studentCard_${i}')">
+                        <option value="">請選擇年級</option>${gradeOpts}
+                    </select>
+                    <input type="text" id="studentGradeOther_${i}" class="other-input" placeholder="請輸入年級" oninput="updateStudentHeader(${i}); validateCard('studentCard_${i}')">
+                </div>
+                <div class="form-group">
+                    <label class="required">預約體驗課程數</label>
+                    <div class="number-input-container">
+                        <button type="button" class="number-btn" onclick="stepNumber('courseCount_${i}', -1)"><span class="material-symbols-outlined">remove_circle_outline</span></button>
+                        <input type="number" id="courseCount_${i}" name="courseCount_${i}" value="0" min="0" required oninput="syncCourseCards(${i}); validateCard('studentCard_${i}')">
+                        <button type="button" class="number-btn" onclick="stepNumber('courseCount_${i}', 1)"><span class="material-symbols-outlined">add_circle_outline</span></button>
+                    </div>
+                </div>
+                <div class="form-group"><label>備註</label><textarea name="studentNote_${i}" rows="2"></textarea></div>
+                <div id="courseCardsContainer_${i}"></div>
+            `;
+            container.appendChild(card);
+            observer.observe(card);
+        }
+
+        function syncCourseCards(sIdx) {
+            const count = parseInt(document.getElementById(`courseCount_${sIdx}`).value) || 0;
+            const container = document.getElementById(`courseCardsContainer_${sIdx}`);
+            const current = container.querySelectorAll('.card.nested').length;
+
+            if (count > current) {
+                for (let j = current + 1; j <= count; j++) addCourseCard(sIdx, j);
+            } else {
+                for (let j = current; j > count; j--) {
+                    const card = document.getElementById(`courseCard_${sIdx}_${j}`);
                     if (card) { observer.unobserve(card); card.remove(); }
                 }
             }
             refreshNav();
         }
 
-        function addStudentCard(index) {
-            const container = document.getElementById('studentCardsContainer');
+        function addCourseCard(sIdx, cIdx) {
+            const container = document.getElementById(`courseCardsContainer_${sIdx}`);
             const card = document.createElement('div');
-            card.className = 'card required-empty';
-            card.id = `studentCard_${index}`;
-            let gradeOptions = '<option value="">請選擇年級</option>';
-            if (configData) configData.grades.forEach(grade => gradeOptions += `<option value="${grade}">${grade}</option>`);
+            card.className = 'card nested required-empty';
+            card.id = `courseCard_${sIdx}_${cIdx}`;
+
+            const today = new Date().toISOString().split('T')[0];
+            const courseOpts = configData.trialCourses.map(c => `<option value="${c}">${c}</option>`).join('');
+            const timeOpts = configData.timeSlots.map(t => `<option value="${t}">${t}</option>`).join('');
+            const testOpts = configData.testSending.map(t => `<option value="${t}">${t}</option>`).join('');
+            const pExp = configData.programmingExp.map(e => `<option value="${e}">${e}</option>`).join('');
+            const mExp = configData.mathExp.map(e => `<option value="${e}">${e}</option>`).join('');
+            const gExp = configData.gameExp.map(e => `<option value="${e}">${e}</option>`).join('');
 
             card.innerHTML = `
-                <div class="card-header"><span class="material-symbols-outlined">face</span><h2 id="studentTitle_${index}">學員 (${index})</h2></div>
+                <div class="card-header"><span class="material-symbols-outlined">auto_stories</span><h2 id="courseTitle_${sIdx}_${cIdx}">課程 (${cIdx})</h2></div>
                 <div class="form-group">
-                    <label class="required"><span class="material-symbols-outlined" style="font-size: 18px">person_edit</span> 姓名</label>
-                    <input type="text" name="studentName_${index}" required placeholder="學員姓名" oninput="updateStudentHeader(${index}); validateCard('studentCard_${index}')">
-                </div>
-                <div class="form-group">
-                    <label class="required"><span class="material-symbols-outlined" style="font-size: 18px">school</span> 年級</label>
-                    <select name="studentGrade_${index}" required onchange="handleDropdownOther(this, 'studentGradeOther_${index}'); updateStudentHeader(${index}); validateCard('studentCard_${index}')">
-                        ${gradeOptions}
+                    <label class="required">體驗課程</label>
+                    <select name="courseType_${sIdx}_${cIdx}" required onchange="updateCourseHeader(${sIdx}, ${cIdx}); validateCard('${card.id}')">
+                        <option value="">請選擇課程</option>${courseOpts}
                     </select>
-                    <input type="text" id="studentGradeOther_${index}" class="other-input" placeholder="請輸入其他年級資訊" oninput="updateStudentHeader(${index}); validateCard('studentCard_${index}')">
                 </div>
                 <div class="form-group">
-                    <label class="required"><span class="material-symbols-outlined" style="font-size: 18px">auto_stories</span> 體驗課程數</label>
-                    <div class="number-input-container">
-                        <button type="button" class="number-btn" onclick="stepNumber('courseCount_${index}', -1)">
-                            <span class="material-symbols-outlined">remove_circle_outline</span>
-                        </button>
-                        <input type="number" id="courseCount_${index}" name="courseCount_${index}" value="0" min="0" required oninput="validateCard('studentCard_${index}')">
-                        <button type="button" class="number-btn" onclick="stepNumber('courseCount_${index}', 1)">
-                            <span class="material-symbols-outlined">add_circle_outline</span>
-                        </button>
+                    <label class="required">預約日期</label>
+                    <div class="date-input-container">
+                        <input type="text" name="dateText_${sIdx}_${cIdx}" placeholder="YYYY-MM-DD" required onblur="formatDateInput(this)" oninput="validateCard('${card.id}')">
+                        <button type="button" class="date-picker-btn" onclick="this.nextElementSibling.showPicker()"><span class="material-symbols-outlined">calendar_today</span></button>
+                        <input type="date" onchange="syncDate(this, 'dateText_${sIdx}_${cIdx}')">
                     </div>
                 </div>
+                <div class="form-group">
+                    <label class="required">預約時段</label>
+                    <select name="timeSlot_${sIdx}_${cIdx}" required onchange="handleDropdownOther(this, 'timeOther_${sIdx}_${cIdx}'); validateCard('${card.id}')">
+                        <option value="">請選擇時段</option>${timeOpts}
+                    </select>
+                    <input type="text" id="timeOther_${sIdx}_${cIdx}" class="other-input" placeholder="請輸入時段" oninput="validateCard('${card.id}')">
+                </div>
+                <div class="form-group">
+                    <label class="required">經驗 (填寫任一項即可)</label>
+                    <div class="experience-group">
+                        <select onchange="syncExp(this, 'progText_${sIdx}_${cIdx}')"><option value="">程式經驗</option>${pExp}</select>
+                        <input type="text" id="progText_${sIdx}_${cIdx}" placeholder="程式經歷描述" oninput="clearExpSelect(this); validateCard('${card.id}')">
+                    </div>
+                    <div class="experience-group">
+                        <select onchange="syncExp(this, 'mathText_${sIdx}_${cIdx}')"><option value="">數學經驗</option>${mExp}</select>
+                        <input type="text" id="mathText_${sIdx}_${cIdx}" placeholder="數學經歷描述" oninput="clearExpSelect(this); validateCard('${card.id}')">
+                    </div>
+                    <div class="experience-group">
+                        <select onchange="syncExp(this, 'gameText_${sIdx}_${cIdx}')"><option value="">遊戲經驗</option>${gExp}</select>
+                        <input type="text" id="gameText_${sIdx}_${cIdx}" placeholder="遊戲經歷描述" oninput="clearExpSelect(this); validateCard('${card.id}')">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>測驗寄送</label>
+                    <select name="testType_${sIdx}_${cIdx}" onchange="validateCard('${card.id}')">
+                        <option value="">請選擇測驗（選填）</option>${testOpts}
+                    </select>
+                </div>
+                <div class="form-group"><label>備註</label><textarea name="courseNote_${sIdx}_${cIdx}" rows="2"></textarea></div>
             `;
             container.appendChild(card);
             observer.observe(card);
         }
 
-        // 更新學員卡片標題與導覽按鈕
-        function updateStudentHeader(index) {
-            const name = document.querySelector(`[name="studentName_${index}"]`).value.trim();
-            const gradeSelect = document.querySelector(`[name="studentGrade_${index}"]`);
-            let grade = gradeSelect.value;
+        function updateStudentHeader(sIdx) {
+            const name = document.querySelector(`[name="studentName_${sIdx}"]`).value.trim();
+            let grade = document.querySelector(`[name="studentGrade_${sIdx}"]`).value;
+            if (grade === '其他') grade = document.getElementById(`studentGradeOther_${sIdx}`).value.trim();
 
-            if (grade === '其他') {
-                grade = document.getElementById(`studentGradeOther_${index}`).value.trim();
-            }
-
-            const header = document.getElementById(`studentTitle_${index}`);
-            const pillText = document.querySelector(`#nav_studentCard_${index} .pill-text`);
-
-            let displayTitle = `學員 (${index})`;
-            if (name && grade) {
-                displayTitle = `學員 (${index})：${grade}${name}`;
-            }
-
-            if (header) header.textContent = displayTitle;
-            if (pillText) pillText.textContent = displayTitle;
+            const title = (name && grade) ? `學員：${grade}${name}` : `學員 (${sIdx})`;
+            document.getElementById(`studentTitle_${sIdx}`).textContent = title;
+            document.querySelectorAll(`[id^="courseTitle_${sIdx}_"]`).forEach(h => {
+                const cIdx = h.id.split('_')[2];
+                updateCourseHeader(sIdx, cIdx);
+            });
+            refreshNav();
         }
 
-        function getDynamicStudentTitle(index) {
-            const nameInput = document.querySelector(`[name="studentName_${index}"]`);
-            const gradeSelect = document.querySelector(`[name="studentGrade_${index}"]`);
-            if (!nameInput || !gradeSelect) return `學員 (${index})`;
+        function updateCourseHeader(sIdx, cIdx) {
+            const name = document.querySelector(`[name="studentName_${sIdx}"]`).value.trim();
+            let grade = document.querySelector(`[name="studentGrade_${sIdx}"]`).value;
+            if (grade === '其他') grade = document.getElementById(`studentGradeOther_${sIdx}`).value.trim();
+            const course = document.querySelector(`[name="courseType_${sIdx}_${cIdx}"]`).value;
 
-            const name = nameInput.value.trim();
-            let grade = gradeSelect.value;
-            if (grade === '其他') {
-                grade = document.getElementById(`studentGradeOther_${index}`).value.trim();
-            }
-
-            return (name && grade) ? `學員 (${index})：${grade}${name}` : `學員 (${index})`;
+            const base = (name && grade) ? `${grade}${name}` : `學員 (${sIdx})`;
+            const suffix = course ? ` - ${course}` : `課程 (${cIdx})`;
+            document.getElementById(`courseTitle_${sIdx}_${cIdx}`).textContent = `${base}${suffix}`;
+            refreshNav();
         }
 
         function handleDropdownOther(select, otherId) {
             const otherInput = document.getElementById(otherId);
-            if (select.value === '其他') {
-                otherInput.classList.add('visible');
-                otherInput.required = true;
-            } else {
-                otherInput.classList.remove('visible');
-                otherInput.required = false;
-                otherInput.value = ''; // 隱藏時清空內容
+            if (select.value === '其他') { otherInput.classList.add('visible'); otherInput.required = true; }
+            else { otherInput.classList.remove('visible'); otherInput.required = false; otherInput.value = ''; }
+        }
+
+        function syncDate(picker, targetName) {
+            const textInput = document.querySelector(`[name="${targetName}"]`);
+            textInput.value = picker.value;
+            validateCard(picker.closest('.card').id);
+            // Stronger fix for Safari: Focus the text input and blur the picker to force the date picker overlay to close
+            picker.blur();
+            if (textInput) textInput.focus();
+        }
+
+        function formatDateInput(input) {
+            let val = input.value.trim();
+            if (!val) return;
+            val = val.replace(/\//g, '-');
+            const match = val.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+            if (match) {
+                const y = match[1], m = match[2].padStart(2, '0'), d = match[3].padStart(2, '0');
+                input.value = `${y}-${m}-${d}`;
+            } else if (!/^\d{4}-\d{2}-\d{2}$/.test(val)) {
+                input.value = ''; // Invalid date, clear it
             }
+        }
+
+        function syncExp(select, textId) {
+            if (select.value) document.getElementById(textId).value = select.value;
+            validateCard(select.closest('.card').id);
+        }
+        function clearExpSelect(input) {
+            input.previousElementSibling.value = "";
         }
 
         function validateCard(cardId) {
             const card = document.getElementById(cardId);
             if (!card) return;
-            const inputs = card.querySelectorAll('input[required], select[required]');
+            const inputs = card.querySelectorAll('[required]');
             let allFilled = true;
+
             inputs.forEach(input => {
-                if (input.type === 'number') { if (input.value === '' || isNaN(input.value) || parseInt(input.value) < 0) allFilled = false; }
-                else if (input.classList.contains('other-input')) { if (input.classList.contains('visible') && !input.value.trim()) allFilled = false; }
-                else { if (!input.value.trim()) allFilled = false; if (input.type === 'email' && !input.validity.valid) allFilled = false; }
+                if (input.classList.contains('other-input') && !input.classList.contains('visible')) return;
+                if (!input.value.trim()) allFilled = false;
+                if (input.type === 'email' && !input.validity.valid) allFilled = false;
             });
-            if (allFilled) { card.classList.remove('required-empty'); card.classList.add('required-filled'); }
-            else { card.classList.remove('required-filled'); card.classList.add('required-empty'); }
+
+            // 特殊邏輯：經驗三選一
+            if (card.id.startsWith('courseCard_')) {
+                const sIdx = card.id.split('_')[1];
+                const cIdx = card.id.split('_')[2];
+                const hasExp = document.getElementById(`progText_${sIdx}_${cIdx}`).value.trim() ||
+                    document.getElementById(`mathText_${sIdx}_${cIdx}`).value.trim() ||
+                    document.getElementById(`gameText_${sIdx}_${cIdx}`).value.trim();
+                if (!hasExp) allFilled = false;
+            }
+
+            card.classList.toggle('required-empty', !allFilled);
+            card.classList.toggle('required-filled', allFilled);
             updateNavPillColor(cardId);
         }
 
