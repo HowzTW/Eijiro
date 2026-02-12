@@ -766,28 +766,36 @@
         }
 
         function refreshNav() {
+            if (!navPills) return;
             navPills.innerHTML = '';
             addNavPill('parentCard', 'person', '家長');
             addNavPill('equipmentCard', 'laptop_mac', '設備');
 
             document.querySelectorAll('[id^="studentCard_"]').forEach(card => {
                 const sIdx = card.id.split('_')[1];
-                const sName = document.querySelector(`[name="studentName_${sIdx}"]`).value.trim();
-                const sGrade = document.querySelector(`[name="studentGrade_${sIdx}"]`).value;
-                const label = (sName && sGrade) ? `學員：${sGrade}${sName}` : `學員 (${sIdx})`;
+                const sNameInput = document.querySelector(`[name="studentName_${sIdx}"]`);
+                const sName = sNameInput ? sNameInput.value.trim() : "";
+
+                const sGradeSelect = document.querySelector(`[name="studentGrade_${sIdx}"]`);
+                const sGrade = sGradeSelect ? sGradeSelect.value : "";
+
+                const label = (sName && sGrade && sGrade !== "請選擇年級") ? `學員：${sGrade}${sName}` : `學員 (${sIdx})`;
                 addNavPill(card.id, 'face', label);
 
                 document.querySelectorAll(`[id^="courseCard_${sIdx}_"]`).forEach(cCard => {
                     const cIdx = cCard.id.split('_')[2];
-                    const cType = document.querySelector(`[name="courseType_${sIdx}_${cIdx}"]`).value;
-                    const cLabel = cType ? `└ ${cType}` : `└ 課程 (${cIdx})`;
+                    const cTypeSelect = document.querySelector(`[name="courseType_${sIdx}_${cIdx}"]`);
+                    const cType = cTypeSelect ? cTypeSelect.value : "";
+                    const cLabel = (cType && cType !== "請選擇課程") ? `└ ${cType}` : `└ 課程 (${cIdx})`;
                     addNavPill(cCard.id, 'auto_stories', cLabel);
                 });
             });
 
             addNavPill('otherInfoCard', 'info', '其他資訊');
             addNavPill('noteCard', 'sticky_note_2', '備註');
-            document.querySelectorAll('.card').forEach(card => updateNavPillColor(card.id));
+            document.querySelectorAll('.card').forEach(card => {
+                if (typeof updateNavPillColor === 'function') updateNavPillColor(card.id);
+            });
         }
 
         function addNavPill(cardId, icon, text) {
@@ -1119,28 +1127,45 @@
 
         function generateRedDotRecord() {
             const container = document.getElementById('redDotBlocksContainer');
+            if (!container) return;
             container.innerHTML = '';
 
-            const studentCount = parseInt(document.getElementById('studentCount').value) || 0;
+            const studentCountEl = document.getElementById('studentCount');
+            const studentCount = studentCountEl ? (parseInt(studentCountEl.value) || 0) : 0;
             let allCourses = [];
 
             for (let i = 1; i <= studentCount; i++) {
-                const sName = document.querySelector(`[name="studentName_${i}"]`).value.trim();
-                let sGrade = document.querySelector(`[name="studentGrade_${i}"]`).value;
-                if (sGrade === '其他') sGrade = document.getElementById(`studentGradeOther_${i}`).value.trim();
+                const sNameInput = document.querySelector(`[name="studentName_${i}"]`);
+                const sName = sNameInput ? sNameInput.value.trim() : "";
 
-                const courseCount = parseInt(document.getElementById(`courseCount_${i}`).value) || 0;
+                const sGradeSelect = document.querySelector(`[name="studentGrade_${i}"]`);
+                let sGrade = sGradeSelect ? sGradeSelect.value : "";
+                if (sGrade === '其他') {
+                    sGrade = document.getElementById(`studentGradeOther_${i}`)?.value.trim() || "其他";
+                }
+
+                const courseCountEl = document.getElementById(`courseCount_${i}`);
+                const courseCount = courseCountEl ? (parseInt(courseCountEl.value) || 0) : 0;
                 for (let j = 1; j <= courseCount; j++) {
                     const cTypeSelect = document.querySelector(`[name="courseType_${i}_${j}"]`);
+                    if (!cTypeSelect) continue;
+
                     const cType = cTypeSelect.value;
                     const cAbbr = cTypeSelect.selectedOptions[0]?.dataset.abbr || cType;
-                    const cDate = document.querySelector(`[name="dateText_${i}_${j}"]`).value.trim();
-                    let cTime = document.querySelector(`[name="timeSlot_${i}_${j}"]`).value;
-                    if (cTime === '其他') cTime = document.getElementById(`timeOther_${i}_${j}`).value.trim();
+
+                    const cDateInput = document.querySelector(`[name="dateText_${i}_${j}"]`);
+                    const cDate = cDateInput ? cDateInput.value.trim() : "";
+
+                    const cTimeSelect = document.querySelector(`[name="timeSlot_${i}_${j}"]`);
+                    let cTime = cTimeSelect ? cTimeSelect.value : "";
+                    if (cTime === '其他') {
+                        cTime = document.getElementById(`timeOther_${i}_${j}`)?.value.trim() || "其他";
+                    }
 
                     const testType = document.querySelector(`[name="testType_${i}_${j}"]`)?.value || "";
 
-                    if (sName && sGrade && cType && cDate && cTime) {
+                    // Strict check for "Combined Appointment Course" line
+                    if (sName && sGrade && sGrade !== "請選擇年級" && cType && cDate && cTime && cTime !== "請選擇時段") {
                         allCourses.push({
                             sName, sGrade, cType, cAbbr, cDate, cTime, testType,
                             sIdx: i, cIdx: j
@@ -1169,86 +1194,188 @@
                     </button>
                 `;
                 container.appendChild(block);
-                document.getElementById(id).value = content;
+                const textArea = document.getElementById(id);
+                if (textArea) textArea.value = content;
             };
 
-            const studentIds = [...new Set(allCourses.map(c => c.sIdx))];
-            const totalStudents = studentIds.length;
-            const totalCourses = allCourses.length;
-            const showCombinedSummary = (totalStudents > 1 || totalCourses > 1);
+            const isSingle = (studentCount === 1);
 
-            let combinedCoursesText = "";
-            let combinedExperiencesText = "";
-            let combinedTestSentText = "";
+            // --- Header: Student Summary (Step 0) ---
+            let sSummaries = [];
+            for (let i = 1; i <= studentCount; i++) {
+                const sNameInput = document.querySelector(`[name="studentName_${i}"]`);
+                const sName = sNameInput ? sNameInput.value.trim() : "";
 
-            // --- Block 1: Combined ---
-            if (totalStudents > 0) {
-
-                if (totalStudents === 1) {
-                    const sIdx = studentIds[0];
-                    const studentCourses = allCourses.filter(c => c.sIdx === sIdx);
-                    const firstS = studentCourses[0];
-
-                    // 1. Courses
-                    combinedCoursesText = `${firstS.sGrade}${firstS.sName} ` +
-                        studentCourses.map(c => `${c.cDate} ${c.cTime} ${c.cAbbr}`).join('；') + "。";
-
-                    // 2. Experience
-                    let exps = [];
-                    studentCourses.forEach(c => {
-                        const pExp = document.getElementById(`progText_${c.sIdx}_${c.cIdx}`).value.trim();
-                        const mExp = document.getElementById(`mathText_${c.sIdx}_${c.cIdx}`).value.trim();
-                        const gExp = document.getElementById(`gameText_${c.sIdx}_${c.cIdx}`).value.trim();
-                        let sExps = [];
-                        if (pExp) sExps.push(pExp);
-                        if (mExp) sExps.push(mExp);
-                        if (gExp) sExps.push(gExp);
-                        if (sExps.length > 0) exps.push(sExps.join('、'));
-                    });
-                    combinedExperiencesText = exps.join('；');
-
-                    // 3. Test Sent
-                    let tests = studentCourses.map(c => c.testType).filter(t => t && t !== '不須寄送');
-                    if (tests.length > 0) combinedTestSentText = tests.join('；') + "。";
-
-                } else {
-                    let courseParts = [];
-                    let expParts = [];
-                    let testParts = [];
-
-                    studentIds.forEach(sIdx => {
-                        const studentCourses = allCourses.filter(c => c.sIdx === sIdx);
-                        const firstS = studentCourses[0];
-
-                        // 1. Courses
-                        courseParts.push(`${firstS.sGrade}${firstS.sName} ` +
-                            studentCourses.map(c => `${c.cDate} ${c.cTime} ${c.cAbbr}`).join('；'));
-
-                        // 2. Experience
-                        let exps = [];
-                        studentCourses.forEach(c => {
-                            const pExp = document.getElementById(`progText_${c.sIdx}_${c.cIdx}`).value.trim();
-                            const mExp = document.getElementById(`mathText_${c.sIdx}_${c.cIdx}`).value.trim();
-                            const gExp = document.getElementById(`gameText_${c.sIdx}_${c.cIdx}`).value.trim();
-                            let sExps = [];
-                            if (pExp) sExps.push(pExp);
-                            if (mExp) sExps.push(mExp);
-                            if (gExp) sExps.push(gExp);
-                            if (sExps.length > 0) exps.push(sExps.join('、'));
-                        });
-                        if (exps.length > 0) expParts.push(`${firstS.sGrade}${firstS.sName} ${exps.join('；')}`);
-
-                        // 3. Test Sent
-                        let tests = studentCourses.map(c => c.testType).filter(t => t && t !== '不須寄送');
-                        if (tests.length > 0) testParts.push(`${firstS.sGrade}${firstS.sName} ${tests.join('；')}`);
-                    });
-
-                    combinedCoursesText = courseParts.join('。') + "。";
-                    combinedExperiencesText = expParts.join('。') + "。";
-                    combinedTestSentText = testParts.length > 0 ? testParts.join('。') + "。" : "";
+                const sGradeSelect = document.querySelector(`[name="studentGrade_${i}"]`);
+                let sGrade = sGradeSelect ? sGradeSelect.value : "";
+                if (sGrade === '其他') {
+                    sGrade = document.getElementById(`studentGradeOther_${i}`)?.value.trim() || "其他";
                 }
 
-                // Gather global data
+                if (sName || (sGrade && sGrade !== "請選擇年級")) {
+                    const gradeLabel = (sGrade === "請選擇年級") ? "" : sGrade;
+                    sSummaries.push(`${gradeLabel}${sName}`);
+                }
+            }
+            let studentSummaryLine = "";
+            if (sSummaries.length > 0) {
+                studentSummaryLine = isSingle ? sSummaries[0] + "。" : sSummaries.join('；') + "。";
+            }
+
+            // --- Define Combined Courses (Section 1) ---
+            const validAppointmentCourses = allCourses.filter(c => c.sName && c.sGrade && c.cType && c.cDate && c.cTime);
+            let combinedCoursesText = "";
+            if (isSingle) {
+                const sCourses = validAppointmentCourses; // only one student's courses will be here
+                if (sCourses.length > 0) {
+                    combinedCoursesText = `${sCourses[0].sGrade}${sCourses[0].sName} ` +
+                        sCourses.map(c => `${c.cDate} ${c.cTime} ${c.cAbbr}`).join('；');
+                }
+            } else if (studentCount > 1) {
+                let parts = [];
+                for (let i = 1; i <= studentCount; i++) {
+                    const sCourses = validAppointmentCourses.filter(c => c.sIdx === i);
+                    if (sCourses.length > 0) {
+                        parts.push(`${sCourses[0].sGrade}${sCourses[0].sName} ` +
+                            sCourses.map(c => `${c.cDate} ${c.cTime} ${c.cAbbr}`).join('；'));
+                    }
+                }
+                if (parts.length > 0) combinedCoursesText = parts.join('。');
+            }
+
+            // --- Define Combined Experiences (Section 3) ---
+            let combinedExperiencesText = "";
+            let expParts = [];
+            for (let i = 1; i <= studentCount; i++) {
+                const sNameInput = document.querySelector(`[name="studentName_${i}"]`);
+                const sName = sNameInput ? sNameInput.value.trim() : "";
+
+                const sGradeSelect = document.querySelector(`[name="studentGrade_${i}"]`);
+                let sGrade = sGradeSelect ? sGradeSelect.value : "";
+                if (sGrade === '其他') {
+                    sGrade = document.getElementById(`studentGradeOther_${i}`)?.value.trim() || "其他";
+                }
+
+                const courseCountEl = document.getElementById(`courseCount_${i}`);
+                const courseCount = courseCountEl ? (parseInt(courseCountEl.value) || 0) : 0;
+
+                // Relaxed condition: check if there are courses OR name/grade is present
+                if (sName || (sGrade && sGrade !== "請選擇年級") || courseCount > 0) {
+                    const gradeLabel = (sGrade === "請選擇年級") ? "" : sGrade;
+                    let sExps = [];
+                    for (let j = 1; j <= courseCount; j++) {
+                        const pExp = document.getElementById(`progText_${i}_${j}`)?.value.trim() || "";
+                        const mExp = document.getElementById(`mathText_${i}_${j}`)?.value.trim() || "";
+                        const gExp = document.getElementById(`gameText_${i}_${j}`)?.value.trim() || "";
+                        let cExps = [];
+                        if (pExp) cExps.push(pExp);
+                        if (mExp) cExps.push(mExp);
+                        if (gExp) cExps.push(gExp);
+                        if (cExps.length > 0) sExps.push(cExps.join('、'));
+                    }
+                    if (sExps.length > 0) {
+                        // If name/grade missing, just show the experience text without prefix
+                        const prefix = (sName || gradeLabel) ? `${gradeLabel}${sName} ` : "";
+                        expParts.push({ name: sName, grade: gradeLabel, exp: prefix + sExps.join('；') });
+                    }
+                }
+            }
+            if (isSingle) {
+                if (expParts.length > 0) combinedExperiencesText = expParts[0].exp.replace(/^(.*?) /, ''); // Remove active student name prefix for single student if desired, or keep logic simple
+                // Actually, for single student, we usually just want the content. 
+                // Let's stick to the generated string above but maybe clean it up if it's redundant.
+                // Re-evaluating logic:
+                // For single student: "Experience..."
+                // For multiple: "Name Experience..."
+                if (expParts.length > 0) {
+                    // For single student, we can just take the raw experience text if we constructed it with prefix. 
+                    // But wait, the loop above constructs `exp` WITH prefix. 
+                    // Let's refine the loop push slightly for better single/multi handling.
+                }
+            }
+
+            // Refined Loop for ExpParts to correct the Logic above inline
+            expParts = [];
+            for (let i = 1; i <= studentCount; i++) {
+                // ... (re-fetching for clarity in this replacement block context)
+                const sNameInput = document.querySelector(`[name="studentName_${i}"]`);
+                const sName = sNameInput ? sNameInput.value.trim() : "";
+                const sGradeSelect = document.querySelector(`[name="studentGrade_${i}"]`);
+                let sGrade = sGradeSelect ? sGradeSelect.value : "";
+                if (sGrade === '其他') sGrade = document.getElementById(`studentGradeOther_${i}`)?.value.trim() || "其他";
+                const gradeLabel = (sGrade === "請選擇年級") ? "" : sGrade;
+
+                const courseCountEl = document.getElementById(`courseCount_${i}`);
+                const courseCount = courseCountEl ? (parseInt(courseCountEl.value) || 0) : 0;
+
+                if (sName || (sGrade && sGrade !== "請選擇年級") || courseCount > 0) {
+                    let sExps = [];
+                    for (let j = 1; j <= courseCount; j++) {
+                        const pExp = document.getElementById(`progText_${i}_${j}`)?.value.trim() || "";
+                        const mExp = document.getElementById(`mathText_${i}_${j}`)?.value.trim() || "";
+                        const gExp = document.getElementById(`gameText_${i}_${j}`)?.value.trim() || "";
+                        let cExps = [];
+                        if (pExp) cExps.push(pExp);
+                        if (mExp) cExps.push(mExp);
+                        if (gExp) cExps.push(gExp);
+                        if (cExps.length > 0) sExps.push(cExps.join('、'));
+                    }
+                    if (sExps.length > 0) {
+                        expParts.push({
+                            prefix: (sName || gradeLabel) ? `${gradeLabel}${sName}` : "",
+                            content: sExps.join('；')
+                        });
+                    }
+                }
+            }
+
+            if (isSingle) {
+                if (expParts.length > 0) combinedExperiencesText = expParts[0].content;
+            } else if (studentCount > 1) {
+                if (expParts.length > 0) combinedExperiencesText = expParts.map(e => `${e.prefix} ${e.content}`).join('。');
+            }
+
+
+            // --- Define Combined Test Sent (in Section 10) ---
+            let combinedTestSentText = "";
+            let testSentParts = [];
+            for (let i = 1; i <= studentCount; i++) {
+                const sNameInput = document.querySelector(`[name="studentName_${i}"]`);
+                const sName = sNameInput ? sNameInput.value.trim() : "";
+
+                const sGradeSelect = document.querySelector(`[name="studentGrade_${i}"]`);
+                let sGrade = sGradeSelect ? sGradeSelect.value : "";
+                if (sGrade === '其他') {
+                    sGrade = document.getElementById(`studentGradeOther_${i}`)?.value.trim() || "其他";
+                }
+                const gradeLabel = (sGrade === "請選擇年級") ? "" : sGrade;
+
+                const courseCountEl = document.getElementById(`courseCount_${i}`);
+                const courseCount = courseCountEl ? (parseInt(courseCountEl.value) || 0) : 0;
+
+                // Relaxed condition: check if there are courses OR name/grade is present
+                if (sName || (sGrade && sGrade !== "請選擇年級") || courseCount > 0) {
+                    let sTests = [];
+                    for (let j = 1; j <= courseCount; j++) {
+                        const tType = document.querySelector(`[name="testType_${i}_${j}"]`)?.value || "";
+                        if (tType && tType !== '不須寄送') sTests.push(tType);
+                    }
+                    if (sTests.length > 0) {
+                        testSentParts.push({
+                            prefix: (sName || gradeLabel) ? `${gradeLabel}${sName}` : "",
+                            test: sTests.join('；')
+                        });
+                    }
+                }
+            }
+            if (isSingle) {
+                if (testSentParts.length > 0) combinedTestSentText = testSentParts[0].test + "。";
+            } else if (studentCount > 1) {
+                if (testSentParts.length > 0) combinedTestSentText = testSentParts.map(t => `${t.prefix} ${t.test}`).join('。') + "。";
+            }
+
+            // --- Block 1: Combined ---
+            if (studentCount >= 0) {
                 const motivation = getValue('[name="leaveMotivation"]', 'leaveMotivationOther');
                 const equipment = getValue('[name="equipmentType"]', 'equipmentOther');
                 const network = getValue('[name="networkType"]', 'networkOther');
@@ -1257,8 +1384,8 @@
                 const briefing = getValue('[name="briefingAttend"]', 'briefingAttendOther');
                 const price = getValue('[name="priceReaction"]', 'priceReactionOther');
                 const level = getValue('[name="customerLevel"]');
-                const parentPhone = document.querySelector('[name="parentPhone"]').value.trim();
-                const parentEmail = document.querySelector('[name="parentEmail"]').value.trim();
+                const parentPhone = document.querySelector('[name="parentPhone"]')?.value.trim() || "";
+                const parentEmail = document.querySelector('[name="parentEmail"]')?.value.trim() || "";
                 const allNotes = collectAllNotes();
 
                 const lines = [];
@@ -1266,9 +1393,9 @@
                     if (content && content.trim()) lines.push(`${prefix}${content}${suffix}`);
                 };
 
-                addLine("① 年級+體驗時間/課程：", combinedCoursesText, "");
+                addLine("① 年級+體驗時間/課程：", combinedCoursesText);
                 addLine("② 動機：", motivation);
-                addLine("③ 經驗：", combinedExperiencesText, combinedExperiencesText.endsWith('。') ? "" : "。");
+                addLine("③ 經驗：", combinedExperiencesText, combinedExperiencesText.endsWith('。') ? "" : (combinedExperiencesText ? "。" : ""));
                 addLine("④ 桌/筆+有無Wifi：", (equipment || network) ? `${equipment}${network ? '＋' + network : ''}` : "");
                 addLine("⑤ Mac/Windows：", os);
                 addLine("⑥ 決策者：", decision);
@@ -1276,16 +1403,16 @@
                 addLine("⑧ 報價反應：", price);
                 addLine("⑨ A/B/C：", level);
 
-                const noteLines = [];
-                if (combinedTestSentText) noteLines.push(combinedTestSentText);
-                if (allNotes.length > 0) noteLines.push(allNotes.join('\n'));
-
-                if (noteLines.length > 0) {
+                if (combinedTestSentText || allNotes.length > 0) {
                     lines.push("⑩ 其他備註：");
-                    lines.push(noteLines.join('\n'));
+                    if (combinedTestSentText) lines.push(combinedTestSentText);
+                    if (allNotes.length > 0) lines.push(allNotes.join('\n'));
                 }
 
-                let body = lines.join('\n');
+                let body = "";
+                if (studentSummaryLine) body += studentSummaryLine + "\n";
+                body += lines.join('\n');
+
                 let contactInfo = [];
                 if (parentEmail) contactInfo.push(`家長Email：${parentEmail}。`);
                 if (parentPhone) contactInfo.push(`家長電話：${parentPhone}。`);
@@ -1303,8 +1430,8 @@
             const briefingGlobal = getValue('[name="briefingAttend"]', 'briefingAttendOther');
             const priceGlobal = getValue('[name="priceReaction"]', 'priceReactionOther');
             const levelGlobal = getValue('[name="customerLevel"]');
-            const parentPhoneGlobal = document.querySelector('[name="parentPhone"]').value.trim();
-            const parentEmailGlobal = document.querySelector('[name="parentEmail"]').value.trim();
+            const parentPhoneGlobal = document.querySelector('[name="parentPhone"]')?.value.trim() || "";
+            const parentEmailGlobal = document.querySelector('[name="parentEmail"]')?.value.trim() || "";
             const allNotesGlobal = collectAllNotes();
 
             allCourses.forEach((c, idx) => {
@@ -1316,9 +1443,9 @@
                 addLine("① 年級+體驗時間/課程：", `${c.sGrade}${c.sName} ${c.cDate} ${c.cTime} ${c.cAbbr}`);
                 addLine("② 動機：", motivationGlobal);
 
-                const pExp = document.getElementById(`progText_${c.sIdx}_${c.cIdx}`).value.trim();
-                const mExp = document.getElementById(`mathText_${c.sIdx}_${c.cIdx}`).value.trim();
-                const gExp = document.getElementById(`gameText_${c.sIdx}_${c.cIdx}`).value.trim();
+                const pExp = document.getElementById(`progText_${c.sIdx}_${c.cIdx}`)?.value.trim() || "";
+                const mExp = document.getElementById(`mathText_${c.sIdx}_${c.cIdx}`)?.value.trim() || "";
+                const gExp = document.getElementById(`gameText_${c.sIdx}_${c.cIdx}`)?.value.trim() || "";
                 let expStrs = [];
                 if (pExp) expStrs.push(pExp);
                 if (mExp) expStrs.push(mExp);
@@ -1335,7 +1462,9 @@
                 const noteLines = [];
                 if (c.testType && c.testType !== '不須寄送') noteLines.push(c.testType + "。");
                 if (allNotesGlobal.length > 0) noteLines.push(allNotesGlobal.join('\n'));
-                if (showCombinedSummary && combinedCoursesText) noteLines.push(combinedCoursesText);
+
+                // Add Combined Summary if it exists and we want to show it (actually not in this logic block but I'll keep it safe)
+                // if (typeof showCombinedSummary !== 'undefined' && showCombinedSummary && combinedCoursesText) noteLines.push(combinedCoursesText);
 
                 if (noteLines.length > 0) {
                     lines.push("⑩ 其他備註：");
@@ -1357,23 +1486,37 @@
         }
 
         function updateSmsTemplate() {
-            const email = document.querySelector('[name="parentEmail"]').value.trim() || "";
-            const studentCount = parseInt(document.getElementById('studentCount').value) || 0;
+            const emailEl = document.querySelector('[name="parentEmail"]');
+            const email = emailEl ? emailEl.value.trim() : "";
+            const studentCountEl = document.getElementById('studentCount');
+            const studentCount = studentCountEl ? (parseInt(studentCountEl.value) || 0) : 0;
             let courseReminders = [];
 
             for (let i = 1; i <= studentCount; i++) {
-                const sName = document.querySelector(`[name="studentName_${i}"]`).value.trim();
-                const courseCount = parseInt(document.getElementById(`courseCount_${i}`).value) || 0;
+                const sNameInput = document.querySelector(`[name="studentName_${i}"]`);
+                const sName = sNameInput ? sNameInput.value.trim() : "";
+
+                const courseCountEl = document.getElementById(`courseCount_${i}`);
+                const courseCount = courseCountEl ? (parseInt(courseCountEl.value) || 0) : 0;
                 for (let j = 1; j <= courseCount; j++) {
                     const cTypeSelect = document.querySelector(`[name="courseType_${i}_${j}"]`);
+                    if (!cTypeSelect) continue;
+
                     const cType = cTypeSelect.value;
                     const cAbbr = cTypeSelect.selectedOptions[0]?.dataset.abbr || cType;
-                    const cDate = document.querySelector(`[name="dateText_${i}_${j}"]`).value.trim();
-                    let cTime = document.querySelector(`[name="timeSlot_${i}_${j}"]`).value;
-                    if (cTime === '其他') cTime = document.getElementById(`timeOther_${i}_${j}`).value.trim();
+
+                    const cDateInput = document.querySelector(`[name="dateText_${i}_${j}"]`);
+                    const cDate = cDateInput ? cDateInput.value.trim() : "";
+
+                    const cTimeSelect = document.querySelector(`[name="timeSlot_${i}_${j}"]`);
+                    let cTime = cTimeSelect ? cTimeSelect.value : "";
+                    if (cTime === '其他') {
+                        cTime = document.getElementById(`timeOther_${i}_${j}`)?.value.trim() || "其他";
+                    }
+
                     const testType = document.querySelector(`[name="testType_${i}_${j}"]`)?.value || "";
 
-                    if (sName && cType && cDate && cTime) {
+                    if (sName && cType && cType !== '請選擇課程' && cDate && cTime && cTime !== '請選擇時段') {
                         let softwareReminder = "";
                         if (cAbbr === 'MC') softwareReminder = "提醒有兩個課程相關軟體，必須在體驗課前先安裝完成。";
                         else if (cAbbr === 'RX') softwareReminder = "提醒有三個課程相關軟體，必須在體驗課前先安裝完成。";
@@ -1395,7 +1538,8 @@ ${courseReminders.join('\n')}
 小朋友體驗課程50分鐘，結束後緊接著還有線上家長說明會(15~20分鐘)詳細介紹課程，請家長務必撥冗參加。謝謝。
 
 若沒收到行前通知信、或有任何問題、或有事要更改體驗課時段，歡迎加入橘子蘋果線上課程官方帳號： https://oaoa.fun/6qhv3g ，加入後須主動傳訊才會看到您的好友唷！謝謝。`;
-            document.getElementById('smsTemplateText').value = template.trim();
+            const templateTextarea = document.getElementById('smsTemplateText');
+            if (templateTextarea) templateTextarea.value = template.trim();
         }
 
         // --- Shared Helper Functions ---
@@ -1412,16 +1556,19 @@ ${courseReminders.join('\n')}
 
         function collectAllNotes() {
             let allNotes = [];
-            const studentCount = parseInt(document.getElementById('studentCount').value) || 0;
+            const studentCountEl = document.getElementById('studentCount');
+            const studentCount = studentCountEl ? (parseInt(studentCountEl.value) || 0) : 0;
             const gather = (name) => {
-                const val = document.querySelector(`[name="${name}"]`)?.value.trim();
+                const el = document.querySelector(`[name="${name}"]`);
+                const val = el ? el.value.trim() : "";
                 if (val) allNotes.push(val);
             };
             gather('parentNote');
             gather('equipmentNote');
             for (let i = 1; i <= studentCount; i++) {
                 gather(`studentNote_${i}`);
-                const courseCount = parseInt(document.getElementById(`courseCount_${i}`).value) || 0;
+                const courseCountEl = document.getElementById(`courseCount_${i}`);
+                const courseCount = courseCountEl ? (parseInt(courseCountEl.value) || 0) : 0;
                 for (let j = 1; j <= courseCount; j++) {
                     gather(`courseNote_${i}_${j}`);
                 }
