@@ -87,6 +87,7 @@
     ],
     "programmingExp": [
         "沒有程式經驗",
+        "學過麥塊",
         "學過Scratch",
         "學過Python",
         "學過樂高積木",
@@ -142,11 +143,6 @@
         "媽媽",
         "爸媽一起討論",
         "其他"
-    ],
-    "reservationStatus": [
-        "無",
-        "僅一人預約",
-        "超過一人預約"
     ],
     "customerLevel": [
         "A",

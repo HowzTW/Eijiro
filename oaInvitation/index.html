@@ -448,6 +448,8 @@
     <div class="container">
         <header>
             <h1>體驗課程預約紀錄</h1>
+            <div id="headerVersionInfo" style="color: #888; font-size: 0.9em; margin-top: -10px; margin-bottom: 20px;">
+            </div>
         </header>
 
         <form id="appointmentForm">
@@ -582,12 +584,7 @@
                     <input type="text" id="decisionMakerOther" class="other-input" placeholder="請輸入其他決策者"
                         oninput="validateCard('otherInfoCard')">
                 </div>
-                <div class="form-group">
-                    <label class="required">預約與否</label>
-                    <select name="reservationStatus" required onchange="validateCard('otherInfoCard')">
-                        <option value="">請選擇預約與否</option>
-                    </select>
-                </div>
+
                 <div class="form-group">
                     <label class="required">客戶等級</label>
                     <select name="customerLevel" required onchange="validateCard('otherInfoCard')">
@@ -732,7 +729,6 @@
                 else if (name === 'briefingAttend') placeholderText = "請選擇出席狀況";
                 else if (name === 'priceReaction') placeholderText = "請選擇報價反應";
                 else if (name === 'decisionMaker') placeholderText = "請選擇決策者";
-                else if (name === 'reservationStatus') placeholderText = "請選擇預約與否";
                 else if (name === 'customerLevel') placeholderText = "請選擇客戶等級";
 
                 select.innerHTML = `<option value="">${placeholderText}</option>`;
@@ -756,7 +752,6 @@
             populateSelect('briefingAttend', configData.briefingAttend);
             populateSelect('priceReaction', configData.priceReaction);
             populateSelect('decisionMaker', configData.decisionMaker);
-            populateSelect('reservationStatus', configData.reservationStatus);
             populateSelect('customerLevel', configData.customerLevel);
         }
 
@@ -1174,8 +1169,9 @@
                 }
             }
 
-            // Sort by Date then Time
+            // Sort by Student Index -> Date -> Time
             allCourses.sort((a, b) => {
+                if (a.sIdx !== b.sIdx) return a.sIdx - b.sIdx;
                 if (a.cDate !== b.cDate) return a.cDate.localeCompare(b.cDate);
                 return a.cTime.localeCompare(b.cTime);
             });
@@ -1463,8 +1459,10 @@
                 if (c.testType && c.testType !== '不須寄送') noteLines.push(c.testType + "。");
                 if (allNotesGlobal.length > 0) noteLines.push(allNotesGlobal.join('\n'));
 
-                // Add Combined Summary if it exists and we want to show it (actually not in this logic block but I'll keep it safe)
-                // if (typeof showCombinedSummary !== 'undefined' && showCombinedSummary && combinedCoursesText) noteLines.push(combinedCoursesText);
+                // Add Combined Appointment Course info if there are multiple courses total
+                if (allCourses.length > 1 && combinedCoursesText) {
+                    noteLines.push(combinedCoursesText);
+                }
 
                 if (noteLines.length > 0) {
                     lines.push("⑩ 其他備註：");
@@ -1595,8 +1593,58 @@ ${courseReminders.join('\n')}
             }
         }
 
-        window.onload = loadConfig;
+        window.onload = function () {
+            loadConfig();
+            initVersionFooter();
+        };
+
+        window.onresize = initVersionFooter;
+
+        function initVersionFooter() {
+            // 1. Dynamic Version Info (Below Title)
+            const headerInfo = document.getElementById('headerVersionInfo');
+            if (headerInfo) {
+                const lastMod = new Date(document.lastModified);
+                const pad = (n) => n.toString().padStart(2, '0');
+                const yyyy = lastMod.getFullYear();
+                const MM = pad(lastMod.getMonth() + 1);
+                const dd = pad(lastMod.getDate());
+                const HH = pad(lastMod.getHours());
+                const mm = pad(lastMod.getMinutes());
+                const ss = pad(lastMod.getSeconds());
+
+                headerInfo.textContent = `最後修改時間：${yyyy}-${MM}-${dd} ${HH}:${mm}:${ss}`;
+            }
+
+            // 2. Footer Spacer Height Calculation
+            const footer = document.getElementById('versionFooter');
+            if (!footer) return;
+
+            const nav = document.querySelector('.sticky-nav');
+            const navHeight = nav ? nav.offsetHeight : 60;
+            const noteCard = document.getElementById('noteCard');
+            if (!noteCard) return;
+
+            const noteHeight = noteCard.offsetHeight;
+            const gap = 20; // assumed from CSS (.card margin-bottom)
+            const halfGap = gap / 2;
+
+            // Equation:
+            // ViewportHeight = NavHeight + HalfGap + NoteCardHeight + Gap + FooterHeight
+
+            const viewportH = window.innerHeight;
+            let requiredHeight = viewportH - navHeight - halfGap - noteHeight - gap;
+
+            // Ensure minimum height (spacer shouldn't be negative)
+            if (requiredHeight < 10) requiredHeight = 10;
+
+            footer.style.height = `${requiredHeight}px`;
+            footer.style.marginTop = `${gap}px`;
+        }
     </script>
+    <!-- Spacer Footer (Transparent) -->
+    <div id="versionFooter"
+        style="background: transparent; border: none; width: 100%; box-sizing: border-box; pointer-events: none;"></div>
 </body>
 
 </html>
