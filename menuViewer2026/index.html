@@ -49,12 +49,21 @@
         header {
             background-color: var(--primary-color);
             color: white;
-            padding: 30px 20px;
+            padding: 20px 20px 10px;
             text-align: center;
             position: sticky;
             top: 0;
             z-index: 100;
             box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-top-row {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 20px;
         }
 
         header h1 {
@@ -65,11 +74,7 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        header p {
-            margin: 5px 0 0;
-            font-size: 18px;
-            opacity: 0.9;
-        }
+        /* Tagline removed */
 
         .container {
             max-width: 600px;
@@ -464,7 +469,7 @@
 
         .header-reload-btn {
             position: absolute;
-            right: 15px;
+            right: 0;
             top: 50%;
             translate: 0 -50%;
             background: rgba(255, 255, 255, 0.2);
@@ -495,18 +500,73 @@
             font-size: 12px;
             font-weight: 900;
         }
+
+        /* Horizontal Navigation */
+        #category-nav {
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+            gap: 12px;
+            padding: 5px 5px 15px;
+            /* Center the nav bar */
+            width: fit-content;
+            max-width: 100%;
+            margin: 0 auto;
+
+            /* Hide scrollbar for Chrome/Safari/Opera */
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            /* Firefox */
+            -ms-overflow-style: none;
+            /* IE 10+ */
+        }
+
+        #category-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-item {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
+        }
+
+        .nav-item:active {
+            scale: 0.95;
+        }
+
+        .nav-item.active {
+            background: var(--accent-color);
+            color: #fff;
+            font-weight: 700;
+            border-color: var(--accent-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transform: scale(1.05);
+        }
     </style>
 </head>
 
 <body>
 
     <header>
-        <button class="header-reload-btn" onclick="if(confirm('確定要清除所有點單並重整網頁嗎？')) window.location.reload();">
-            <i class="ph-bold ph-arrows-clockwise"></i>
-            <span>重置</span>
-        </button>
-        <h1>翠庭 JADE</h1>
-        <p>精緻粵式料理 • 暖心服務</p>
+        <div class="header-top-row">
+            <button class="header-reload-btn" onclick="if(confirm('確定要清除所有點單並重整網頁嗎？')) window.location.reload();">
+                <i class="ph-bold ph-arrows-clockwise"></i>
+                <span>重置</span>
+            </button>
+            <h1>翠庭 JADE</h1>
+        </div>
+        <nav id="category-nav">
+            <!-- Navigation items will be injected here -->
+        </nav>
     </header>
 
     <div class="container" id="menu-container">
@@ -717,6 +777,99 @@
                     section.appendChild(card);
                 });
                 container.appendChild(section);
+            });
+
+            renderNav();
+            initScrollSpy();
+        }
+
+        function renderNav() {
+            const nav = document.getElementById('category-nav');
+            nav.innerHTML = '';
+            menuData.forEach((cat, index) => {
+                const btn = document.createElement('div');
+                btn.className = 'nav-item';
+                if (index === 0) btn.classList.add('active'); // Default active
+                btn.textContent = cat.category;
+                btn.onclick = () => {
+                    const sections = document.querySelectorAll('.category-section');
+                    if (sections[index]) {
+                        // Dynamic offset based on header height + extra padding
+                        const header = document.querySelector('header');
+                        const headerHeight = header.offsetHeight;
+                        const extraPadding = 30;
+                        const headerOffset = headerHeight + extraPadding;
+
+                        const elementPosition = sections[index].getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: "smooth"
+                        });
+
+                        // Manually set active class immediately for better feedback
+                        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                        btn.classList.add('active');
+                        centerNavItem(btn);
+                    }
+                };
+                nav.appendChild(btn);
+            });
+        }
+
+        function initScrollSpy() {
+            const navItems = document.querySelectorAll('.nav-item');
+            const sections = document.querySelectorAll('.category-section');
+
+            // Optimization: Throttled scroll event listener
+            let isScrolling = false;
+
+            window.addEventListener('scroll', () => {
+                if (!isScrolling) {
+                    window.requestAnimationFrame(() => {
+                        let current = '';
+                        const header = document.querySelector('header');
+                        const headerHeight = header ? header.offsetHeight : 200;
+                        const headerOffset = headerHeight + 50;
+
+                        sections.forEach((section, index) => {
+                            const sectionTop = section.offsetTop;
+                            const sectionHeight = section.clientHeight;
+                            if (window.scrollY >= (sectionTop - headerOffset)) {
+                                current = index;
+                            }
+                        });
+
+                        navItems.forEach((item, index) => {
+                            item.classList.remove('active');
+                            if (index === current) {
+                                item.classList.add('active');
+                                centerNavItem(item);
+                            }
+                        });
+                        isScrolling = false;
+                    });
+                    isScrolling = true;
+                }
+            });
+        }
+
+        function centerNavItem(target) {
+            const nav = document.getElementById('category-nav');
+            const navRect = nav.getBoundingClientRect();
+            const targetRect = target.getBoundingClientRect();
+
+            // Calculate the scroll position needed to center the item
+            // target.offsetLeft is relative to the scroll parent's content start
+            // We want: target.offsetLeft - (navWidth/2) + (targetWidth/2)
+
+            const offsetLeft = target.offsetLeft;
+            const scrollLeft = offsetLeft - (nav.clientWidth / 2) + (target.clientWidth / 2);
+
+            nav.scrollTo({
+                left: scrollLeft,
+                behavior: 'smooth'
             });
         }
 
