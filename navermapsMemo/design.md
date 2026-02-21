@@ -4,16 +4,16 @@
 
 ## 1. 核心設計原則
 - **響應式設計 (Responsive Design)**: 網頁必須在手機（iOS/Android）與電腦（Desktop）瀏覽器上均有良好的瀏覽體驗。
-- **視覺一致性**: 整體配色方案應與 `navermapsMemo/icon.png` 協調，並以「視覺舒適」為前提進行搭配。
+- **視覺一致性**: 整體配色方案應與 `navermapsMemo/icon-solid.png` 協調，並以「視覺舒適」為前提進行搭配。
 
 ## 2. 應用程式圖標 (App Icons)
-- **瀏覽器標籤頁 (Favicon)**: 使用 `navermapsMemo/icon.png`。
-- **iOS 主畫面圖標 (Apple Touch Icon)**: 使用 `navermapsMemo/icon.png`。
+- **瀏覽器標籤頁 (Favicon)**: 使用 `navermapsMemo/icon-solid.png`。
+- **iOS 主畫面圖標 (Apple Touch Icon)**: 使用 `navermapsMemo/icon-solid.png`。
 
 ## 3. 滿版封面/載入畫面 (Splash Screen)
 網頁載入時，應先顯示一個滿版封面：
 - **視覺呈現**:
-    - **背景底色**: 與 `icon.png` 的背景底色完全相同。
+    - **背景底色**: 與 `icon-solid.png` 的背景底色完全相同。
     - **中央區域**: 正中央顯示大型的 `icon.png`。
     - **標題**: 圖標下方顯示醒目的應用名稱「NaverMaps Memo」。
     - **底部資訊**: 畫面最下方置中顯示小字「版本：yyyy-mm-dd hh:mi:ss」。
@@ -28,7 +28,7 @@
 ### 4.1 頁首區塊 (Header Block)
 - **定位**: 固定在畫面頂部 (Fixed/Sticky)，不隨頁面捲動而消失。
 - **視覺**:
-    - **底色**: 與 `icon.png` 的背景底色相同。
+    - **底色**: 與 `icon-solid.png` 的背景底色相同。
     - **內容**:
         - `icon.png` 作為網站 LOGO（合適大小）。
         - 應用名稱「NaverMaps Memo」（合適大小，字體清晰）。
