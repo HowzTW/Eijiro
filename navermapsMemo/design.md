@@ -33,10 +33,9 @@
 - **定位**: 固定在畫面頂部 (Fixed/Sticky)，不隨頁面捲動而消失。
 - **視覺**:
     - **底色**: 與 `icon-solid.png` 的背景底色相同。
-    - **內容**:
-        - `icon.png` 作為網站 LOGO（合適大小）。
-        - 應用名稱「NaverMaps Memo」（合適大小，字體清晰）。
-        - **篩選按鈕**: 位於 Header 最右側，僅顯示圖示（Material Icon: `filter_alt`），無文字內容。
+    - **內容排列**: 
+        - **Logo 與標題**: `icon.png` 與 應用名稱「NaverMaps Memo」水平排列且**無間距**。
+        - **篩選按鈕**: 採**圓形按鈕**設計，**固定在畫面最右上角** (Position: Fixed)，僅顯示圖示 (Material Icon: `filter_alt`)。
             - 點擊後開啟「標籤篩選視窗 (Tag Block)」。
 
 
