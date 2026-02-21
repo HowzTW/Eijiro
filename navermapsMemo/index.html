@@ -320,7 +320,8 @@
         }
 
         /* 彈窗樣式 */
-        #filter-modal {
+        #filter-modal,
+        #add-modal {
             position: fixed;
             top: 0;
             left: 0;
@@ -474,6 +475,114 @@
             font-weight: 700;
         }
 
+        /* 浮動新增按鈕 (FAB) */
+        .fab-add {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 80px;
+            height: 80px;
+            background: var(--accent-teal);
+            color: var(--bg-color);
+            /* 圖示與文字顏色需與主畫面背景色相同 */
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 200;
+            box-shadow: 0 8px 32px rgba(45, 212, 191, 0.4);
+            border: none;
+            padding-top: 5px;
+        }
+
+        .fab-add:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 12px 40px rgba(45, 212, 191, 0.6);
+        }
+
+        .fab-add .material-symbols-outlined {
+            font-size: 2.2rem;
+            margin-bottom: -2px;
+        }
+
+        .fab-add span.label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* 標籤篩選 & 新增景點小視窗 共通樣式強化 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(8px);
+        }
+
+        /* 新增景點特定欄位樣式 */
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .required-star {
+            color: var(--accent-green);
+            margin-left: 0.25rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-teal);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn-confirm-circle:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.2);
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
         @media (max-width: 600px) {
             .content-grid {
                 grid-template-columns: 1fr;
@@ -506,8 +615,14 @@
         </button>
     </header>
 
+    <!-- 浮動新增按鈕 -->
+    <button class="fab-add" onclick="openAddModal()">
+        <span class="material-symbols-outlined">add</span>
+        <span class="label">新增景點</span>
+    </button>
+
     <!-- 標籤篩選彈窗 -->
-    <div id="filter-modal">
+    <div id="filter-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">標籤篩選</h2>
@@ -527,6 +642,43 @@
             </div>
             <div style="height: 2rem;"></div> <!-- 距離標籤膠囊一段高度 -->
             <button class="btn-confirm-circle" onclick="applyFilters()" title="確定">
+                <span class="material-symbols-outlined">check</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 新增景點彈窗 -->
+    <div id="add-modal" class="modal-overlay">
+        <div class="modal-content" style="max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h2 class="modal-title">新增景點</h2>
+                <button class="btn-close-modal" onclick="closeAddModal()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <hr class="modal-hr">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">景點中文名稱<span class="required-star">*</span></label>
+                    <input type="text" id="add-name-cn" class="form-input" placeholder="例如：景福宮"
+                        oninput="validateAddForm()">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">景點原文名稱</label>
+                    <input type="text" id="add-name-orig" class="form-input" placeholder="例如：경복궁">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">NaverMap 網址<span class="required-star">*</span></label>
+                    <input type="url" id="add-url" class="form-input" placeholder="https://naver.me/..."
+                        oninput="validateAddForm()">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">景點簡介</label>
+                    <textarea id="add-desc" class="form-input form-textarea" placeholder="輸入景點特色..."></textarea>
+                </div>
+            </div>
+            <div style="height: 1rem;"></div>
+            <button id="btn-save-attr" class="btn-confirm-circle" onclick="saveNewAttraction()" title="新增" disabled>
                 <span class="material-symbols-outlined">check</span>
             </button>
         </div>
@@ -806,6 +958,80 @@
             renderCards();
             closeFilterModal();
         }
+
+        // --- 新增景點視窗邏輯 ---
+        function openAddModal() {
+            document.getElementById('add-modal').style.display = 'flex';
+            // 清空表單
+            document.getElementById('add-name-cn').value = '';
+            document.getElementById('add-name-orig').value = '';
+            document.getElementById('add-url').value = '';
+            document.getElementById('add-desc').value = '';
+            validateAddForm();
+        }
+
+        function closeAddModal() {
+            document.getElementById('add-modal').style.display = 'none';
+        }
+
+        function validateAddForm() {
+            const nameCn = document.getElementById('add-name-cn').value.trim();
+            const url = document.getElementById('add-url').value.trim();
+            const btn = document.getElementById('btn-save-attr');
+
+            // 只要中文名稱與網址都有內容，即可啟用按鈕
+            btn.disabled = !(nameCn && url);
+        }
+
+        async function saveNewAttraction() {
+            const btn = document.getElementById('btn-save-attr');
+            const originalIcon = btn.innerHTML;
+
+            try {
+                // 防止重複提交
+                btn.disabled = true;
+                btn.innerHTML = '<span class="material-symbols-outlined rotating" style="animation: spin 1s linear infinite;">sync</span>';
+
+                const attractionData = {
+                    name_cn: document.getElementById('add-name-cn').value.trim(),
+                    name_orig: document.getElementById('add-name-orig').value.trim(),
+                    naver_map_url: document.getElementById('add-url').value.trim(),
+                    description: document.getElementById('add-desc').value.trim()
+                };
+
+                // 調用 GAS
+                if (GAS_URL.includes('YOUR_APPS_SCRIPT_URL')) {
+                    alert('目前為開發模式，將模擬儲存資料到主控台。');
+                    console.log('模擬儲存景點:', attractionData);
+                    closeAddModal();
+                    btn.disabled = false;
+                    btn.innerHTML = originalIcon;
+                } else {
+                    // 為了支援 localhost:8080 測試，改用 fetch POST
+                    // 註：GAS Web App 需要實作 doPost(e)
+                    await fetch(GAS_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: JSON.stringify(attractionData)
+                    });
+
+                    alert('景點資料已送出！請檢查試算表是否已新增資料。');
+                    location.reload();
+                }
+            } catch (err) {
+                console.error("儲存失敗:", err);
+                alert("儲存景點時發生錯誤。");
+                btn.disabled = false;
+                btn.innerHTML = originalIcon;
+            }
+        }
+
+        // 加入 spin 動畫樣式
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        `;
+        document.head.appendChild(style);
 
         // 開發測試用的模擬資料 (對應 setupDatabase.gs)
         function getMockData() {
