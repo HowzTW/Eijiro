@@ -1,0 +1,50 @@
+# NaverMaps Memo 網頁應用設計需求
+
+本文件詳細記錄了 「NaverMaps Memo」 網頁應用的視覺設計、互動流程與介面結構要求。
+
+## 1. 核心設計原則
+- **響應式設計 (Responsive Design)**: 網頁必須在手機（iOS/Android）與電腦（Desktop）瀏覽器上均有良好的瀏覽體驗。
+- **視覺一致性**: 整體配色方案應與 `navermapsMemo/icon.png` 協調，並以「視覺舒適」為前提進行搭配。
+
+## 2. 應用程式圖標 (App Icons)
+- **瀏覽器標籤頁 (Favicon)**: 使用 `navermapsMemo/icon.png`。
+- **iOS 主畫面圖標 (Apple Touch Icon)**: 使用 `navermapsMemo/icon.png`。
+
+## 3. 滿版封面/載入畫面 (Splash Screen)
+網頁載入時，應先顯示一個滿版封面：
+- **視覺呈現**:
+    - **背景底色**: 與 `icon.png` 的背景底色完全相同。
+    - **中央區域**: 正中央顯示大型的 `icon.png`。
+    - **標題**: 圖標下方顯示醒目的應用名稱「NaverMaps Memo」。
+    - **底部資訊**: 畫面最下方置中顯示小字「版本：yyyy-mm-dd hh:mi:ss」。
+        - *註：日期與時間需自動讀取 `index.html` 檔案的最後修改時間（以台北時間為準）。*
+- **互動行為**:
+    - 封面顯示一段合適的時間（不宜過長）。
+    - 隨後以「淡出 (Fade out)」效果消失，顯露出下方的主畫面。
+
+## 4. 主畫面結構 (Main Interface)
+主畫面主要分為兩大區塊：
+
+### 4.1 頁首區塊 (Header Block)
+- **定位**: 固定在畫面頂部 (Fixed/Sticky)，不隨頁面捲動而消失。
+- **視覺**:
+    - **底色**: 與 `icon.png` 的背景底色相同。
+    - **內容**:
+        - `icon.png` 作為網站 LOGO（合適大小）。
+        - 應用名稱「NaverMaps Memo」（合適大小，字體清晰）。
+
+### 4.2 內容區塊 (Content Block)
+- **位置**: 位於 Header Block 下方。
+- **內容**:
+    - 以「小卡片 (Cards)」形式排列顯示景點資訊。
+    - 每個卡片代表一個景點。
+    - **資料來源**: 動態讀取自 Google Sheets。
+        - **API URL**: `https://script.google.com/macros/s/AKfycbwbS7dJKnllCnZCcYWRogpeV5N8do80Dl4v7rigUA6q-7s0bkQsBkn24h_OZ4oF0dqt/exec`
+        - **資料結構**: 參考 `navermapsMemo/setupDatabase.gs` 所定義的四個主要分頁：
+            - `Attractions`: 景點主資訊。
+            - `Tags`: 標籤定義。
+            - `Attraction_Tags`: 景點與標籤的對照關係。
+            - `Reference_URLs`: 景點的外部參考連結。
+
+---
+*最後更新時間：2026-02-21*
