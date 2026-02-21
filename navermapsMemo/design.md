@@ -37,7 +37,17 @@
 - **位置**: 位於 Header Block 下方。
 - **內容**:
     - 以「小卡片 (Cards)」形式排列顯示景點資訊。
-    - 每個卡片代表一個景點。
+    - **小卡片版面配置**:
+        1. 景點中文名稱
+        2. 景點原文名稱
+        3. `[在 Naver Maps 開啟]` 按鈕
+        4. 標籤 (Tags)
+        5. 景點簡介
+        6. 參考資訊連結
+    - **參考資訊顯示邏輯**:
+        - 以 `url_description` 作為超連結顯示文字。
+        - 若 `url_description` 為空，則顯示完整的 `url` 字串作為超連結文字。
+    - **圖標資源**: 網頁中所有圖標皆統一使用 [Google Material Icons (Material Symbols)](https://fonts.google.com/icons) 免費資源。
     - **資料來源**: 動態讀取自 Google Sheets。
         - **API URL**: `https://script.google.com/macros/s/AKfycbwbS7dJKnllCnZCcYWRogpeV5N8do80Dl4v7rigUA6q-7s0bkQsBkn24h_OZ4oF0dqt/exec`
         - **資料結構**: 參考 `navermapsMemo/setupDatabase.gs` 所定義的四個主要分頁：
