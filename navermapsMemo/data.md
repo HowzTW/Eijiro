@@ -1,6 +1,6 @@
-# NavmapMemo 資料模型設計 (Data Model Design)
+# NavermapsMemo 資料模型設計 (Data Model Design)
 
-本文件定義了 NavmapMemo 網頁應用的資料模型。資料將儲存於 Google Sheets 中。
+本文件定義了 NavermapsMemo 網頁應用的資料模型。資料將儲存於 Google Sheets 中。
 
 ## 1. 資料實體 (Data Entities)
 

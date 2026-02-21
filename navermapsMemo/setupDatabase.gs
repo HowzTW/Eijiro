@@ -1,5 +1,5 @@
 /**
- * NavmapMemo Google Sheets 初始化腳本
+ * NavermapsMemo Google Sheets 初始化腳本
  * 
  * 使用方式：
  * 1. 在 Google 試算表中，點擊「擴充功能」 > 「Apps Script」。
