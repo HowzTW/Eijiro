@@ -180,6 +180,7 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
             transition: max-height 0.3s ease;
+            white-space: pre-wrap;
         }
 
         .card.expanded .card-desc {
@@ -490,8 +491,8 @@
         function getMockData() {
             return {
                 attractions: [
-                    { id: 'attr01', name_cn: '景福宮', name_orig: '경복궁', naver_map_url: 'https://naver.me/Fw7iyAYH', description: '朝鮮王朝的主要皇宮。' },
-                    { id: 'attr02', name_cn: '明洞商圈', name_orig: '명동', naver_map_url: 'https://naver.me/xWIcPz8f', description: '熱鬧的購物與美食街。' }
+                    { id: 'attr01', name_cn: '景福宮', name_orig: '경복궁', naver_map_url: 'https://naver.me/Fw7iyAYH', description: '朝鮮王朝的主要皇宮。\n包含勤政殿、慶會樓等建築。' },
+                    { id: 'attr02', name_cn: '明洞商圈', name_orig: '명동', naver_map_url: 'https://naver.me/xWIcPz8f', description: '熱鬧的購物與美食街。\n這是一段很長很長的測試內容：\n1. 美食豐富\n2. 購物天堂\n3. 交通便利\n4. 遊客必去\n5. 換錢首選' }
                 ],
                 tags: [
                     { id: 'tag01', tag_name: '歷史景點' },
