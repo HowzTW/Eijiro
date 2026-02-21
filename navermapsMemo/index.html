@@ -280,6 +280,183 @@
             color: var(--text-secondary);
         }
 
+        /* 標籤篩選器樣式 */
+        .filter-btn {
+            background: none;
+            border: none;
+            color: white;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .filter-btn:hover {
+            transform: scale(1.1);
+            color: var(--accent-green);
+        }
+
+        .filter-btn .material-symbols-outlined {
+            font-size: 1.8rem;
+        }
+
+        /* 彈窗樣式 */
+        #filter-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-content {
+            background: rgba(30, 41, 59, 0.95);
+            padding: 2.5rem;
+            border-radius: 32px;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid rgba(163, 230, 53, 0.3);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+            color: #fff;
+        }
+
+        .btn-close-modal {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-close-modal:hover {
+            background: rgba(255, 59, 48, 0.2);
+            border-color: #ff3b30;
+        }
+
+        .modal-hr {
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 1rem 0;
+            width: 100%;
+        }
+
+        .bulk-actions {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            justify-content: flex-start;
+        }
+
+        .bulk-link {
+            color: var(--accent-green);
+            font-size: 0.9rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            font-weight: 500;
+        }
+
+        .bulk-link:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        .modal-body {
+            max-height: 50vh;
+            overflow-y: auto;
+            margin-bottom: 2rem;
+            padding: 0.5rem 0;
+        }
+
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .filter-tag {
+            padding: 0.75rem 1.5rem;
+            border-radius: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+            text-align: center;
+        }
+
+        .filter-tag.active {
+            background: #334139;
+            color: var(--accent-green);
+            font-weight: 700;
+            border: 1px solid #334139;
+        }
+
+        .filter-tag.inactive {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .filter-tag.inactive:hover {
+            border-color: var(--text-secondary);
+            color: #fff;
+        }
+
+        .btn-confirm-circle {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            color: #000;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(163, 230, 53, 0.4);
+            margin-left: auto;
+        }
+
+        .btn-confirm-circle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(163, 230, 53, 0.6);
+        }
+
+        .btn-confirm-circle .material-symbols-outlined {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
         @media (max-width: 600px) {
             .content-grid {
                 grid-template-columns: 1fr;
@@ -295,7 +472,7 @@
 <body>
 
     <!-- 滿版封面 -->
-    <div id="splash-screen">
+    <div id="splash-screen" onclick="hideSplash()">
         <img src="icon.png" alt="Logo" class="splash-logo">
         <h1 class="splash-title">NaverMaps Memo</h1>
         <div class="version-info" id="version-display">版本：正在讀取...</div>
@@ -303,9 +480,40 @@
 
     <!-- 主畫面 Header -->
     <header>
-        <img src="icon.png" alt="Logo" class="header-logo">
-        <span class="header-title">NaverMaps Memo</span>
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <img src="icon.png" alt="Logo" class="header-logo">
+            <span class="header-title">NaverMaps Memo</span>
+        </div>
+        <button class="filter-btn" onclick="openFilterModal()" title="篩選標籤">
+            <span class="material-symbols-outlined">filter_alt</span>
+        </button>
     </header>
+
+    <!-- 標籤篩選彈窗 -->
+    <div id="filter-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">標籤篩選</h2>
+                <button class="btn-close-modal" onclick="closeFilterModal()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <hr class="modal-hr">
+            <div class="bulk-actions">
+                <span class="bulk-link" onclick="selectAllTags()">全部選取</span>
+                <span class="bulk-link" onclick="clearAllTags()">全部取消</span>
+            </div>
+            <div class="modal-body">
+                <div id="filter-tag-list" class="filter-tags">
+                    <!-- 標籤動態產生成為膠囊 -->
+                </div>
+            </div>
+            <div style="height: 2rem;"></div> <!-- 距離標籤膠囊一段高度 -->
+            <button class="btn-confirm-circle" onclick="applyFilters()" title="確定">
+                <span class="material-symbols-outlined">check</span>
+            </button>
+        </div>
+    </div>
 
     <!-- 內容區塊 -->
     <main>
@@ -333,6 +541,7 @@
         // 淡出封面
         function hideSplash() {
             const splash = document.getElementById('splash-screen');
+            if (!splash || splash.classList.contains('fade-out')) return;
             splash.classList.add('fade-out');
             // 動畫結束後移除元素以釋放資源
             setTimeout(() => splash.remove(), 1000);
@@ -340,6 +549,11 @@
 
         // 資料處理與渲染
         const GAS_URL = 'https://script.google.com/macros/s/AKfycbwbS7dJKnllCnZCcYWRogpeV5N8do80Dl4v7rigUA6q-7s0bkQsBkn24h_OZ4oF0dqt/exec';
+
+        // 全域資料儲存
+        let appData = null;
+        let selectedTagIds = new Set();
+        let tempSelectedTagIds = new Set();
 
         async function loadData() {
             try {
@@ -353,7 +567,12 @@
                     data = await response.json();
                 }
 
-                renderCards(data);
+                appData = data;
+
+                // 預設全選標籤
+                selectedTagIds = new Set(appData.tags.map(t => t.id));
+
+                renderCards();
             } catch (err) {
                 console.error("資料載入失敗:", err);
                 document.getElementById('content').innerHTML = '<div class="loading-text">無法載入資料，請檢查網路或 GAS 設定。</div>';
@@ -363,13 +582,40 @@
             }
         }
 
-        function renderCards(data) {
+        function renderCards() {
             const container = document.getElementById('content');
             container.innerHTML = '';
 
-            const { attractions, tags, relationships, references } = data;
+            const { attractions, tags, relationships, references } = appData;
 
-            attractions.forEach(attr => {
+            // 篩選邏輯
+            const totalTags = tags.length;
+            const selectedCount = selectedTagIds.size;
+            const isAllSelected = selectedCount === totalTags;
+            const isNoneSelected = selectedCount === 0;
+
+            const filteredAttractions = attractions.filter(attr => {
+                const attrTagIds = relationships
+                    .filter(r => r.attraction_id === attr.id)
+                    .map(r => r.tag_id);
+
+                const hasNoTags = attrTagIds.length === 0;
+
+                // 只有在「全選」或「全部取消選取」時，才出現無標籤卡片
+                if (hasNoTags) {
+                    return isAllSelected || isNoneSelected;
+                }
+
+                // 若有標籤，則檢查是否有交集
+                return attrTagIds.some(id => selectedTagIds.has(id));
+            });
+
+            if (filteredAttractions.length === 0) {
+                container.innerHTML = '<div class="loading-text">沒有符合篩選條件的景點。</div>';
+                return;
+            }
+
+            filteredAttractions.forEach(attr => {
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.dataset.id = attr.id;
@@ -487,12 +733,65 @@
             }
         });
 
+        // --- 篩選視窗邏輯 ---
+        function openFilterModal() {
+            const modal = document.getElementById('filter-modal');
+            modal.style.display = 'flex';
+            // 複製目前的選取狀態到暫存
+            tempSelectedTagIds = new Set(selectedTagIds);
+            renderFilterTags();
+        }
+
+        function closeFilterModal() {
+            document.getElementById('filter-modal').style.display = 'none';
+        }
+
+        function renderFilterTags() {
+            const list = document.getElementById('filter-tag-list');
+            list.innerHTML = '';
+
+            appData.tags.forEach(tag => {
+                const isActive = tempSelectedTagIds.has(tag.id);
+                const tagEl = document.createElement('div');
+                tagEl.className = `filter-tag ${isActive ? 'active' : 'inactive'}`;
+                tagEl.textContent = tag.tag_name;
+                tagEl.onclick = () => toggleTag(tag.id);
+                list.appendChild(tagEl);
+            });
+        }
+
+        function toggleTag(tagId) {
+            if (tempSelectedTagIds.has(tagId)) {
+                tempSelectedTagIds.delete(tagId);
+            } else {
+                tempSelectedTagIds.add(tagId);
+            }
+            renderFilterTags();
+        }
+
+        function selectAllTags() {
+            tempSelectedTagIds = new Set(appData.tags.map(t => t.id));
+            renderFilterTags();
+        }
+
+        function clearAllTags() {
+            tempSelectedTagIds = new Set();
+            renderFilterTags();
+        }
+
+        function applyFilters() {
+            selectedTagIds = new Set(tempSelectedTagIds);
+            renderCards();
+            closeFilterModal();
+        }
+
         // 開發測試用的模擬資料 (對應 setupDatabase.gs)
         function getMockData() {
             return {
                 attractions: [
                     { id: 'attr01', name_cn: '景福宮', name_orig: '경복궁', naver_map_url: 'https://naver.me/Fw7iyAYH', description: '朝鮮王朝的主要皇宮。\n包含勤政殿、慶會樓等建築。' },
-                    { id: 'attr02', name_cn: '明洞商圈', name_orig: '명동', naver_map_url: 'https://naver.me/xWIcPz8f', description: '熱鬧的購物與美食街。\n這是一段很長很長的測試內容：\n1. 美食豐富\n2. 購物天堂\n3. 交通便利\n4. 遊客必去\n5. 換錢首選' }
+                    { id: 'attr02', name_cn: '明洞商圈', name_orig: '명동', naver_map_url: 'https://naver.me/xWIcPz8f', description: '熱鬧的購物與美食街。\n這是一段很長很長的測試內容：\n1. 美食豐富\n2. 購物天堂\n3. 交通便利\n4. 遊客必去\n5. 換錢首選' },
+                    { id: 'attr03', name_cn: '測試景點 (無標籤)', name_orig: 'Test No Tags', naver_map_url: '#', description: '這是一個沒有標籤的測試景點。' }
                 ],
                 tags: [
                     { id: 'tag01', tag_name: '歷史景點' },
