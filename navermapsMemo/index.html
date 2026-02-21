@@ -172,8 +172,43 @@
 
         .card-desc {
             font-size: 0.95rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 0.5rem;
             flex-grow: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .card.expanded .card-desc {
+            -webkit-line-clamp: unset;
+            line-clamp: unset;
+            display: block;
+        }
+
+        .toggle-desc {
+            background: none;
+            border: none;
+            color: var(--accent-teal);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-bottom: 1rem;
+            width: fit-content;
+        }
+
+        .toggle-desc:hover {
+            text-decoration: underline;
+        }
+
+        .toggle-desc .material-symbols-outlined {
+            font-size: 1.1rem;
         }
 
         .tag-container {
@@ -336,6 +371,7 @@
             attractions.forEach(attr => {
                 const card = document.createElement('div');
                 card.className = 'card';
+                card.dataset.id = attr.id;
 
                 // 處理標籤
                 const attrTags = relationships
@@ -359,7 +395,11 @@
                         ${attrTags.map(t => `<span class="tag">${t}</span>`).join('')}
                     </div>
 
-                    <div class="card-desc">${attr.description || ''}</div>
+                    <div class="card-desc" id="desc-${attr.id}">${attr.description || ''}</div>
+                    <button class="toggle-desc" id="btn-${attr.id}" style="display: none;">
+                        <span class="text">展開內容</span>
+                        <span class="material-symbols-outlined">expand_more</span>
+                    </button>
                     
                     ${attrRefs.length > 0 ? `
                         <div class="references">
@@ -374,8 +414,77 @@
                     ` : ''}
                 `;
                 container.appendChild(card);
+
+                const descEl = document.getElementById(`desc-${attr.id}`);
+                const btnEl = document.getElementById(`btn-${attr.id}`);
+
+                // 檢查是否需要顯示展開按鈕（高度超過 3 行）
+                setTimeout(() => {
+                    if (descEl.scrollHeight > descEl.clientHeight) {
+                        btnEl.style.display = 'flex';
+                    }
+                }, 100);
+
+                btnEl.onclick = (e) => {
+                    e.stopPropagation();
+                    const isExpanded = card.classList.contains('expanded');
+                    if (isExpanded) {
+                        collapseCard(card);
+                    } else {
+                        // 先收合其他的
+                        document.querySelectorAll('.card.expanded').forEach(c => collapseCard(c));
+                        expandCard(card);
+                    }
+                };
+
+                // 點擊卡片任何地方（除了連結和按鈕）也可以觸發收合其他卡片的邏輯
+                card.onclick = (e) => {
+                    if (e.target.tagName === 'A' || e.target.closest('a') || e.target.closest('.btn-naver') || e.target.closest('.toggle-desc')) return;
+
+                    // 點擊卡片其他地方，收合其他卡片
+                    document.querySelectorAll('.card.expanded').forEach(c => {
+                        if (c !== card) collapseCard(c);
+                    });
+                };
+
+                // 加入觀察者：若捲動出螢幕則自動收合
+                scrollObserver.observe(card);
             });
         }
+
+        function expandCard(card) {
+            card.classList.add('expanded');
+            const btn = card.querySelector('.toggle-desc');
+            if (btn) {
+                btn.querySelector('.text').textContent = '收合內容';
+                btn.querySelector('.material-symbols-outlined').textContent = 'expand_less';
+            }
+        }
+
+        function collapseCard(card) {
+            card.classList.remove('expanded');
+            const btn = card.querySelector('.toggle-desc');
+            if (btn) {
+                btn.querySelector('.text').textContent = '展開內容';
+                btn.querySelector('.material-symbols-outlined').textContent = 'expand_more';
+            }
+        }
+
+        // 偵測捲動：當卡片完全消失在螢幕時收合
+        const scrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting && entry.target.classList.contains('expanded')) {
+                    collapseCard(entry.target);
+                }
+            });
+        }, { threshold: 0 });
+
+        // 全域點擊點到卡片之外時也收合
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.card')) {
+                document.querySelectorAll('.card.expanded').forEach(c => collapseCard(c));
+            }
+        });
 
         // 開發測試用的模擬資料 (對應 setupDatabase.gs)
         function getMockData() {
