@@ -180,7 +180,14 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
             transition: max-height 0.3s ease;
-            white-space: pre-wrap;
+        }
+
+        .desc-segment {
+            margin-bottom: 0.9rem;
+        }
+
+        .desc-segment:last-child {
+            margin-bottom: 0;
         }
 
         .card.expanded .card-desc {
@@ -652,7 +659,9 @@
                         ${attrTags.map(t => `<span class="tag">${t}</span>`).join('')}
                     </div>
 
-                    <div class="card-desc" id="desc-${attr.id}">${attr.description || ''}</div>
+                    <div class="card-desc" id="desc-${attr.id}">
+                        ${(attr.description || '').split('\n').map(line => line.trim() ? `<div class="desc-segment">${line}</div>` : '<div class="desc-segment">&nbsp;</div>').join('')}
+                    </div>
                     <button class="toggle-desc" id="btn-${attr.id}" style="display: none;">
                         <span class="text">展開內容</span>
                         <span class="material-symbols-outlined">expand_more</span>
