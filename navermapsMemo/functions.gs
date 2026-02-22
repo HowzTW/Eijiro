@@ -138,9 +138,15 @@ function updateAttractionTags(data) {
       }
     }
 
-    // 寫入新的關聯對應
+    // 寫入新的關聯對應 (增加安全檢查：確保 tagId 存在於 Tags 表中)
+    var tagsSheet = ss.getSheetByName('Tags');
+    var existingTags = tagsSheet.getDataRange().getValues().slice(1).map(function(row) { return row[0]; });
+    var validTagIds = new Set(existingTags);
+
     tagIds.forEach(function(tagId) {
-      relSheet.appendRow([attractionId, tagId]);
+      if (validTagIds.has(tagId)) {
+        relSheet.appendRow([attractionId, tagId]);
+      }
     });
 
     return { success: true };

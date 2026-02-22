@@ -699,12 +699,22 @@
             font-weight: 600;
             flex-grow: 1;
             margin-right: 1rem;
-            padding: 2px 5px;
-            border-bottom: 1px solid transparent;
+            padding: 4px 5px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 4px 4px 0 0;
+            transition: all 0.2s;
+        }
+
+        .global-tag-name-input:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom-style: solid;
+            border-bottom-color: rgba(255, 255, 255, 0.5);
         }
 
         .global-tag-name-input:focus {
             outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-bottom-style: solid;
             border-bottom-color: var(--accent-teal);
         }
 
@@ -887,19 +897,19 @@
                 </button>
             </div>
             <hr class="modal-hr">
-            <div class="modal-body" style="max-height: 55vh;">
+            <div class="modal-body" style="max-height: 50vh; overflow-y: auto; padding-right: 8px;">
                 <div id="global-tag-list">
                     <!-- 標籤清單 -->
                 </div>
-                <div class="add-tag-box"
-                    style="position: sticky; bottom: 0; background: rgba(30, 41, 59, 1); margin-top: 1rem; padding-bottom: 0;">
-                    <input type="text" id="global-new-tag-input" class="add-tag-input" placeholder="新增標籤(禁空白)"
-                        oninput="filterGlobalNewTagName()">
-                    <button id="btn-global-add-tag" class="btn-add-tag-inline" onclick="handleGlobalAddTag()" disabled
-                        title="新增標籤">
-                        <span class="material-symbols-outlined">add</span>
-                    </button>
-                </div>
+            </div>
+            <div class="add-tag-box"
+                style="padding: 1.25rem 1.5rem 0.5rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); background: rgba(30, 41, 59, 0.5);">
+                <input type="text" id="global-new-tag-input" class="add-tag-input" placeholder="新增標籤(禁空白)"
+                    oninput="filterGlobalNewTagName()">
+                <button id="btn-global-add-tag" class="btn-add-tag-inline" onclick="handleGlobalAddTag()" disabled
+                    title="新增標籤">
+                    <span class="material-symbols-outlined">add</span>
+                </button>
             </div>
         </div>
     </div>
@@ -1265,10 +1275,12 @@
             document.getElementById('tag-settings-title').textContent = `標籤設定 - ${attr.name_cn}`;
             document.getElementById('tag-settings-modal').style.display = 'flex';
 
-            // 獲取該景點目前的標籤
+            // 獲取該景點目前的標籤 (只保留目前 Tags 表中還存在的標籤，防止孤兒資料)
+            const validTagIds = new Set(appData.tags.map(t => t.id));
             const currentTagIds = appData.relationships
                 .filter(r => r.attraction_id === attrId)
-                .map(r => r.tag_id);
+                .map(r => r.tag_id)
+                .filter(tid => validTagIds.has(tid));
             tempAttrTagIds = new Set(currentTagIds);
 
             renderSettingsTags();
@@ -1312,7 +1324,9 @@
                 btn.disabled = true;
                 btn.innerHTML = '<span class="material-symbols-outlined rotating" style="animation: spin 1s linear infinite;">sync</span>';
 
-                const tagIds = Array.from(tempAttrTagIds);
+                // 提取目前的標籤 ID，並確保這些標籤在當前的 appData.tags 中是有效的
+                const validTagIds = new Set(appData.tags.map(t => t.id));
+                const tagIds = Array.from(tempAttrTagIds).filter(tid => validTagIds.has(tid));
 
                 if (GAS_URL.includes('YOUR_APPS_SCRIPT_URL')) {
                     // 模擬更新
@@ -1410,13 +1424,21 @@
 
         async function handleGlobalAddTag() {
             const input = document.getElementById('global-new-tag-input');
+            const btn = document.getElementById('btn-global-add-tag');
             const tagName = input.value.trim();
             if (!tagName) return;
 
+            // 檢查重複
             if (appData.tags.some(t => t.tag_name === tagName)) {
                 alert(`標籤 [${tagName}] 已經存在。`);
                 return;
             }
+
+            // --- 立即防重與清理 ---
+            const originalIcon = btn.innerHTML;
+            input.value = '';
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined rotating" style="font-size:1.2rem; animation: spin 1s linear infinite;">sync</span>';
 
             try {
                 if (GAS_URL.includes('YOUR_APPS_SCRIPT_URL')) {
@@ -1426,7 +1448,6 @@
                     if (isAllSelectedBeforeRow) {
                         selectedTagIds.add(newTag.id);
                     }
-                    input.value = '';
                     filterGlobalNewTagName();
                     renderGlobalTags();
                     alert('模擬新增標籤成功！');
@@ -1442,13 +1463,18 @@
                     if (isAllSelectedBeforeRow) {
                         selectedTagIds.add(newTag.id);
                     }
-                    input.value = '';
                     filterGlobalNewTagName();
                     renderGlobalTags();
                     alert('標籤已新增！');
                 }
             } catch (err) {
+                console.error("新增失敗:", err);
                 alert('新增失敗');
+                // 失敗時若要恢復原狀需謹慎，這裡先維持清空狀態
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalIcon;
+                filterGlobalNewTagName();
             }
         }
 
