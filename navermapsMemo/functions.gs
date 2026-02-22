@@ -31,6 +31,10 @@ function doPost(e) {
       res = addNewTag(data.payload);
     } else if (action === 'updateAttractionTags') {
       res = updateAttractionTags(data.payload);
+    } else if (action === 'renameTag') {
+      res = renameTag(data.payload);
+    } else if (action === 'deleteTag') {
+      res = deleteTag(data.payload);
     } else {
       // 向後相容：直接接收 attractionData 的舊版邏輯
       res = addAttraction(data);
@@ -139,6 +143,64 @@ function updateAttractionTags(data) {
       relSheet.appendRow([attractionId, tagId]);
     });
 
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.toString() };
+  }
+}
+
+/**
+ * 修改標籤名稱
+ * @param {Object} data 包含 tagId 與 newName 的物件
+ */
+function renameTag(data) {
+  try {
+    var tagId = data.tagId;
+    var newName = data.newName;
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName('Tags');
+    var values = sheet.getDataRange().getValues();
+    
+    for (var i = 1; i < values.length; i++) {
+      if (values[i][0] === tagId) {
+        sheet.getRange(i + 1, 2).setValue(newName);
+        return { success: true };
+      }
+    }
+    throw new Error('找不到該標籤 ID');
+  } catch (error) {
+    return { success: false, error: error.toString() };
+  }
+}
+
+/**
+ * 刪除標籤及其所有關聯
+ * @param {Object} data 包含 tagId 的物件
+ */
+function deleteTag(data) {
+  try {
+    var tagId = data.tagId;
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    
+    // 1. 從 Tags 表刪除
+    var tagSheet = ss.getSheetByName('Tags');
+    var tagData = tagSheet.getDataRange().getValues();
+    for (var i = tagData.length - 1; i >= 1; i--) {
+      if (tagData[i][0] === tagId) {
+        tagSheet.deleteRow(i + 1);
+        break;
+      }
+    }
+    
+    // 2. 從 Attraction_Tags 表刪除關聯
+    var relSheet = ss.getSheetByName('Attraction_Tags');
+    var relData = relSheet.getDataRange().getValues();
+    for (var i = relData.length - 1; i >= 1; i--) {
+      if (relData[i][1] === tagId) {
+        relSheet.deleteRow(i + 1);
+      }
+    }
+    
     return { success: true };
   } catch (error) {
     return { success: false, error: error.toString() };

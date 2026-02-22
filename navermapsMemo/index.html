@@ -475,16 +475,23 @@
             font-weight: 700;
         }
 
-        /* 浮動新增按鈕 (FAB) */
-        .fab-add {
+        /* 浮動按鈕群 (FAB Group) */
+        .fab-container {
             position: fixed;
             bottom: 2rem;
             right: 2rem;
-            width: 80px;
-            height: 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+            z-index: 200;
+        }
+
+        .fab-item {
+            width: 70px;
+            height: 70px;
             background: var(--accent-teal);
             color: var(--bg-color);
-            /* 圖示與文字顏色需與主畫面背景色相同 */
             border-radius: 50%;
             display: flex;
             flex-direction: column;
@@ -492,26 +499,35 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 200;
             box-shadow: 0 8px 32px rgba(45, 212, 191, 0.4);
             border: none;
             padding-top: 5px;
         }
 
-        .fab-add:hover {
+        .fab-item:hover {
             transform: scale(1.1) rotate(5deg);
             box-shadow: 0 12px 40px rgba(45, 212, 191, 0.6);
         }
 
-        .fab-add .material-symbols-outlined {
-            font-size: 2.2rem;
+        .fab-item .material-symbols-outlined {
+            font-size: 2rem;
             margin-bottom: -2px;
         }
 
-        .fab-add span.label {
-            font-size: 0.75rem;
+        .fab-item span.label {
+            font-size: 0.7rem;
             font-weight: 700;
             letter-spacing: 0.5px;
+        }
+
+        /* 為了管理標籤按鈕微調顏色 */
+        .fab-manage-tags {
+            background: var(--accent-green);
+            box-shadow: 0 8px 32px rgba(142, 217, 63, 0.3);
+        }
+
+        .fab-manage-tags:hover {
+            box-shadow: 0 12px 40px rgba(142, 217, 63, 0.5);
         }
 
         /* 標籤篩選 & 新增景點小視窗 共通樣式強化 */
@@ -657,6 +673,80 @@
             font-weight: 700;
         }
 
+        /* 標籤管理清單樣式 */
+        .global-tag-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .global-tag-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .global-tag-name-input {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            flex-grow: 1;
+            margin-right: 1rem;
+            padding: 2px 5px;
+            border-bottom: 1px solid transparent;
+        }
+
+        .global-tag-name-input:focus {
+            outline: none;
+            border-bottom-color: var(--accent-teal);
+        }
+
+        .global-tag-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-tag-action {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-tag-rename {
+            color: var(--accent-teal);
+        }
+
+        .btn-tag-rename:hover {
+            background: rgba(70, 209, 224, 0.15);
+        }
+
+        .btn-tag-delete {
+            color: #ff5555;
+        }
+
+        .btn-tag-delete:hover {
+            background: rgba(255, 85, 85, 0.15);
+        }
+
+        .tag-usage-info {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
         @media (max-width: 600px) {
             .content-grid {
                 grid-template-columns: 1fr;
@@ -680,7 +770,8 @@
 
     <!-- 主畫面 Header -->
     <header>
-        <div style="display: flex; align-items: center;">
+        <div style="display: flex; align-items: center; cursor: pointer;" onclick="window.location.reload()"
+            title="重新整理">
             <img src="icon.png" alt="Logo" class="header-logo">
             <span class="header-title">NaverMaps Memo</span>
         </div>
@@ -689,11 +780,17 @@
         </button>
     </header>
 
-    <!-- 浮動新增按鈕 -->
-    <button class="fab-add" onclick="openAddModal()">
-        <span class="material-symbols-outlined">add</span>
-        <span class="label">新增景點</span>
-    </button>
+    <!-- 浮動按鈕群 -->
+    <div class="fab-container">
+        <button class="fab-item fab-manage-tags" onclick="openGlobalTagModal()" title="管理標籤">
+            <span class="material-symbols-outlined">label</span>
+            <span class="label">管理標籤</span>
+        </button>
+        <button class="fab-item" onclick="openAddModal()" title="新增景點">
+            <span class="material-symbols-outlined">add</span>
+            <span class="label">新增景點</span>
+        </button>
+    </div>
 
     <!-- 標籤篩選彈窗 -->
     <div id="filter-modal" class="modal-overlay">
@@ -772,18 +869,38 @@
                 <div id="settings-tag-list" class="filter-tags">
                     <!-- 標籤區域 -->
                 </div>
-                <div class="add-tag-box">
-                    <input type="text" id="new-tag-name" class="add-tag-input" placeholder="輸入新標籤(禁空白)"
-                        oninput="filterTagName()">
-                    <button id="btn-add-new-tag" class="btn-add-tag-inline" onclick="createNewTag()" disabled>
-                        <span class="material-symbols-outlined">add</span>
-                    </button>
-                </div>
             </div>
             <div style="height: 1rem;"></div>
             <button id="btn-save-tag-settings" class="btn-confirm-circle" onclick="saveTagSettings()" title="確定">
                 <span class="material-symbols-outlined">check</span>
             </button>
+        </div>
+    </div>
+
+    <!-- 標籤管理彈窗 -->
+    <div id="global-tag-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2 class="modal-title">標籤管理</h2>
+                <button class="btn-close-modal" onclick="closeGlobalTagModal()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <hr class="modal-hr">
+            <div class="modal-body" style="max-height: 55vh;">
+                <div id="global-tag-list">
+                    <!-- 標籤清單 -->
+                </div>
+                <div class="add-tag-box"
+                    style="position: sticky; bottom: 0; background: rgba(30, 41, 59, 1); margin-top: 1rem; padding-bottom: 0;">
+                    <input type="text" id="global-new-tag-input" class="add-tag-input" placeholder="新增標籤(禁空白)"
+                        oninput="filterGlobalNewTagName()">
+                    <button id="btn-global-add-tag" class="btn-add-tag-inline" onclick="handleGlobalAddTag()" disabled
+                        title="新增標籤">
+                        <span class="material-symbols-outlined">add</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1008,7 +1125,7 @@
             });
         }, { threshold: 0 });
 
-        // 全域點擊點到卡片之外時也收合
+        // 點擊點到卡片之外時也收合
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.card')) {
                 document.querySelectorAll('.card.expanded').forEach(c => collapseCard(c));
@@ -1154,21 +1271,11 @@
                 .map(r => r.tag_id);
             tempAttrTagIds = new Set(currentTagIds);
 
-            document.getElementById('new-tag-name').value = '';
-            filterTagName();
             renderSettingsTags();
         }
 
         function closeTagSettingsModal() {
             document.getElementById('tag-settings-modal').style.display = 'none';
-        }
-
-        function filterTagName() {
-            const input = document.getElementById('new-tag-name');
-            const btn = document.getElementById('btn-add-new-tag');
-            // 過濾掉所有空白字元
-            input.value = input.value.replace(/\s/g, '');
-            btn.disabled = input.value.length === 0;
         }
 
         function renderSettingsTags() {
@@ -1196,57 +1303,6 @@
             renderSettingsTags();
         }
 
-        async function createNewTag() {
-            const input = document.getElementById('new-tag-name');
-            const tagName = input.value.trim();
-            if (!tagName) return;
-
-            // 檢查重複
-            if (appData.tags.some(t => t.tag_name === tagName)) {
-                alert(`標籤 [${tagName}] 已經存在，不可重複新增。`);
-                return;
-            }
-
-            const btn = document.getElementById('btn-add-new-tag');
-            const originalIcon = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<span class="material-symbols-outlined rotating" style="font-size:1.2rem; animation: spin 1s linear infinite;">sync</span>';
-
-            try {
-                if (GAS_URL.includes('YOUR_APPS_SCRIPT_URL')) {
-                    // 模擬模式
-                    const newTag = { id: 'tag' + Date.now(), tag_name: tagName };
-                    appData.tags.push(newTag);
-                    input.value = '';
-                    filterTagName();
-                    renderSettingsTags();
-                    alert('模擬新增標籤成功！');
-                } else {
-                    await fetch(GAS_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        body: JSON.stringify({
-                            action: 'addNewTag',
-                            payload: { tag_name: tagName }
-                        })
-                    });
-
-                    // 樂觀更新 local cache 以立即反應在畫面上
-                    const newTag = { id: 'tag' + Date.now(), tag_name: tagName };
-                    appData.tags.push(newTag);
-                    input.value = '';
-                    filterTagName();
-                    renderSettingsTags();
-                    alert('標籤已送出！請稍後檢查標籤清單。');
-                }
-            } catch (err) {
-                console.error("建立標籤失敗:", err);
-                alert("建立標籤時發生錯誤。");
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalIcon;
-            }
-        }
 
         async function saveTagSettings() {
             const btn = document.getElementById('btn-save-tag-settings');
@@ -1296,6 +1352,172 @@
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalIcon;
+            }
+        }
+
+        // --- 標籤管理邏輯 ---
+        function openGlobalTagModal() {
+            document.getElementById('global-tag-modal').style.display = 'flex';
+            document.getElementById('global-new-tag-input').value = '';
+            filterGlobalNewTagName();
+            renderGlobalTags();
+        }
+
+        function closeGlobalTagModal() {
+            document.getElementById('global-tag-modal').style.display = 'none';
+        }
+
+        function filterGlobalNewTagName() {
+            const input = document.getElementById('global-new-tag-input');
+            const btn = document.getElementById('btn-global-add-tag');
+            input.value = input.value.replace(/\s/g, '');
+            btn.disabled = input.value.length === 0;
+        }
+
+        function renderGlobalTags() {
+            const list = document.getElementById('global-tag-list');
+            list.innerHTML = '';
+            const sortedTags = [...appData.tags].sort((a, b) => a.tag_name.localeCompare(b.tag_name));
+
+            sortedTags.forEach(tag => {
+                const item = document.createElement('div');
+                item.className = 'global-tag-item';
+
+                // 計算關聯景點數量
+                const linkedAttrs = appData.relationships
+                    .filter(r => r.tag_id === tag.id)
+                    .map(r => appData.attractions.find(a => a.id === r.attraction_id))
+                    .filter(Boolean);
+
+                item.innerHTML = `
+                    <div style="flex-grow: 1;">
+                        <input type="text" class="global-tag-name-input" value="${tag.tag_name}" 
+                            id="input-tag-${tag.id}" onfocus="this.dataset.old = this.value">
+                        <div class="tag-usage-info">關聯景點數: ${linkedAttrs.length}</div>
+                    </div>
+                    <div class="global-tag-actions">
+                        <button class="btn-tag-action btn-tag-rename" onclick="handleRenameTag('${tag.id}')" title="存檔名稱">
+                            <span class="material-symbols-outlined">save</span>
+                        </button>
+                        <button class="btn-tag-action btn-tag-delete" onclick="handleDeleteTag('${tag.id}', '${tag.tag_name.replace(/'/g, "\\'")}')" title="刪除標籤">
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        async function handleGlobalAddTag() {
+            const input = document.getElementById('global-new-tag-input');
+            const tagName = input.value.trim();
+            if (!tagName) return;
+
+            if (appData.tags.some(t => t.tag_name === tagName)) {
+                alert(`標籤 [${tagName}] 已經存在。`);
+                return;
+            }
+
+            try {
+                if (GAS_URL.includes('YOUR_APPS_SCRIPT_URL')) {
+                    const isAllSelectedBeforeRow = selectedTagIds.size === appData.tags.length;
+                    const newTag = { id: 'tag' + Date.now(), tag_name: tagName };
+                    appData.tags.push(newTag);
+                    if (isAllSelectedBeforeRow) {
+                        selectedTagIds.add(newTag.id);
+                    }
+                    input.value = '';
+                    filterGlobalNewTagName();
+                    renderGlobalTags();
+                    alert('模擬新增標籤成功！');
+                } else {
+                    await fetch(GAS_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: JSON.stringify({ action: 'addNewTag', payload: { tag_name: tagName } })
+                    });
+                    const isAllSelectedBeforeRow = selectedTagIds.size === appData.tags.length;
+                    const newTag = { id: 'tag' + Date.now(), tag_name: tagName };
+                    appData.tags.push(newTag);
+                    if (isAllSelectedBeforeRow) {
+                        selectedTagIds.add(newTag.id);
+                    }
+                    input.value = '';
+                    filterGlobalNewTagName();
+                    renderGlobalTags();
+                    alert('標籤已新增！');
+                }
+            } catch (err) {
+                alert('新增失敗');
+            }
+        }
+
+        async function handleRenameTag(tagId) {
+            const input = document.getElementById(`input-tag-${tagId}`);
+            const newName = input.value.replace(/\s/g, ''); // 強制去空白
+            const oldName = input.dataset.old;
+
+            if (!newName) {
+                alert('標籤名稱不可為空。');
+                input.value = oldName;
+                return;
+            }
+            if (newName === oldName) return;
+            if (appData.tags.some(t => t.tag_name === newName && t.id !== tagId)) {
+                alert(`標籤名稱 [${newName}] 已被其他標籤使用。`);
+                input.value = oldName;
+                return;
+            }
+
+            try {
+                if (!GAS_URL.includes('YOUR_APPS_SCRIPT_URL')) {
+                    await fetch(GAS_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: JSON.stringify({ action: 'renameTag', payload: { tagId, newName } })
+                    });
+                }
+                // 樂觀更新
+                const tag = appData.tags.find(t => t.id === tagId);
+                if (tag) tag.tag_name = newName;
+                input.dataset.old = newName;
+                renderCards(); // 更新主畫面卡片
+                alert('名稱已更新！');
+            } catch (err) {
+                alert('更新失敗');
+            }
+        }
+
+        async function handleDeleteTag(tagId, tagName) {
+            // 找出關聯景點
+            const linkedAttrNames = appData.relationships
+                .filter(r => r.tag_id === tagId)
+                .map(r => appData.attractions.find(a => a.id === r.attraction_id)?.name_cn)
+                .filter(Boolean);
+
+            let msg = `確定要刪除標籤 [${tagName}] 嗎？`;
+            if (linkedAttrNames.length > 0) {
+                msg = `此標籤關聯至以下景點：\n- ${linkedAttrNames.join('\n- ')}\n\n確定要刪除嗎？（關聯紀錄將一併移除）`;
+            }
+
+            if (!confirm(msg)) return;
+
+            try {
+                if (!GAS_URL.includes('YOUR_APPS_SCRIPT_URL')) {
+                    await fetch(GAS_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: JSON.stringify({ action: 'deleteTag', payload: { tagId } })
+                    });
+                }
+                // 樂觀更新
+                appData.tags = appData.tags.filter(t => t.id !== tagId);
+                appData.relationships = appData.relationships.filter(r => r.tag_id !== tagId);
+                renderGlobalTags();
+                renderCards();
+                alert('標籤已刪除。');
+            } catch (err) {
+                alert('刪除失敗');
             }
         }
 
