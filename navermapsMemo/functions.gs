@@ -17,12 +17,25 @@ function doGet(e) {
 }
 
 /**
- * 處理 POST 請求 (用於新增資料)
+ * 處理 POST 請求 (支援多種操作)
  */
 function doPost(e) {
   try {
-    var attractionData = JSON.parse(e.postData.contents);
-    var res = addAttraction(attractionData);
+    var data = JSON.parse(e.postData.contents);
+    var action = data.action;
+    var res;
+
+    if (action === 'addAttraction') {
+      res = addAttraction(data.payload);
+    } else if (action === 'addNewTag') {
+      res = addNewTag(data.payload);
+    } else if (action === 'updateAttractionTags') {
+      res = updateAttractionTags(data.payload);
+    } else {
+      // 向後相容：直接接收 attractionData 的舊版邏輯
+      res = addAttraction(data);
+    }
+
     return ContentService.createTextOutput(JSON.stringify(res))
       .setMimeType(ContentService.MimeType.JSON);
   } catch (error) {
@@ -76,6 +89,57 @@ function addAttraction(attractionData) {
     ]);
 
     return { success: true, id: id };
+  } catch (error) {
+    return { success: false, error: error.toString() };
+  }
+}
+
+/**
+ * 在試算表中建立新標籤
+ * @param {Object} tagData 包含 tag_name 的物件
+ */
+function addNewTag(tagData) {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName('Tags');
+    if (!sheet) throw new Error('找不到 Tags 工作表');
+
+    var id = 'tag_' + new Date().getTime();
+    sheet.appendRow([id, tagData.tag_name]);
+
+    return { success: true, id: id };
+  } catch (error) {
+    return { success: false, error: error.toString() };
+  }
+}
+
+/**
+ * 批次更新景點與標籤的關聯
+ * @param {Object} data 包含 attractionId 與 tagIds (陣列) 的物件
+ */
+function updateAttractionTags(data) {
+  try {
+    var attractionId = data.attractionId;
+    var tagIds = data.tagIds; 
+
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var relSheet = ss.getSheetByName('Attraction_Tags');
+    if (!relSheet) throw new Error('找不到 Attraction_Tags 工作表');
+
+    var relData = relSheet.getDataRange().getValues();
+    // 從最後一行往回刪除該景點的舊有關聯
+    for (var i = relData.length - 1; i >= 1; i--) {
+      if (relData[i][0] === attractionId) {
+        relSheet.deleteRow(i + 1);
+      }
+    }
+
+    // 寫入新的關聯對應
+    tagIds.forEach(function(tagId) {
+      relSheet.appendRow([attractionId, tagId]);
+    });
+
+    return { success: true };
   } catch (error) {
     return { success: false, error: error.toString() };
   }

@@ -583,6 +583,80 @@
             transform: none !important;
         }
 
+        /* 個別景點「設定標籤」按鈕 */
+        .btn-set-tags {
+            color: var(--accent-teal);
+            font-size: 0.85rem;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 600;
+            margin-left: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: opacity 0.2s;
+        }
+
+        .btn-set-tags:hover {
+            text-decoration: underline;
+            opacity: 0.8;
+        }
+
+        /* 標籤設定彈窗內的「新增標籤」區塊 */
+        .add-tag-box {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+        }
+
+        .add-tag-input {
+            flex-grow: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 0.5rem 0.8rem;
+            color: white;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        .add-tag-input:focus {
+            outline: none;
+            border-color: var(--accent-teal);
+        }
+
+        .btn-add-tag-inline {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            background: var(--accent-green);
+            color: #000;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+            flex-shrink: 0;
+        }
+
+        .btn-add-tag-inline:hover:not(:disabled) {
+            transform: scale(1.05);
+        }
+
+        .btn-add-tag-inline:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .btn-add-tag-inline .material-symbols-outlined {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
         @media (max-width: 600px) {
             .content-grid {
                 grid-template-columns: 1fr;
@@ -679,6 +753,35 @@
             </div>
             <div style="height: 1rem;"></div>
             <button id="btn-save-attr" class="btn-confirm-circle" onclick="saveNewAttraction()" title="新增" disabled>
+                <span class="material-symbols-outlined">check</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 標籤設定彈窗 -->
+    <div id="tag-settings-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="tag-settings-title">標籤設定</h2>
+                <button class="btn-close-modal" onclick="closeTagSettingsModal()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <hr class="modal-hr">
+            <div class="modal-body">
+                <div id="settings-tag-list" class="filter-tags">
+                    <!-- 標籤區域 -->
+                </div>
+                <div class="add-tag-box">
+                    <input type="text" id="new-tag-name" class="add-tag-input" placeholder="輸入新標籤(禁空白)"
+                        oninput="filterTagName()">
+                    <button id="btn-add-new-tag" class="btn-add-tag-inline" onclick="createNewTag()" disabled>
+                        <span class="material-symbols-outlined">add</span>
+                    </button>
+                </div>
+            </div>
+            <div style="height: 1rem;"></div>
+            <button id="btn-save-tag-settings" class="btn-confirm-circle" onclick="saveTagSettings()" title="確定">
                 <span class="material-symbols-outlined">check</span>
             </button>
         </div>
@@ -813,6 +916,10 @@
 
                     <div class="tag-container">
                         ${attrTags.map(t => `<span class="tag">${t}</span>`).join('')}
+                        <div class="btn-set-tags" onclick="event.stopPropagation(); openTagSettingsModal('${attr.id}')">
+                            <span class="material-symbols-outlined" style="font-size: 1.1rem;">settings</span>
+                            <span>設定標籤</span>
+                        </div>
                     </div>
 
                     <div class="card-desc" id="desc-${attr.id}">
@@ -1014,7 +1121,10 @@
                     await fetch(GAS_URL, {
                         method: 'POST',
                         mode: 'no-cors',
-                        body: JSON.stringify(attractionData)
+                        body: JSON.stringify({
+                            action: 'addAttraction',
+                            payload: attractionData
+                        })
                     });
 
                     alert('景點資料已送出！請檢查試算表是否已新增資料。');
@@ -1023,6 +1133,167 @@
             } catch (err) {
                 console.error("儲存失敗:", err);
                 alert("儲存景點時發生錯誤。");
+                btn.disabled = false;
+                btn.innerHTML = originalIcon;
+            }
+        }
+
+        // --- 標籤設定視窗邏輯 ---
+        let currentEditingAttrId = null;
+        let tempAttrTagIds = new Set();
+
+        function openTagSettingsModal(attrId) {
+            currentEditingAttrId = attrId;
+            const attr = appData.attractions.find(a => a.id === attrId);
+            document.getElementById('tag-settings-title').textContent = `標籤設定 - ${attr.name_cn}`;
+            document.getElementById('tag-settings-modal').style.display = 'flex';
+
+            // 獲取該景點目前的標籤
+            const currentTagIds = appData.relationships
+                .filter(r => r.attraction_id === attrId)
+                .map(r => r.tag_id);
+            tempAttrTagIds = new Set(currentTagIds);
+
+            document.getElementById('new-tag-name').value = '';
+            filterTagName();
+            renderSettingsTags();
+        }
+
+        function closeTagSettingsModal() {
+            document.getElementById('tag-settings-modal').style.display = 'none';
+        }
+
+        function filterTagName() {
+            const input = document.getElementById('new-tag-name');
+            const btn = document.getElementById('btn-add-new-tag');
+            // 過濾掉所有空白字元
+            input.value = input.value.replace(/\s/g, '');
+            btn.disabled = input.value.length === 0;
+        }
+
+        function renderSettingsTags() {
+            const list = document.getElementById('settings-tag-list');
+            list.innerHTML = '';
+
+            // 依據名稱排序顯示所有可用標籤
+            const sortedTags = [...appData.tags].sort((a, b) => a.tag_name.localeCompare(b.tag_name));
+            sortedTags.forEach(tag => {
+                const isActive = tempAttrTagIds.has(tag.id);
+                const tagEl = document.createElement('div');
+                tagEl.className = `filter-tag ${isActive ? 'active' : 'inactive'}`;
+                tagEl.textContent = tag.tag_name;
+                tagEl.onclick = () => toggleSettingsTag(tag.id);
+                list.appendChild(tagEl);
+            });
+        }
+
+        function toggleSettingsTag(tagId) {
+            if (tempAttrTagIds.has(tagId)) {
+                tempAttrTagIds.delete(tagId);
+            } else {
+                tempAttrTagIds.add(tagId);
+            }
+            renderSettingsTags();
+        }
+
+        async function createNewTag() {
+            const input = document.getElementById('new-tag-name');
+            const tagName = input.value.trim();
+            if (!tagName) return;
+
+            // 檢查重複
+            if (appData.tags.some(t => t.tag_name === tagName)) {
+                alert(`標籤 [${tagName}] 已經存在，不可重複新增。`);
+                return;
+            }
+
+            const btn = document.getElementById('btn-add-new-tag');
+            const originalIcon = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined rotating" style="font-size:1.2rem; animation: spin 1s linear infinite;">sync</span>';
+
+            try {
+                if (GAS_URL.includes('YOUR_APPS_SCRIPT_URL')) {
+                    // 模擬模式
+                    const newTag = { id: 'tag_' + Date.now(), tag_name: tagName };
+                    appData.tags.push(newTag);
+                    input.value = '';
+                    filterTagName();
+                    renderSettingsTags();
+                    alert('模擬新增標籤成功！');
+                } else {
+                    await fetch(GAS_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: JSON.stringify({
+                            action: 'addNewTag',
+                            payload: { tag_name: tagName }
+                        })
+                    });
+
+                    // 樂觀更新 local cache 以立即反應在畫面上
+                    const newTag = { id: 'tag_' + Date.now(), tag_name: tagName };
+                    appData.tags.push(newTag);
+                    input.value = '';
+                    filterTagName();
+                    renderSettingsTags();
+                    alert('標籤已送出！請稍後檢查標籤清單。');
+                }
+            } catch (err) {
+                console.error("建立標籤失敗:", err);
+                alert("建立標籤時發生錯誤。");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalIcon;
+            }
+        }
+
+        async function saveTagSettings() {
+            const btn = document.getElementById('btn-save-tag-settings');
+            const originalIcon = btn.innerHTML;
+
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="material-symbols-outlined rotating" style="animation: spin 1s linear infinite;">sync</span>';
+
+                const tagIds = Array.from(tempAttrTagIds);
+
+                if (GAS_URL.includes('YOUR_APPS_SCRIPT_URL')) {
+                    // 模擬更新
+                    appData.relationships = appData.relationships.filter(r => r.attraction_id !== currentEditingAttrId);
+                    tagIds.forEach(tid => {
+                        appData.relationships.push({ attraction_id: currentEditingAttrId, tag_id: tid });
+                    });
+                    renderCards();
+                    closeTagSettingsModal();
+                    alert('模擬標籤設定儲存成功！');
+                } else {
+                    await fetch(GAS_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: JSON.stringify({
+                            action: 'updateAttractionTags',
+                            payload: {
+                                attractionId: currentEditingAttrId,
+                                tagIds: tagIds
+                            }
+                        })
+                    });
+
+                    // 樂觀更新 local cache 以立即反應在畫面上
+                    appData.relationships = appData.relationships.filter(r => r.attraction_id !== currentEditingAttrId);
+                    tagIds.forEach(tid => {
+                        appData.relationships.push({ attraction_id: currentEditingAttrId, tag_id: tid });
+                    });
+
+                    renderCards();
+                    closeTagSettingsModal();
+                    alert('設定已送出！請確認卡片標籤是否更新。');
+                }
+            } catch (err) {
+                console.error("儲存失敗:", err);
+                alert("儲存設定時發生錯誤。");
+            } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalIcon;
             }
