@@ -77,7 +77,7 @@ function addAttraction(attractionData) {
     if (!sheet) throw new Error('找不到 Attractions 工作表');
 
     // 以 Timestamp 作為 ID
-    var id = 'attr_' + new Date().getTime();
+    var id = 'attr' + new Date().getTime();
     
     // 依據試算表標題排序寫入資料碼：id, name_cn, name_orig, naver_map_url, description
     sheet.appendRow([
@@ -104,7 +104,7 @@ function addNewTag(tagData) {
     var sheet = ss.getSheetByName('Tags');
     if (!sheet) throw new Error('找不到 Tags 工作表');
 
-    var id = 'tag_' + new Date().getTime();
+    var id = 'tag' + new Date().getTime();
     sheet.appendRow([id, tagData.tag_name]);
 
     return { success: true, id: id };

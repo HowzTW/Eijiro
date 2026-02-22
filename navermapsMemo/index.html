@@ -1215,7 +1215,7 @@
             try {
                 if (GAS_URL.includes('YOUR_APPS_SCRIPT_URL')) {
                     // 模擬模式
-                    const newTag = { id: 'tag_' + Date.now(), tag_name: tagName };
+                    const newTag = { id: 'tag' + Date.now(), tag_name: tagName };
                     appData.tags.push(newTag);
                     input.value = '';
                     filterTagName();
@@ -1232,7 +1232,7 @@
                     });
 
                     // 樂觀更新 local cache 以立即反應在畫面上
-                    const newTag = { id: 'tag_' + Date.now(), tag_name: tagName };
+                    const newTag = { id: 'tag' + Date.now(), tag_name: tagName };
                     appData.tags.push(newTag);
                     input.value = '';
                     filterTagName();
