@@ -796,7 +796,8 @@
                 const attrTags = relationships
                     .filter(r => r.attraction_id === attr.id)
                     .map(r => tags.find(t => t.id === r.tag_id)?.tag_name)
-                    .filter(name => name);
+                    .filter(name => name)
+                    .sort();
 
                 // 處理連結
                 const attrRefs = references.filter(r => r.attraction_id === attr.id);
@@ -924,7 +925,8 @@
             const list = document.getElementById('filter-tag-list');
             list.innerHTML = '';
 
-            appData.tags.forEach(tag => {
+            const sortedTags = [...appData.tags].sort((a, b) => a.tag_name.localeCompare(b.tag_name));
+            sortedTags.forEach(tag => {
                 const isActive = tempSelectedTagIds.has(tag.id);
                 const tagEl = document.createElement('div');
                 tagEl.className = `filter-tag ${isActive ? 'active' : 'inactive'}`;
