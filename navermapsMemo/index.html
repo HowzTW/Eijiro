@@ -1338,27 +1338,29 @@
                     closeTagSettingsModal();
                     alert('模擬標籤設定儲存成功！');
                 } else {
-                    await fetch(GAS_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        body: JSON.stringify({
-                            action: 'updateAttractionTags',
-                            payload: {
-                                attractionId: currentEditingAttrId,
-                                tagIds: tagIds
-                            }
-                        })
-                    });
-
-                    // 樂觀更新 local cache 以立即反應在畫面上
+                    // --- 樂觀更新：立即更新本地狀態並反映在 UI ---
                     appData.relationships = appData.relationships.filter(r => r.attraction_id !== currentEditingAttrId);
                     tagIds.forEach(tid => {
                         appData.relationships.push({ attraction_id: currentEditingAttrId, tag_id: tid });
                     });
-
                     renderCards();
                     closeTagSettingsModal();
-                    alert('設定已送出！請確認卡片標籤是否更新。');
+
+                    if (!GAS_URL.includes('YOUR_APPS_SCRIPT_URL')) {
+                        // 背景執行非同步請求
+                        fetch(GAS_URL, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            body: JSON.stringify({
+                                action: 'updateAttractionTags',
+                                payload: {
+                                    attractionId: currentEditingAttrId,
+                                    tagIds: tagIds
+                                }
+                            })
+                        }).catch(err => console.error("背景儲存失敗:", err));
+                    }
+                    // 不再等待，直接結束函數
                 }
             } catch (err) {
                 console.error("儲存失敗:", err);
@@ -1434,52 +1436,43 @@
                 return;
             }
 
-            // --- 立即防重與清理 ---
+            // --- 樂觀更新：立即更新 UI 狀態 ---
             const originalIcon = btn.innerHTML;
+            const newId = 'tag' + Date.now() + Math.floor(Math.random() * 1000);
+            const isAllSelectedBeforeRow = selectedTagIds.size === appData.tags.length;
+            const newTag = { id: newId, tag_name: tagName };
+
+            appData.tags.push(newTag);
+            if (isAllSelectedBeforeRow) {
+                selectedTagIds.add(newId);
+            }
+
             input.value = '';
-            btn.disabled = true;
-            btn.innerHTML = '<span class="material-symbols-outlined rotating" style="font-size:1.2rem; animation: spin 1s linear infinite;">sync</span>';
+            filterGlobalNewTagName();
+            renderGlobalTags();
 
             try {
                 if (GAS_URL.includes('YOUR_APPS_SCRIPT_URL')) {
-                    const isAllSelectedBeforeRow = selectedTagIds.size === appData.tags.length;
-                    const newTag = { id: 'tag' + Date.now(), tag_name: tagName };
-                    appData.tags.push(newTag);
-                    if (isAllSelectedBeforeRow) {
-                        selectedTagIds.add(newTag.id);
-                    }
-                    filterGlobalNewTagName();
-                    renderGlobalTags();
                     alert('模擬新增標籤成功！');
                 } else {
-                    await fetch(GAS_URL, {
+                    // 背景執行
+                    fetch(GAS_URL, {
                         method: 'POST',
                         mode: 'no-cors',
-                        body: JSON.stringify({ action: 'addNewTag', payload: { tag_name: tagName } })
-                    });
-                    const isAllSelectedBeforeRow = selectedTagIds.size === appData.tags.length;
-                    const newTag = { id: 'tag' + Date.now(), tag_name: tagName };
-                    appData.tags.push(newTag);
-                    if (isAllSelectedBeforeRow) {
-                        selectedTagIds.add(newTag.id);
-                    }
-                    filterGlobalNewTagName();
-                    renderGlobalTags();
-                    alert('標籤已新增！');
+                        body: JSON.stringify({
+                            action: 'addNewTag',
+                            payload: { id: newId, tag_name: tagName }
+                        })
+                    }).catch(err => console.error("背景新增失敗:", err));
                 }
             } catch (err) {
-                console.error("新增失敗:", err);
-                alert('新增失敗');
-                // 失敗時若要恢復原狀需謹慎，這裡先維持清空狀態
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalIcon;
-                filterGlobalNewTagName();
+                console.error("背景處理錯誤:", err);
             }
         }
 
         async function handleRenameTag(tagId) {
             const input = document.getElementById(`input-tag-${tagId}`);
+            const btn = document.querySelector(`.btn-tag-rename[onclick*="${tagId}"]`);
             const newName = input.value.replace(/\s/g, ''); // 強制去空白
             const oldName = input.dataset.old;
 
@@ -1495,22 +1488,19 @@
                 return;
             }
 
-            try {
-                if (!GAS_URL.includes('YOUR_APPS_SCRIPT_URL')) {
-                    await fetch(GAS_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        body: JSON.stringify({ action: 'renameTag', payload: { tagId, newName } })
-                    });
-                }
-                // 樂觀更新
-                const tag = appData.tags.find(t => t.id === tagId);
-                if (tag) tag.tag_name = newName;
-                input.dataset.old = newName;
-                renderCards(); // 更新主畫面卡片
-                alert('名稱已更新！');
-            } catch (err) {
-                alert('更新失敗');
+            // --- 樂觀更新 ---
+            const tag = appData.tags.find(t => t.id === tagId);
+            if (tag) tag.tag_name = newName;
+            input.dataset.old = newName;
+            renderCards();
+
+            if (!GAS_URL.includes('YOUR_APPS_SCRIPT_URL')) {
+                // 背景執行
+                fetch(GAS_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({ action: 'renameTag', payload: { tagId, newName } })
+                }).catch(err => console.error("背景重新命名失敗:", err));
             }
         }
 
@@ -1528,22 +1518,19 @@
 
             if (!confirm(msg)) return;
 
-            try {
-                if (!GAS_URL.includes('YOUR_APPS_SCRIPT_URL')) {
-                    await fetch(GAS_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        body: JSON.stringify({ action: 'deleteTag', payload: { tagId } })
-                    });
-                }
-                // 樂觀更新
-                appData.tags = appData.tags.filter(t => t.id !== tagId);
-                appData.relationships = appData.relationships.filter(r => r.tag_id !== tagId);
-                renderGlobalTags();
-                renderCards();
-                alert('標籤已刪除。');
-            } catch (err) {
-                alert('刪除失敗');
+            // --- 樂觀更新 ---
+            appData.tags = appData.tags.filter(t => t.id !== tagId);
+            appData.relationships = appData.relationships.filter(r => r.tag_id !== tagId);
+            renderGlobalTags();
+            renderCards();
+
+            if (!GAS_URL.includes('YOUR_APPS_SCRIPT_URL')) {
+                // 背景執行
+                fetch(GAS_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({ action: 'deleteTag', payload: { tagId } })
+                }).catch(err => console.error("背景刪除失敗:", err));
             }
         }
 

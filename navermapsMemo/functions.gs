@@ -75,13 +75,15 @@ function getSheetData(sheet) {
  * @return {Object} 回傳操作結果
  */
 function addAttraction(attractionData) {
+  var lock = LockService.getScriptLock();
   try {
+    lock.waitLock(30000); // 等待最多 30 秒
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = ss.getSheetByName('Attractions');
     if (!sheet) throw new Error('找不到 Attractions 工作表');
 
-    // 以 Timestamp 作為 ID
-    var id = 'attr' + new Date().getTime();
+    // 優先使用前端傳入的 ID，若無則才自行生成
+    var id = attractionData.id || ('attr' + new Date().getTime());
     
     // 依據試算表標題排序寫入資料碼：id, name_cn, name_orig, naver_map_url, description
     sheet.appendRow([
@@ -95,6 +97,8 @@ function addAttraction(attractionData) {
     return { success: true, id: id };
   } catch (error) {
     return { success: false, error: error.toString() };
+  } finally {
+    lock.releaseLock();
   }
 }
 
@@ -103,17 +107,22 @@ function addAttraction(attractionData) {
  * @param {Object} tagData 包含 tag_name 的物件
  */
 function addNewTag(tagData) {
+  var lock = LockService.getScriptLock();
   try {
+    lock.waitLock(30000);
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = ss.getSheetByName('Tags');
     if (!sheet) throw new Error('找不到 Tags 工作表');
 
-    var id = 'tag' + new Date().getTime();
+    // 優先使用前端傳入的 ID
+    var id = tagData.id || ('tag' + new Date().getTime());
     sheet.appendRow([id, tagData.tag_name]);
 
     return { success: true, id: id };
   } catch (error) {
     return { success: false, error: error.toString() };
+  } finally {
+    lock.releaseLock();
   }
 }
 
@@ -122,7 +131,9 @@ function addNewTag(tagData) {
  * @param {Object} data 包含 attractionId 與 tagIds (陣列) 的物件
  */
 function updateAttractionTags(data) {
+  var lock = LockService.getScriptLock();
   try {
+    lock.waitLock(30000);
     var attractionId = data.attractionId;
     var tagIds = data.tagIds; 
 
@@ -152,6 +163,8 @@ function updateAttractionTags(data) {
     return { success: true };
   } catch (error) {
     return { success: false, error: error.toString() };
+  } finally {
+    lock.releaseLock();
   }
 }
 
@@ -160,7 +173,9 @@ function updateAttractionTags(data) {
  * @param {Object} data 包含 tagId 與 newName 的物件
  */
 function renameTag(data) {
+  var lock = LockService.getScriptLock();
   try {
+    lock.waitLock(30000);
     var tagId = data.tagId;
     var newName = data.newName;
     var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -176,6 +191,8 @@ function renameTag(data) {
     throw new Error('找不到該標籤 ID');
   } catch (error) {
     return { success: false, error: error.toString() };
+  } finally {
+    lock.releaseLock();
   }
 }
 
@@ -184,7 +201,9 @@ function renameTag(data) {
  * @param {Object} data 包含 tagId 的物件
  */
 function deleteTag(data) {
+  var lock = LockService.getScriptLock();
   try {
+    lock.waitLock(30000);
     var tagId = data.tagId;
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     
@@ -210,5 +229,7 @@ function deleteTag(data) {
     return { success: true };
   } catch (error) {
     return { success: false, error: error.toString() };
+  } finally {
+    lock.releaseLock();
   }
 }
