@@ -1521,6 +1521,7 @@
             // --- 樂觀更新 ---
             appData.tags = appData.tags.filter(t => t.id !== tagId);
             appData.relationships = appData.relationships.filter(r => r.tag_id !== tagId);
+            selectedTagIds.delete(tagId); // 維持篩選狀態 (全選/全不選)
             renderGlobalTags();
             renderCards();
 
