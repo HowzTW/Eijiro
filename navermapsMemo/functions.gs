@@ -21,7 +21,18 @@ function doGet(e) {
  */
 function doPost(e) {
   try {
-    var data = JSON.parse(e.postData.contents);
+    var data = {};
+    if (e.postData && e.postData.contents) {
+      try {
+        data = JSON.parse(e.postData.contents);
+      } catch (error) {
+        // 如果無法解析為 JSON，則嘗試從 parameters 取得 (處理某些 form 提交)
+        data = e.parameter || {};
+      }
+    } else {
+      data = e.parameter || {};
+    }
+
     var action = data.action;
     var res;
 
@@ -35,9 +46,15 @@ function doPost(e) {
       res = renameTag(data.payload);
     } else if (action === 'deleteTag') {
       res = deleteTag(data.payload);
+    } else if (action === 'addReferenceURL') {
+      res = addReferenceURL(data.payload);
+    } else if (action === 'deleteReferenceURL') {
+      res = deleteReferenceURL(data.payload);
+    } else if (action === 'deleteAttraction') {
+      res = deleteAttraction(data.payload);
     } else {
-      // 向後相容：直接接收 attractionData 的舊版邏輯
-      res = addAttraction(data);
+      // 移除危險的 else { addAttraction(data) }，改為報錯以利串接偵錯
+      res = { success: false, error: '未知的操作類型: ' + (action || '未定義') };
     }
 
     return ContentService.createTextOutput(JSON.stringify(res))
@@ -226,6 +243,113 @@ function deleteTag(data) {
       }
     }
     
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.toString() };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/**
+ * 新增參考資訊
+ * @param {Object} data 包含 attraction_id, url, url_description 的物件
+ */
+function addReferenceURL(data) {
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(30000);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName('Reference_URLs');
+    if (!sheet) throw new Error('找不到 Reference_URLs 工作表');
+
+    sheet.appendRow([
+      data.attraction_id,
+      data.url,
+      data.url_description || ''
+    ]);
+
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.toString() };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/**
+ * 刪除參考資訊
+ * @param {Object} data 包含 attraction_id 與 url 的物件
+ */
+function deleteReferenceURL(data) {
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(30000);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName('Reference_URLs');
+    if (!sheet) throw new Error('找不到 Reference_URLs 工作表');
+
+    var values = sheet.getDataRange().getValues();
+    for (var i = values.length - 1; i >= 1; i--) {
+      // 比對景點 ID 與 URL 來精準刪除
+      if (values[i][0] === data.attraction_id && values[i][1] === data.url) {
+        sheet.deleteRow(i + 1);
+      }
+    }
+
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.toString() };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/**
+ * 刪除景點及其所有相關資料 (連鎖刪除)
+ * @param {Object} data 包含 attraction_id 的物件
+ */
+function deleteAttraction(data) {
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(30000);
+    var attractionId = data.attraction_id;
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+
+    // 1. 從 Attractions 表刪除
+    var attrSheet = ss.getSheetByName('Attractions');
+    if (attrSheet) {
+      var attrData = attrSheet.getDataRange().getValues();
+      for (var i = attrData.length - 1; i >= 1; i--) {
+        if (attrData[i][0] === attractionId) {
+          attrSheet.deleteRow(i + 1);
+          break;
+        }
+      }
+    }
+
+    // 2. 從 Attraction_Tags 表刪除關聯
+    var relSheet = ss.getSheetByName('Attraction_Tags');
+    if (relSheet) {
+      var relData = relSheet.getDataRange().getValues();
+      for (var i = relData.length - 1; i >= 1; i--) {
+        if (relData[i][0] === attractionId) {
+          relSheet.deleteRow(i + 1);
+        }
+      }
+    }
+
+    // 3. 從 Reference_URLs 表刪除參考連結
+    var refSheet = ss.getSheetByName('Reference_URLs');
+    if (refSheet) {
+      var refData = refSheet.getDataRange().getValues();
+      for (var i = refData.length - 1; i >= 1; i--) {
+        if (refData[i][0] === attractionId) {
+          refSheet.deleteRow(i + 1);
+        }
+      }
+    }
+
     return { success: true };
   } catch (error) {
     return { success: false, error: error.toString() };

@@ -143,18 +143,16 @@
 
         /* 小卡片樣式 */
         .card {
-            background: var(--card-bg);
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--card-border);
-            border-radius: 16px;
+            border-radius: 20px;
             padding: 1.5rem;
-            transition: transform 0.3s ease, background 0.3s ease;
             display: flex;
             flex-direction: column;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
         }
 
         .card-name {
@@ -162,6 +160,8 @@
             font-weight: 700;
             margin-bottom: 0.5rem;
             color: var(--accent-teal);
+            padding-right: 6.5rem;
+            /* 為右上角「移除景點」按鈕留空間 */
         }
 
         .card-orig-name {
@@ -601,7 +601,7 @@
 
         /* 個別景點「設定標籤」按鈕 */
         .btn-set-tags {
-            color: var(--accent-teal);
+            color: var(--accent-green);
             font-size: 0.85rem;
             text-decoration: none;
             cursor: pointer;
@@ -614,6 +614,27 @@
         }
 
         .btn-set-tags:hover {
+            text-decoration: underline;
+            opacity: 0.8;
+        }
+
+        .btn-delete-link {
+            color: #ff4d4d;
+            /* 亮紅色 */
+            font-size: 0.85rem;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: opacity 0.2s;
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+        }
+
+        .btn-delete-link:hover {
             text-decoration: underline;
             opacity: 0.8;
         }
@@ -914,6 +935,38 @@
         </div>
     </div>
 
+    <!-- 參考資訊設定彈窗 -->
+    <div id="ref-settings-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2 class="modal-title" id="ref-settings-title">參考資訊設定</h2>
+                <button class="btn-close-modal" onclick="closeRefSettingsModal()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <hr class="modal-hr">
+            <div class="modal-body" style="max-height: 50vh; overflow-y: auto; padding-right: 8px;">
+                <div id="ref-settings-list">
+                    <!-- 參考資訊清單 -->
+                </div>
+            </div>
+            <div class="add-tag-box"
+                style="padding: 1.25rem 1.5rem 0.5rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); background: rgba(30, 41, 59, 0.5); flex-direction: column;">
+                <div style="display: flex; gap: 0.5rem; width: 100%; margin-bottom: 0.5rem;">
+                    <input type="text" id="ref-new-desc-input" class="add-tag-input" placeholder="網址說明 (例如：官網)">
+                </div>
+                <div style="display: flex; gap: 0.5rem; width: 100%;">
+                    <input type="text" id="ref-new-url-input" class="add-tag-input" placeholder="網址 (必填)"
+                        oninput="validateRefAddForm()">
+                    <button id="btn-ref-add-url" class="btn-add-tag-inline" onclick="handleRefAddUrl()" disabled
+                        title="新增參考資訊">
+                        <span class="material-symbols-outlined">add</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 內容區塊 -->
     <main>
         <div id="content" class="content-grid">
@@ -1035,6 +1088,11 @@
                 card.innerHTML = `
                     <div class="card-name">${attr.name_cn}</div>
                     <div class="card-orig-name">${attr.name_orig || ''}</div>
+
+                    <div class="btn-delete-link" onclick="event.stopPropagation(); handleDeleteAttraction('${attr.id}', '${attr.name_cn.replace(/'/g, "\\'")}')">
+                        <span class="material-symbols-outlined" style="font-size: 1.1rem;">delete</span>
+                        <span>移除景點</span>
+                    </div>
                     
                     <a href="${attr.naver_map_url}" target="_blank" class="btn-naver">
                         <span class="material-symbols-outlined">map</span>
@@ -1068,6 +1126,11 @@
                 }).join('')}
                         </div>
                     ` : ''}
+
+                    <div class="btn-set-tags" style="margin-top: 0.5rem; margin-left: 0;" onclick="event.stopPropagation(); openRefSettingsModal('${attr.id}')">
+                        <span class="material-symbols-outlined" style="font-size: 1.1rem;">settings_ethernet</span>
+                        <span>設定參考資訊</span>
+                    </div>
                 `;
                 container.appendChild(card);
 
@@ -1532,6 +1595,149 @@
                     mode: 'no-cors',
                     body: JSON.stringify({ action: 'deleteTag', payload: { tagId } })
                 }).catch(err => console.error("背景刪除失敗:", err));
+            }
+        }
+
+        // --- 參考資訊設定邏輯 ---
+        let currentRefEditingAttrId = null;
+
+        function openRefSettingsModal(attrId) {
+            currentRefEditingAttrId = attrId;
+            const attr = appData.attractions.find(a => a.id === attrId);
+            document.getElementById('ref-settings-title').textContent = `參考資訊設定 - ${attr.name_cn}`;
+            document.getElementById('ref-settings-modal').style.display = 'flex';
+            document.getElementById('ref-new-desc-input').value = '';
+            document.getElementById('ref-new-url-input').value = '';
+            validateRefAddForm();
+            renderRefSettingsList();
+        }
+
+        function closeRefSettingsModal() {
+            document.getElementById('ref-settings-modal').style.display = 'none';
+        }
+
+        function validateRefAddForm() {
+            const urlInput = document.getElementById('ref-new-url-input');
+            const btn = document.getElementById('btn-ref-add-url');
+            btn.disabled = urlInput.value.trim().length === 0;
+        }
+
+        function renderRefSettingsList() {
+            const list = document.getElementById('ref-settings-list');
+            list.innerHTML = '';
+            const attrRefs = appData.references.filter(r => r.attraction_id === currentRefEditingAttrId);
+
+            if (attrRefs.length === 0) {
+                list.innerHTML = '<div class="loading-text" style="padding: 1rem;">尚無參考資訊。</div>';
+                return;
+            }
+
+            attrRefs.forEach(ref => {
+                const item = document.createElement('div');
+                item.className = 'global-tag-item';
+                const displayText = ref.url_description || ref.url;
+
+                item.innerHTML = `
+                    <div style="flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        <div style="font-weight: 600; color: white;">${displayText}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis;">${ref.url}</div>
+                    </div>
+                    <div class="global-tag-actions">
+                        <button class="btn-tag-action btn-tag-delete" onclick="handleRefDeleteUrl('${ref.url.replace(/'/g, "\\'")}')" title="刪除資訊">
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        async function handleRefAddUrl() {
+            const descInput = document.getElementById('ref-new-desc-input');
+            const urlInput = document.getElementById('ref-new-url-input');
+            const url = urlInput.value.trim();
+            const description = descInput.value.trim();
+
+            if (!url) return;
+
+            // --- 樂觀更新 ---
+            const newRef = { attraction_id: currentRefEditingAttrId, url: url, url_description: description };
+            appData.references.push(newRef);
+
+            descInput.value = '';
+            urlInput.value = '';
+            validateRefAddForm();
+            renderRefSettingsList();
+            renderCards(); // 立即更新主畫面小卡
+
+            try {
+                if (GAS_URL.includes('YOUR_APPS_SCRIPT_URL')) {
+                    console.log('模擬新增參考資訊:', newRef);
+                } else {
+                    fetch(GAS_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: JSON.stringify({
+                            action: 'addReferenceURL',
+                            payload: newRef
+                        })
+                    }).catch(err => console.error("背景新增參考資訊失敗:", err));
+                }
+            } catch (err) {
+                console.error("處理錯誤:", err);
+            }
+        }
+
+        async function handleRefDeleteUrl(url) {
+            if (!confirm(`確定要刪除此參考資訊嗎？\n${url}`)) return;
+
+            // --- 樂觀更新 ---
+            appData.references = appData.references.filter(r => !(r.attraction_id === currentRefEditingAttrId && r.url === url));
+            renderRefSettingsList();
+            renderCards();
+
+            try {
+                if (GAS_URL.includes('YOUR_APPS_SCRIPT_URL')) {
+                    console.log('模擬刪除參考資訊:', url);
+                } else {
+                    fetch(GAS_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: JSON.stringify({
+                            action: 'deleteReferenceURL',
+                            payload: { attraction_id: currentRefEditingAttrId, url: url }
+                        })
+                    }).catch(err => console.error("背景刪除參考資訊失敗:", err));
+                }
+            } catch (err) {
+                console.error("處理錯誤:", err);
+            }
+        }
+
+        async function handleDeleteAttraction(attrId, attrName) {
+            if (!confirm(`確定要移除景點 [${attrName}] 嗎？\n這將會連同刪除相關的標籤關聯與參考連結。`)) return;
+
+            // --- 樂觀更新 ---
+            appData.attractions = appData.attractions.filter(a => a.id !== attrId);
+            appData.relationships = appData.relationships.filter(r => r.attraction_id !== attrId);
+            appData.references = appData.references.filter(r => r.attraction_id !== attrId);
+            renderCards();
+
+            try {
+                if (GAS_URL.includes('YOUR_APPS_SCRIPT_URL')) {
+                    console.log('模擬刪除景點:', attrId);
+                } else {
+                    fetch(GAS_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: JSON.stringify({
+                            action: 'deleteAttraction',
+                            payload: { attraction_id: attrId }
+                        })
+                    }).catch(err => console.error("背景刪除景點失敗:", err));
+                }
+            } catch (err) {
+                console.error("處理錯誤:", err);
             }
         }
 
