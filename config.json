@@ -1,0 +1,118 @@
+{
+    "displayOrder": [
+        "navermapsMemo",
+        "oaInvitation",
+        "bloodStatus",
+        "bingeWatching",
+        "koreanNote",
+        "mdViewer",
+        "menuViewer2026",
+        "ayuOrder",
+        "nextTrip2026",
+        "linkPass",
+        "promptGen",
+        "primeSeeker",
+        "uiPalette",
+        "godDecision"
+    ],
+    "cards": {
+        "oaInvitation": {
+            "href": "oaInvitation/index.html",
+            "icon": "calendar_month",
+            "title": "體驗課預約",
+            "description": "專業的預約紀錄系統，支援動態導覽與學員資訊同步。",
+            "stats": "Appointment System"
+        },
+        "menuViewer2026": {
+            "href": "menuViewer2026/index.html",
+            "icon": "restaurant",
+            "title": "翠庭 (JADE)",
+            "description": "精緻粵式料理點餐系統，支援即時點單與列印功能。",
+            "stats": "Dining System"
+        },
+        "ayuOrder": {
+            "href": "ayuOrder/index.html",
+            "icon": "bento",
+            "title": "阿玉點餐機",
+            "description": "專為阿玉設計的點餐系統，同步 Google Sheets 菜單。",
+            "stats": "Active Project"
+        },
+        "bingeWatching": {
+            "href": "bingeWatching/index.html",
+            "icon": "movie",
+            "title": "追劇清單",
+            "description": "追蹤最新的電影與影集進度，不再漏掉任何一集。",
+            "stats": "Entertainment"
+        },
+        "bloodStatus": {
+            "href": "bloodStatus/index.html",
+            "icon": "bloodtype",
+            "title": "血脂狀態",
+            "description": "健康數據可視化，守護每一天的身體平衡。",
+            "stats": "Health"
+        },
+        "mdViewer": {
+            "href": "mdViewer/index.html",
+            "icon": "description",
+            "title": "Markdown 預覽",
+            "description": "即時渲染 Markdown 檔案，簡潔優雅的閱讀體驗。",
+            "stats": "Developer Tool"
+        },
+        "nextTrip2026": {
+            "href": "nextTrip2026/index.html",
+            "icon": "flight",
+            "title": "2026 旅程規劃",
+            "description": "未來的旅行藍圖，從機票到景點的完整記錄。",
+            "stats": "Travel"
+        },
+        "linkPass": {
+            "href": "linkPass/index.html",
+            "icon": "key",
+            "title": "連結通行證",
+            "description": "快速跳轉至受保護的連結與常用工具。",
+            "stats": "Utility"
+        },
+        "promptGen": {
+            "href": "promptGen/index.html",
+            "icon": "smart_toy",
+            "title": "AI 提示詞",
+            "description": "優化與 AI 的對話內容，精準傳達指令。",
+            "stats": "AI productivity"
+        },
+        "primeSeeker": {
+            "href": "primeSeeker/index.html",
+            "icon": "pin",
+            "title": "質數探索員",
+            "description": "數學之美：高效搜尋與驗證質數規律。",
+            "stats": "Mathematics"
+        },
+        "koreanNote": {
+            "href": "koreanNote/index.html",
+            "icon": "translate",
+            "title": "韓語筆記",
+            "description": "韓文學習進度與每日單字累積。",
+            "stats": "Education"
+        },
+        "uiPalette": {
+            "href": "uiPalette/index.html",
+            "icon": "palette",
+            "title": "UI 調色盤",
+            "description": "設計師的色彩靈感，快速複製常用色碼。",
+            "stats": "Design"
+        },
+        "godDecision": {
+            "href": "godDecision/index.html",
+            "icon": "casino",
+            "title": "命運之選",
+            "description": "讓機率幫你做決定，解決你的選擇困難症。",
+            "stats": "Randomizer"
+        },
+        "navermapsMemo": {
+            "href": "navermapsMemo/index.html",
+            "icon": "map",
+            "title": "Navermaps 景點備忘",
+            "description": "專為韓國旅行設計的景點整理，快速紀錄與標籤管理。",
+            "stats": "Travel"
+        }
+    }
+}

@@ -23,42 +23,48 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem;
+  padding: 0; /* Removed padding to allow full-width header */
   overflow-x: hidden;
 }
 
 header {
-  text-align: center;
-  margin-bottom: 4rem;
-  animation: fadeInDown 0.8s ease-out;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background-color: rgba(15, 23, 42, 0.85); /* Dark background matching the theme with slight transparency */
+  padding: 1rem 2rem; /* Added horizontal padding to align with grid */
   display: flex;
-  flex-direction: column;
   align-items: center;
+  border-bottom: 1px solid var(--glass-border);
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  text-align: left;
+  margin-bottom: 2rem;
 }
 
 .logo {
-  width: 100px;
-  height: 100px;
-  border-radius: 22px;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  margin-right: 1rem;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
   border: 1px solid var(--glass-border);
 }
 
 h1 {
-  font-size: 3.5rem;
+  font-size: 1.5rem;
   font-weight: 800;
   background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin-bottom: 0.5rem;
+  margin: 0;
   letter-spacing: -0.025em;
 }
 
 p.subtitle {
-  color: var(--text-secondary);
-  font-size: 1.1rem;
+  display: none; /* Hide subtitle in minimal header layout */
 }
 
 .grid {
@@ -67,6 +73,7 @@ p.subtitle {
   gap: 2rem;
   width: 100%;
   max-width: 1200px;
+  padding: 0 2rem; /* Add padding here instead of body */
   animation: fadeInUp 1s ease-out;
 }
 
