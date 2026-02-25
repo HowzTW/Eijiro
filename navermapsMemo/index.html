@@ -173,7 +173,6 @@
         .card-desc {
             font-size: 0.95rem;
             margin-bottom: 0.5rem;
-            flex-grow: 1;
             display: -webkit-box;
             -webkit-line-clamp: 3;
             line-clamp: 3;
@@ -613,6 +612,26 @@
             transition: opacity 0.2s;
         }
 
+        .btn-edit-link {
+            color: var(--accent-teal);
+            font-size: 0.85rem;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: opacity 0.2s;
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+        }
+
+        .btn-edit-link:hover {
+            text-decoration: underline;
+            opacity: 0.8;
+        }
+
         .btn-set-tags:hover {
             text-decoration: underline;
             opacity: 0.8;
@@ -630,7 +649,7 @@
             gap: 0.25rem;
             transition: opacity 0.2s;
             position: absolute;
-            top: 1.5rem;
+            bottom: 1.5rem;
             right: 1.5rem;
         }
 
@@ -886,6 +905,44 @@
         </div>
     </div>
 
+    <!-- 景點編輯彈窗 -->
+    <div id="edit-modal" class="modal-overlay">
+        <div class="modal-content" style="max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h2 class="modal-title" id="edit-modal-title">景點編輯</h2>
+                <button class="btn-close-modal" onclick="closeEditModal()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <hr class="modal-hr">
+            <div class="modal-body">
+                <input type="hidden" id="edit-attr-id">
+                <div class="form-group">
+                    <label class="form-label">景點中文名稱<span class="required-star">*</span></label>
+                    <input type="text" id="edit-name-cn" class="form-input" placeholder="例如：景福宮"
+                        oninput="validateEditForm()">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">景點原文名稱</label>
+                    <input type="text" id="edit-name-orig" class="form-input" placeholder="例如：경복궁">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">NaverMap 網址<span class="required-star">*</span></label>
+                    <input type="url" id="edit-url" class="form-input" placeholder="https://naver.me/..."
+                        oninput="validateEditForm()">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">景點簡介</label>
+                    <textarea id="edit-desc" class="form-input form-textarea" placeholder="輸入景點特色..."></textarea>
+                </div>
+            </div>
+            <div style="height: 1rem;"></div>
+            <button id="btn-update-attr" class="btn-confirm-circle" onclick="saveEditedAttraction()" title="確認修改">
+                <span class="material-symbols-outlined">check</span>
+            </button>
+        </div>
+    </div>
+
     <!-- 標籤設定彈窗 -->
     <div id="tag-settings-modal" class="modal-overlay">
         <div class="modal-content">
@@ -1089,11 +1146,11 @@
                     <div class="card-name">${attr.name_cn}</div>
                     <div class="card-orig-name">${attr.name_orig || ''}</div>
 
-                    <div class="btn-delete-link" onclick="event.stopPropagation(); handleDeleteAttraction('${attr.id}', '${attr.name_cn.replace(/'/g, "\\'")}')">
-                        <span class="material-symbols-outlined" style="font-size: 1.1rem;">delete</span>
-                        <span>移除景點</span>
+                    <div class="btn-edit-link" onclick="event.stopPropagation(); openEditModal('${attr.id}')">
+                        <span class="material-symbols-outlined" style="font-size: 1.1rem;">edit</span>
+                        <span>編輯景點</span>
                     </div>
-                    
+
                     <a href="${attr.naver_map_url}" target="_blank" class="btn-naver">
                         <span class="material-symbols-outlined">map</span>
                         在 Naver Map 開啟
@@ -1115,21 +1172,30 @@
                         <span class="material-symbols-outlined">expand_more</span>
                     </button>
                     
-                    ${attrRefs.length > 0 ? `
-                        <div class="references">
-                            ${attrRefs.map(r => {
+                    <div class="card-bottom-area" style="margin-top: auto; pt: 0.5rem;">
+                        ${attrRefs.length > 0 ? `
+                            <div class="references">
+                                ${attrRefs.map(r => {
                     const displayText = r.url_description || r.url;
                     return `<a href="${r.url}" target="_blank" class="ref-link">
-                                    <span class="material-symbols-outlined" style="font-size: 1.2rem;">link</span>
-                                    <span>${displayText}</span>
-                                </a>`;
+                                        <span class="material-symbols-outlined" style="font-size: 1.2rem;">link</span>
+                                        <span>${displayText}</span>
+                                    </a>`;
                 }).join('')}
-                        </div>
-                    ` : ''}
+                            </div>
+                        ` : ''}
 
-                    <div class="btn-set-tags" style="margin-top: 0.5rem; margin-left: 0;" onclick="event.stopPropagation(); openRefSettingsModal('${attr.id}')">
-                        <span class="material-symbols-outlined" style="font-size: 1.1rem;">settings_ethernet</span>
-                        <span>設定參考資訊</span>
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.5rem;">
+                            <div class="btn-set-tags" style="margin-left: 0;" onclick="event.stopPropagation(); openRefSettingsModal('${attr.id}')">
+                                <span class="material-symbols-outlined" style="font-size: 1.1rem;">settings_ethernet</span>
+                                <span>設定參考資訊</span>
+                            </div>
+                            
+                            <div class="btn-delete-link" style="position: static;" onclick="event.stopPropagation(); handleDeleteAttraction('${attr.id}', '${attr.name_cn.replace(/'/g, "\\'")}')">
+                                <span class="material-symbols-outlined" style="font-size: 1.1rem;">delete</span>
+                                <span>移除景點</span>
+                            </div>
+                        </div>
                     </div>
                 `;
                 container.appendChild(card);
@@ -1139,10 +1205,11 @@
 
                 // 檢查是否需要顯示展開按鈕（高度超過 3 行）
                 setTimeout(() => {
-                    if (descEl.scrollHeight > descEl.clientHeight) {
+                    // 使用容錯值防止浮點數誤差，並確保在 flex 佈局下能正確檢測
+                    if (descEl.scrollHeight > descEl.clientHeight + 2) {
                         btnEl.style.display = 'flex';
                     }
-                }, 100);
+                }, 200);
 
                 btnEl.onclick = (e) => {
                     e.stopPropagation();
@@ -1323,6 +1390,82 @@
             } catch (err) {
                 console.error("儲存失敗:", err);
                 alert("儲存景點時發生錯誤。");
+                btn.disabled = false;
+                btn.innerHTML = originalIcon;
+            }
+        }
+
+        // --- 編輯景點視窗邏輯 ---
+        function openEditModal(attrId) {
+            const attr = appData.attractions.find(a => a.id === attrId);
+            if (!attr) return;
+
+            document.getElementById('edit-modal-title').textContent = `景點編輯 - ${attr.name_cn}`;
+            document.getElementById('edit-attr-id').value = attr.id;
+            document.getElementById('edit-name-cn').value = attr.name_cn;
+            document.getElementById('edit-name-orig').value = attr.name_orig || '';
+            document.getElementById('edit-url').value = attr.naver_map_url;
+            document.getElementById('edit-desc').value = attr.description || '';
+
+            document.getElementById('edit-modal').style.display = 'flex';
+            validateEditForm();
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').style.display = 'none';
+        }
+
+        function validateEditForm() {
+            const nameCn = document.getElementById('edit-name-cn').value.trim();
+            const url = document.getElementById('edit-url').value.trim();
+            const btn = document.getElementById('btn-update-attr');
+
+            btn.disabled = !(nameCn && url);
+        }
+
+        async function saveEditedAttraction() {
+            const btn = document.getElementById('btn-update-attr');
+            const originalIcon = btn.innerHTML;
+            const attrId = document.getElementById('edit-attr-id').value;
+
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="material-symbols-outlined rotating" style="animation: spin 1s linear infinite;">sync</span>';
+
+                const updatedData = {
+                    id: attrId,
+                    name_cn: document.getElementById('edit-name-cn').value.trim(),
+                    name_orig: document.getElementById('edit-name-orig').value.trim(),
+                    naver_map_url: document.getElementById('edit-url').value.trim(),
+                    description: document.getElementById('edit-desc').value.trim()
+                };
+
+                // --- 樂觀更新 ---
+                const index = appData.attractions.findIndex(a => a.id === attrId);
+                if (index !== -1) {
+                    appData.attractions[index] = { ...appData.attractions[index], ...updatedData };
+                }
+                renderCards();
+                closeEditModal();
+
+                if (GAS_URL.includes('YOUR_APPS_SCRIPT_URL')) {
+                    alert('目前為開發模式，將模擬更新資料到主控台。');
+                    console.log('模擬更新景點:', updatedData);
+                } else {
+                    // 背景執行非同步請求
+                    fetch(GAS_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: JSON.stringify({
+                            action: 'updateAttraction',
+                            payload: updatedData
+                        })
+                    }).catch(err => console.error("背景更新失敗:", err));
+                }
+            } catch (err) {
+                console.error("更新失敗:", err);
+                alert("更新景點時發生錯誤。");
+            } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalIcon;
             }

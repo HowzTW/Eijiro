@@ -52,6 +52,8 @@ function doPost(e) {
       res = deleteReferenceURL(data.payload);
     } else if (action === 'deleteAttraction') {
       res = deleteAttraction(data.payload);
+    } else if (action === 'updateAttraction') {
+      res = updateAttraction(data.payload);
     } else {
       // 移除危險的 else { addAttraction(data) }，改為報錯以利串接偵錯
       res = { success: false, error: '未知的操作類型: ' + (action || '未定義') };
@@ -351,6 +353,41 @@ function deleteAttraction(data) {
     }
 
     return { success: true };
+  } catch (error) {
+    return { success: false, error: error.toString() };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/**
+ * 更新景點主資訊
+ * @param {Object} attractionData 包含 id, name_cn, name_orig, naver_map_url, description 的物件
+ * @return {Object} 回傳操作結果
+ */
+function updateAttraction(attractionData) {
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(30000);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName('Attractions');
+    if (!sheet) throw new Error('找不到 Attractions 工作表');
+
+    var data = sheet.getDataRange().getValues();
+    var id = attractionData.id;
+
+    for (var i = 1; i < data.length; i++) {
+      if (data[i][0] === id) {
+        // 更新該列資料：id, name_cn, name_orig, naver_map_url, description
+        // 注意 getRange 是從 1 開始，且 i 是陣列索引
+        sheet.getRange(i + 1, 2).setValue(attractionData.name_cn);
+        sheet.getRange(i + 1, 3).setValue(attractionData.name_orig || '');
+        sheet.getRange(i + 1, 4).setValue(attractionData.naver_map_url);
+        sheet.getRange(i + 1, 5).setValue(attractionData.description || '');
+        return { success: true };
+      }
+    }
+    throw new Error('找不到該景點 ID: ' + id);
   } catch (error) {
     return { success: false, error: error.toString() };
   } finally {
