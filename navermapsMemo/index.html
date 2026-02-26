@@ -1360,38 +1360,40 @@
                 btn.disabled = true;
                 btn.innerHTML = '<span class="material-symbols-outlined rotating" style="animation: spin 1s linear infinite;">sync</span>';
 
+                const newId = 'attr' + Date.now();
                 const attractionData = {
+                    id: newId,
                     name_cn: document.getElementById('add-name-cn').value.trim(),
                     name_orig: document.getElementById('add-name-orig').value.trim(),
                     naver_map_url: document.getElementById('add-url').value.trim(),
                     description: document.getElementById('add-desc').value.trim()
                 };
 
+                // --- 樂觀更新 ---
+                appData.attractions.push(attractionData);
+                // 新增後自動將標籤篩選切換為「全部選取」，確保新卡片會顯示出來
+                selectedTagIds = new Set(appData.tags.map(t => t.id));
+                renderCards();
+                closeAddModal();
+
                 // 調用 GAS
                 if (GAS_URL.includes('YOUR_APPS_SCRIPT_URL')) {
-                    alert('目前為開發模式，將模擬儲存資料到主控台。');
                     console.log('模擬儲存景點:', attractionData);
-                    closeAddModal();
-                    btn.disabled = false;
-                    btn.innerHTML = originalIcon;
                 } else {
-                    // 為了支援 localhost:8080 測試，改用 fetch POST
-                    // 註：GAS Web App 需要實作 doPost(e)
-                    await fetch(GAS_URL, {
+                    // 背景執行非同步請求
+                    fetch(GAS_URL, {
                         method: 'POST',
                         mode: 'no-cors',
                         body: JSON.stringify({
                             action: 'addAttraction',
                             payload: attractionData
                         })
-                    });
-
-                    alert('景點資料已送出！');
-                    location.reload();
+                    }).catch(err => console.error("背景新增失敗:", err));
                 }
             } catch (err) {
                 console.error("儲存失敗:", err);
                 alert("儲存景點時發生錯誤。");
+            } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalIcon;
             }
