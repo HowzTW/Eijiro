@@ -498,7 +498,7 @@
                     <div class="number-input-container">
                         <button type="button" class="number-btn" onclick="stepNumber('studentCount', -1)"><span
                                 class="material-symbols-outlined">remove_circle_outline</span></button>
-                        <input type="number" id="studentCount" name="studentCount" value="0" min="0" required
+                        <input type="number" id="studentCount" name="studentCount" value="1" min="0" required
                             oninput="syncStudentCards(); validateCard('parentCard')">
                         <button type="button" class="number-btn" onclick="stepNumber('studentCount', 1)"><span
                                 class="material-symbols-outlined">add_circle_outline</span></button>
@@ -709,6 +709,7 @@
                 configData = await response.json();
                 populateDropdowns();
                 initNav();
+                syncStudentCards();
             } catch (error) { console.error('無法載入參數紀錄檔:', error); }
         }
 
