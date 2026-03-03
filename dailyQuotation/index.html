@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日箴言</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #ecf0f1;
+            --accent-color: #d35400;
+            --header-footer-height: 60px;
+            --padding: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Microsoft JhengHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f4f7f6;
+            color: var(--primary-color);
+            line-height: 1.6;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Sticky Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-footer-height);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 var(--padding);
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        header img {
+            height: 40px;
+            width: 40px;
+            margin-right: 15px;
+            border-radius: 8px;
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+        }
+
+        /* Main Content Area (Scrollable) */
+        main {
+            margin-top: var(--header-footer-height);
+            margin-bottom: var(--header-footer-height);
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--padding);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+            align-self: center;
+        }
+
+        /* Date Picker Block */
+        .date-picker-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .date-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        #date_input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            flex: 1;
+            text-align: center;
+        }
+
+        .nav-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: bold;
+        }
+
+        .nav-btn:hover {
+            background-color: #e67e22;
+        }
+
+        /* Content Block */
+        .content-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .field-label {
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+
+        .text-box {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background-color: #fafafa;
+            color: var(--primary-color);
+            font-size: 1rem;
+            resize: none;
+        }
+
+        .multiline {
+            height: 150px;
+            line-height: 1.8;
+        }
+
+        .singleline {
+            height: 45px;
+        }
+
+        /* Sticky Footer */
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-footer-height);
+            background-color: var(--secondary-color);
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            z-index: 1000;
+            border-top: 1px solid #ddd;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 1rem;
+            }
+
+            .date-controls {
+                gap: 5px;
+            }
+
+            .nav-btn {
+                padding: 8px 10px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <img src="/Users/Howz/Documents/Eijiro/navermapsMemo/icon.png" alt="Icon">
+        <h1>每日箴言</h1>
+    </header>
+
+    <main>
+        <!-- Date Picker Block -->
+        <section class="date-picker-container">
+            <div class="date-controls">
+                <button class="nav-btn" onclick="adjustDate(-1)">前一日</button>
+                <input type="date" id="date_input" onchange="handleDateChange()">
+                <button class="nav-btn" onclick="adjustDate(1)">後一日</button>
+            </div>
+            <button class="nav-btn" style="width: 100%; background: #95a5a6;" onclick="setToToday()">回到今日</button>
+        </section>
+
+        <!-- Content Block -->
+        <section class="content-container">
+            <div>
+                <span class="field-label">📅 日期標籤</span>
+                <p id="display_date" style="font-size: 1.2rem; font-weight: bold; margin-bottom: 10px;"></p>
+            </div>
+
+            <div>
+                <span class="field-label">📜 箴言內容</span>
+                <textarea id="content_box" class="text-box multiline" readonly></textarea>
+            </div>
+
+            <div>
+                <span class="field-label">📍 背景景點</span>
+                <input type="text" id="background_box" class="text-box singleline" readonly>
+            </div>
+
+            <div>
+                <span class="field-label">✍️ 出處</span>
+                <input type="text" id="source_box" class="text-box singleline" readonly>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        最後修改時間：<span id="last_modified"></span> (TPE)
+    </footer>
+
+    <script>
+        let quotations = [];
+        const dateInput = document.getElementById('date_input');
+        const displayDate = document.getElementById('display_date');
+        const contentBox = document.getElementById('content_box');
+        const backgroundBox = document.getElementById('background_box');
+        const sourceBox = document.getElementById('source_box');
+
+        // Initialize App
+        async function init() {
+            try {
+                const response = await fetch('data-cht.json');
+                quotations = await response.json();
+                setToToday();
+                updateLastModified();
+            } catch (error) {
+                console.error("無法載入資料:", error);
+                contentBox.value = "資料載入失敗，請確認 data-cht.json 是否存在。";
+            }
+        }
+
+        function setToToday() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            dateInput.value = `${year}-${month}-${day}`;
+            updateContent();
+        }
+
+        function adjustDate(days) {
+            const current = new Date(dateInput.value);
+            current.setDate(current.getDate() + days);
+            const year = current.getFullYear();
+            const month = String(current.getMonth() + 1).padStart(2, '0');
+            const day = String(current.getDate()).padStart(2, '0');
+            dateInput.value = `${year}-${month}-${day}`;
+            updateContent();
+        }
+
+        function handleDateChange() {
+            updateContent();
+        }
+
+        function updateContent() {
+            const selectedDate = new Date(dateInput.value);
+            const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+            const day = String(selectedDate.getDate()).padStart(2, '0');
+            const targetDateStr = `${month}月${day}日`;
+
+            displayDate.innerText = targetDateStr;
+
+            const item = quotations.find(q => q.date === targetDateStr);
+            if (item) {
+                contentBox.value = item.content.trim();
+                backgroundBox.value = item.background || "無景點資訊";
+                sourceBox.value = item.source.replace(/<\/?[^>]+(>|$)/g, "").trim(); // Remove HTML tags from source
+            } else {
+                contentBox.value = "此日期目前無相關箴言。";
+                backgroundBox.value = "";
+                sourceBox.value = "";
+            }
+        }
+
+        function updateLastModified() {
+            // Document.lastModified returns a string, let's format it to "YYYY-MM-DD HH:mm:ss"
+            const modDate = new Date(document.lastModified);
+
+            // Note: Since we want "Taiwan Time", and the user provided a specific format, 
+            // the system time of the browser is used.
+            const year = modDate.getFullYear();
+            const month = String(modDate.getMonth() + 1).padStart(2, '0');
+            const day = String(modDate.getDate()).padStart(2, '0');
+            const hh = String(modDate.getHours()).padStart(2, '0');
+            const mm = String(modDate.getMinutes()).padStart(2, '0');
+            const ss = String(modDate.getSeconds()).padStart(2, '0');
+
+            document.getElementById('last_modified').innerText = `${year}-${month}-${day} ${hh}:${mm}:${ss}`;
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
