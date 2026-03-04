@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#0f0c29">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -30,19 +31,28 @@
             padding: 0;
         }
 
+        html {
+            background-color: #0f0c29;
+            /* Solid top color for iOS status bar */
+        }
+
         body,
         html {
             min-height: 100vh;
             overflow-x: hidden;
             font-family: 'Montserrat', 'Noto Serif TC', serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             color: var(--text-main);
+        }
+
+        body {
+            background-color: #0f0c29;
         }
 
         /* App Container */
         .poster-wrapper {
             position: relative;
             min-height: 100vh;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -248,7 +258,7 @@
         /* Floating Action Button (FAB) */
         #download_area {
             position: fixed;
-            bottom: 30px;
+            bottom: calc(30px + env(safe-area-inset-bottom));
             right: 30px;
             z-index: 100;
         }
@@ -350,12 +360,14 @@
 
         footer {
             position: fixed;
-            bottom: 15px;
+            bottom: 0;
+            padding-bottom: calc(15px + env(safe-area-inset-bottom));
             width: 100%;
             text-align: center;
             font-size: 0.7rem;
             color: rgba(255, 255, 255, 0.4);
             letter-spacing: 1px;
+            z-index: 100;
         }
 
         /* Responsive Mobile */
@@ -594,7 +606,18 @@
 
         function updateLastMod() {
             const m = new Date(document.lastModified);
-            document.getElementById('last_mod').innerText = m.toISOString().replace('T', ' ').split('.')[0];
+            const options = {
+                timeZone: 'Asia/Taipei',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            };
+            const formatter = new Intl.DateTimeFormat('sv-SE', options); // Using sv-SE for YYYY-MM-DD HH:mm:ss format
+            document.getElementById('last_mod').innerText = formatter.format(m).replace(' ', ' ');
         }
 
         init();
