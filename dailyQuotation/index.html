@@ -609,7 +609,7 @@
 
             html2canvas(target, {
                 useCORS: true,
-                backgroundColor: "#0f0c29", // 符合背景顏色
+                backgroundColor: null, // 透明底色，保留圓角外的透明度
                 scale: 3, // 高解析度
                 logging: false
             }).then(canvas => {
