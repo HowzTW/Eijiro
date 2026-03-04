@@ -1,5 +1,6 @@
 {
     "displayOrder": [
+        "dailyQuotation",
         "navermapsMemo",
         "oaInvitation",
         "bloodStatus",
@@ -113,6 +114,13 @@
             "title": "Navermaps 景點備忘",
             "description": "專為韓國旅行設計的景點整理，快速紀錄與標籤管理。",
             "stats": "Travel"
+        },
+        "dailyQuotation": {
+            "href": "dailyQuotation/index.html",
+            "icon": "format_quote",
+            "title": "每日箴言",
+            "description": "沉浸式每日金句讀取器，支援文字編輯與 AI 提示詞產生。",
+            "stats": "Inspiration"
         }
     }
 }
