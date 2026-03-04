@@ -151,6 +151,48 @@
             box-shadow: 0 0 0 1px var(--glass-border);
         }
 
+        /* Loading Overlay for AI Generation */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 50;
+            display: none;
+            /* Hidden by default */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            transition: opacity 0.3s;
+        }
+
+        .loading-spinner {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            animation: rotate 2s linear infinite;
+        }
+
+        .loading-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
         .quote-content::before {
             content: "“";
             position: absolute;
@@ -417,6 +459,12 @@
         </div>
 
         <div id="poster_card">
+            <!-- Loading Overlay -->
+            <div id="loading_overlay" class="loading-overlay">
+                <span class="material-symbols-rounded loading-spinner">settings_slow_motion</span>
+                <div class="loading-text">AI 正在構思背景...</div>
+            </div>
+
             <div class="card-title">每日箴言</div>
             <div id="date_label" class="date-label"></div>
             <div id="quote_text" class="quote-content" contenteditable="true" spellcheck="false">
@@ -436,6 +484,9 @@
     </div>
 
     <div id="download_area">
+        <div class="circle-btn" onclick="generateAIBackground()" title="生成 AI 背景圖片">
+            <span class="material-symbols-rounded">auto_awesome</span>
+        </div>
         <div class="circle-btn" onclick="downloadPoster()" title="將箴言存為圖片">
             <span class="material-symbols-rounded">download</span>
         </div>
@@ -586,6 +637,69 @@
         // Listen for manual edits
         quoteText.addEventListener('input', autoFitFont);
         window.addEventListener('resize', autoFitFont);
+
+        // AI Background Generation Logic
+        const GEMINI_API_KEY = "AIzaSyAhrLNSM8b5_DJzlQ7vXCHLd0mu5QQ2LY0";
+
+        async function generateAIBackground() {
+            const overlay = document.getElementById('loading_overlay');
+            const posterCard = document.getElementById('poster_card');
+
+            // Get current landmark info
+            const d = new Date(dateInput.value);
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const dateStr = `${mm}月${dd}日`;
+            const item = quotations.find(q => q.date === dateStr) || {};
+
+            const backgroundCh = item.background || "精美的自然景觀";
+            const backgroundEn = item['background-eng'] || "Beautiful natural landscape";
+
+            // Nano Banana Pro / Gemini 3 Pro Image specific prompt
+            const prompt = `Generate a high-quality, professional 3:4 vertical photography of ${backgroundEn} (${backgroundCh}). Cinematic lighting, high resolution, architectural perspective. Output format: 1 image.`;
+
+            overlay.style.display = 'flex';
+
+            try {
+                // Using Nano Banana Pro (Gemini 3 Pro Image Preview) via generateContent
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent?key=${GEMINI_API_KEY}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }]
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error?.message || "API 請求失敗");
+                }
+
+                const data = await response.json();
+
+                // Extract image from standard Gemini generateContent response
+                if (data.candidates && data.candidates[0].content.parts) {
+                    const imagePart = data.candidates[0].content.parts.find(p => p.inlineData);
+                    if (imagePart) {
+                        const base64Data = imagePart.inlineData.data;
+                        posterCard.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(data:image/png;base64,${base64Data})`;
+                    } else {
+                        // Sometimes the model returns a text response if it refuses or fails
+                        const textResponse = data.candidates[0].content.parts[0].text;
+                        throw new Error("模型未回傳影像資料。AI 回應：" + (textResponse || "無"));
+                    }
+                } else {
+                    throw new Error("模型未回傳有效回應");
+                }
+            } catch (error) {
+                console.error("AI Background Generation Failed:", error);
+                alert("AI 背景生成失敗: " + error.message);
+            } finally {
+                overlay.style.display = 'none';
+            }
+        }
 
         async function openPromptModal() {
             const modal = document.getElementById('prompt_modal');
