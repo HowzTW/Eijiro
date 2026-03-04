@@ -75,15 +75,14 @@
             border-radius: 30px;
             width: 100%;
             max-width: 500px;
-            padding: 40px 25px;
-            /* Reduced from 50px 40px */
-            text-align: center;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            padding: 15px 10px;
+            /* Drastically reduced for compactness */
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
-            /* Reduced from 25px */
+            gap: 5px;
+            /* Minimum gap */
             position: relative;
             overflow: hidden;
         }
@@ -103,6 +102,7 @@
             color: var(--text-main);
             letter-spacing: 3px;
             margin-bottom: 5px;
+            /* Adjusting space to quote box */
         }
 
         .quote-content {
@@ -113,9 +113,9 @@
             color: var(--text-main);
             word-break: break-word;
             position: relative;
-            margin: 15px 0;
-            padding: 30px 40px 50px 40px;
-            /* Synchronized left/right padding */
+            margin: 0px 0 5px;
+            padding: 10px 15px 15px 15px;
+            /* Drastically reduced padding */
             border-radius: 10px;
             transition: background 0.3s;
             cursor: text;
@@ -132,10 +132,11 @@
         .quote-content::before {
             content: "“";
             position: absolute;
-            top: -40px;
-            /* Adjusted for tighter padding */
-            left: -15px;
-            font-size: 5.5rem;
+            top: -30px;
+            /* Adjusted for smaller size */
+            left: -10px;
+            font-size: 4rem;
+            /* Reduced from 5.5rem */
             color: var(--accent);
             opacity: 1;
             pointer-events: none;
@@ -144,11 +145,11 @@
         .quote-content::after {
             content: "”";
             position: absolute;
-            bottom: -60px;
-            /* Moved further down to avoid overlap */
-            right: -15px;
-            /* Moved further right */
-            font-size: 5.5rem;
+            bottom: -35px;
+            /* Adjusted for smaller size */
+            right: 0px;
+            font-size: 4rem;
+            /* Reduced from 5.5rem */
             color: var(--accent);
             opacity: 1;
             pointer-events: none;
@@ -177,14 +178,12 @@
 
         .quote-author {
             font-size: 1.6rem;
-            /* Larger */
             font-weight: 900;
-            /* Extra bold */
             color: var(--accent);
-            /* Consistent accent color */
             text-align: right;
             width: 100%;
-            margin-top: 15px;
+            margin-top: 5px;
+            /* Minimal gap above author */
         }
 
         .landmark-badge {
