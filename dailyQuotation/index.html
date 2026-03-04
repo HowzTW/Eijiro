@@ -89,16 +89,18 @@
             border-radius: 0;
             width: 100%;
             max-width: 500px;
-            padding: 15px 10px;
-            /* Drastically reduced for compactness */
+            aspect-ratio: 3 / 4;
+            /* Fixed Aspect Ratio */
+            padding: 30px 20px;
+            /* Increased padding slightly */
             text-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 5px;
-            /* Minimum gap */
             position: relative;
-            overflow: hidden;
+            /* Removed overflow: hidden to prevent quote clipping */
+            overflow: visible;
         }
 
         .card-title {
@@ -121,21 +123,27 @@
 
         .quote-content {
             font-family: 'Noto Serif TC', serif;
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 900;
-            line-height: 1.6;
+            line-height: 1.4;
+            /* Slightly tighter for better balance */
             color: var(--text-main);
             word-break: break-word;
             position: relative;
-            margin: 0px 0 5px;
-            padding: 10px 15px 15px 15px;
-            /* Drastically reduced padding */
-            border-radius: 10px;
-            transition: background 0.3s;
+            margin: 0;
+            padding: 20px 30px;
+            /* Reduced to provide more room for content */
+            flex: 1;
+            min-height: 0;
+            /* CRITICAL: Allows flex child to stay within bounds */
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: text;
             outline: none;
             text-align: left;
             width: 100%;
+            /* Removed overflow: hidden to prevent quote clipping */
         }
 
         .quote-content:focus {
@@ -146,26 +154,31 @@
         .quote-content::before {
             content: "“";
             position: absolute;
-            top: -30px;
-            /* Adjusted for smaller size */
-            left: -10px;
-            font-size: 4rem;
-            /* Reduced from 5.5rem */
+            top: -10px;
+            left: 0;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-size: 4.2rem;
+            /* Shrunk to 70% */
             color: var(--accent);
             opacity: 1;
+            line-height: 1;
             pointer-events: none;
+            z-index: -1;
         }
 
         .quote-content::after {
             content: "”";
             position: absolute;
-            bottom: -65px;
-            /* Moved down further to handle compact padding */
-            right: 0px;
-            font-size: 4rem;
+            bottom: -5px;
+            right: 0;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-size: 4.2rem;
+            /* Shrunk to 70% */
             color: var(--accent);
             opacity: 1;
+            line-height: 1;
             pointer-events: none;
+            z-index: -1;
         }
 
         .quote-source {
@@ -406,7 +419,9 @@
         <div id="poster_card">
             <div class="card-title">每日箴言</div>
             <div id="date_label" class="date-label"></div>
-            <div id="quote_text" class="quote-content" contenteditable="true" spellcheck="false">正在載入智慧...</div>
+            <div id="quote_text" class="quote-content" contenteditable="true" spellcheck="false">
+                <div id="quote_inner">正在載入智慧...</div>
+            </div>
 
             <div style="width: 100%; text-align: right;">
                 <div class="quote-author">——池田大作</div>
@@ -518,7 +533,7 @@
             const item = quotations.find(q => q.date === targetDate);
 
             if (item) {
-                quoteText.innerText = item.content;
+                document.getElementById('quote_inner').innerText = item.content;
                 sourceText.innerText = item.source.replace(/<\/?[^>]+(>|$)/g, "");
 
                 // 更新地標資訊
@@ -531,11 +546,46 @@
                     landmarkInfo.style.display = 'none';
                 }
             } else {
-                quoteText.innerText = "此日期目前無箴言。";
+                document.getElementById('quote_inner').innerText = "此日期目前無箴言。";
                 sourceText.innerText = "";
                 document.getElementById('landmark_info').style.display = 'none';
             }
+
+            // 動態調整字級
+            setTimeout(autoFitFont, 50);
         }
+
+        function autoFitFont() {
+            const container = document.getElementById('quote_text');
+            const inner = document.getElementById('quote_inner');
+            if (!container || !inner) return;
+
+            // Reset to a very large font size to start the "shrink-to-fit" process
+            let fontSize = 3.5;
+            container.style.fontSize = fontSize + 'rem';
+
+            // Wait for one frame to let the browser calculate the container's actual height
+            requestAnimationFrame(() => {
+                // The available height is the container's height excluding its internal padding
+                const style = window.getComputedStyle(container);
+                const paddingTop = parseFloat(style.paddingTop);
+                const paddingBottom = parseFloat(style.paddingBottom);
+                // Added an extra 20px buffer to ensure we don't hit the quote icons
+                const availableHeight = container.clientHeight - paddingTop - paddingBottom - 20;
+
+                let iterations = 0;
+                // Shrink fontSize until the inner content height is less than or equal to the available height
+                while (inner.scrollHeight > availableHeight && fontSize > 0.6 && iterations < 60) {
+                    fontSize -= 0.1;
+                    container.style.fontSize = fontSize + 'rem';
+                    iterations++;
+                }
+            });
+        }
+
+        // Listen for manual edits
+        quoteText.addEventListener('input', autoFitFont);
+        window.addEventListener('resize', autoFitFont);
 
         async function openPromptModal() {
             const modal = document.getElementById('prompt_modal');
@@ -557,7 +607,7 @@
                 const item = quotations.find(q => q.date === dateStr) || {};
 
                 // 優先使用目前畫面上可能已經編輯過的文字
-                const currentContent = quoteText.innerText;
+                const currentContent = document.getElementById('quote_inner').innerText;
                 const currentSource = sourceText.innerText.replace(/^—\s*/, "");
                 const backgroundCh = item.background || "自然風景";
                 const backgroundEn = item['background-eng'] || "Nature orientation";
