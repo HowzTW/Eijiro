@@ -4,17 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>每日箴言</title>
-    <!-- Google Material Symbols -->
+    <title>每日箴言 | 沉浸式海報</title>
+    <!-- Google Fonts & Material Symbols -->
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Montserrat:wght@300;400;700&display=swap">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #ecf0f1;
-            --accent-color: #d35400;
-            --header-footer-height: 60px;
-            --padding: 20px;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-blur: blur(20px);
+            --accent: #f1c40f;
+            --text-main: #ffffff;
+            --text-sub: rgba(255, 255, 255, 0.8);
         }
 
         * {
@@ -23,196 +27,207 @@
             padding: 0;
         }
 
-        body {
-            font-family: "Microsoft JhengHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #f4f7f6;
-            color: var(--primary-color);
-            line-height: 1.6;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
+        body,
+        html {
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-family: 'Montserrat', 'Noto Serif TC', serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: var(--text-main);
         }
 
-        /* Sticky Header */
+        /* App Container */
+        .poster-wrapper {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 100px 20px 60px;
+            z-index: 10;
+        }
+
         header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: var(--header-footer-height);
-            background-color: var(--primary-color);
-            color: white;
+            position: absolute;
+            top: 30px;
             display: flex;
             align-items: center;
-            padding: 0 var(--padding);
-            z-index: 1000;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        header img {
-            height: 40px;
-            width: 40px;
-            margin-right: 15px;
-            border-radius: 8px;
-        }
-
-        header h1 {
-            font-size: 1.2rem;
-            letter-spacing: 2px;
-        }
-
-        /* Main Content Area (Scrollable) */
-        main {
-            margin-top: var(--header-footer-height);
-            margin-bottom: var(--header-footer-height);
-            flex: 1;
-            overflow-y: auto;
-            padding: var(--padding);
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            align-items: center;
-            width: 100%;
-            max-width: 800px;
-            align-self: center;
-        }
-
-        /* Date Picker Block */
-        .date-picker-container {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .date-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            justify-content: space-between;
-        }
-
-        #date_input {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 1rem;
-            flex: 1;
-            text-align: center;
-        }
-
-        .nav-btn {
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.3s;
-            font-weight: bold;
-        }
-
-        .nav-btn:hover {
-            background-color: #e67e22;
-        }
-
-        /* Content Block */
-        .content-container {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .field-label {
-            font-weight: bold;
-            font-size: 0.9rem;
-            color: #7f8c8d;
-        }
-
-        .text-box {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            background-color: #fafafa;
-            color: var(--primary-color);
-            font-size: 1rem;
-            resize: none;
-        }
-
-        .multiline {
-            height: 150px;
-            line-height: 1.8;
-        }
-
-        .singleline {
-            height: 45px;
-        }
-
-        /* Sticky Footer */
-        footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: var(--header-footer-height);
-            background-color: var(--secondary-color);
-            color: #666;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.85rem;
-            z-index: 1000;
-            border-top: 1px solid #ddd;
-        }
-
-        /* Icon Styling */
-        .material-symbols-rounded {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            vertical-align: middle;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-size: 1.1rem;
         }
 
         header .material-symbols-rounded {
-            font-size: 40px;
-            margin-right: 15px;
-            color: #f1c40f;
+            font-size: 32px;
+            margin-right: 12px;
+            color: var(--accent);
         }
 
-        .nav-btn .material-symbols-rounded {
-            font-size: 20px;
-            margin: 0 5px;
+        /* Main Poster Card */
+        #poster_card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            width: 100%;
+            max-width: 500px;
+            padding: 50px 40px;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            position: relative;
         }
 
-        .field-label .material-symbols-rounded {
-            font-size: 18px;
-            margin-right: 5px;
-            color: var(--accent-color);
+        .date-label {
+            font-size: 1.2rem;
+            font-weight: 300;
+            color: var(--text-sub);
+            letter-spacing: 2px;
         }
 
-        /* Responsive Adjustments */
-        @media (max-width: 600px) {
-            header h1 {
-                font-size: 1rem;
+        .quote-content {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            line-height: 1.6;
+            color: var(--text-main);
+            word-break: break-all;
+            position: relative;
+            margin: 20px 0;
+            padding: 10px 10px 10px 20px;
+            border-radius: 10px;
+            transition: background 0.3s;
+            cursor: text;
+            outline: none;
+            text-align: left;
+            width: 100%;
+        }
+
+        .quote-content:focus {
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 0 1px var(--glass-border);
+        }
+
+        .quote-content::before {
+            content: "“";
+            position: absolute;
+            top: -40px;
+            left: -20px;
+            font-size: 6rem;
+            color: var(--accent);
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .quote-source {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: var(--text-sub);
+            text-align: right;
+            width: 100%;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background 0.3s;
+            cursor: text;
+            outline: none;
+        }
+
+        .quote-source:focus {
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 0 1px var(--glass-border);
+        }
+
+        .landmark-badge {
+            background: rgba(0, 0, 0, 0.4);
+            color: var(--accent);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        /* Nav Controls */
+        #controls {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .circle-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .circle-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .date-input-wrapper {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 10px 20px;
+        }
+
+        input[type="date"] {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        /* Downloader */
+        #download_area {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 15px;
+            width: 100%;
+            text-align: center;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 1px;
+        }
+
+        /* Responsive Mobile */
+        @media (max-width: 500px) {
+            #poster_card {
+                padding: 40px 25px;
             }
 
-            .date-controls {
-                gap: 5px;
+            .quote-content {
+                font-size: 1.4rem;
             }
 
-            .nav-btn {
-                padding: 8px 10px;
-                font-size: 0.9rem;
+            .circle-btn {
+                width: 50px;
+                height: 50px;
             }
         }
     </style>
@@ -220,136 +235,148 @@
 
 <body>
 
-    <header>
-        <span class="material-symbols-rounded">format_quote</span>
-        <h1>每日箴言</h1>
-    </header>
+    <div class="poster-wrapper">
+        <header>
+            <span class="material-symbols-rounded">format_quote</span>
+            <span>Daily Quotation</span>
+        </header>
 
-    <main>
-        <!-- Date Picker Block -->
-        <section class="date-picker-container">
-            <div class="date-controls">
-                <button class="nav-btn" onclick="adjustDate(-1)">
-                    <span class="material-symbols-rounded">chevron_left</span>前一日
-                </button>
+        <div id="controls">
+            <div class="circle-btn" onclick="adjustDate(-1)">
+                <span class="material-symbols-rounded">chevron_left</span>
+            </div>
+            <div class="date-input-wrapper">
                 <input type="date" id="date_input" onchange="handleDateChange()">
-                <button class="nav-btn" onclick="adjustDate(1)">
-                    後一日<span class="material-symbols-rounded">chevron_right</span>
-                </button>
             </div>
-            <button class="nav-btn"
-                style="width: 100%; background: #95a5a6; display: flex; align-items: center; justify-content: center;"
-                onclick="setToToday()">
-                <span class="material-symbols-rounded">today</span> 回到今日
-            </button>
-        </section>
+            <div class="circle-btn" onclick="adjustDate(1)">
+                <span class="material-symbols-rounded">chevron_right</span>
+            </div>
+        </div>
 
-        <!-- Content Block -->
-        <section class="content-container">
-            <div>
-                <span class="field-label"><span class="material-symbols-rounded">calendar_today</span> 日期標籤</span>
-                <p id="display_date" style="font-size: 1.2rem; font-weight: bold; margin-bottom: 10px;"></p>
+        <div id="poster_card">
+            <div id="date_label" class="date-label"></div>
+            <div id="quote_text" class="quote-content" contenteditable="true" spellcheck="false">正在載入智慧...</div>
+            <div id="source_text" class="quote-source" contenteditable="true" spellcheck="false"></div>
+            <div id="landmark_info" class="landmark-badge" style="display:none;">
+                <span class="material-symbols-rounded">location_on</span>
+                <span id="landmark_name"></span>
             </div>
+        </div>
+    </div>
 
-            <div>
-                <span class="field-label"><span class="material-symbols-rounded">notes</span> 箴言內容</span>
-                <textarea id="content_box" class="text-box multiline" readonly></textarea>
-            </div>
-
-            <div>
-                <span class="field-label"><span class="material-symbols-rounded">location_on</span> 背景景點</span>
-                <input type="text" id="background_box" class="text-box singleline" readonly>
-            </div>
-
-            <div>
-                <span class="field-label"><span class="material-symbols-rounded">history_edu</span> 出處</span>
-                <input type="text" id="source_box" class="text-box singleline" readonly>
-            </div>
-        </section>
-    </main>
+    <div id="download_area">
+        <div class="circle-btn" onclick="downloadPoster()" title="下載海報">
+            <span class="material-symbols-rounded">download</span>
+        </div>
+    </div>
 
     <footer>
-        最後修改時間：<span id="last_modified"></span> (TPE)
+        LAST UPDATED: <span id="last_mod"></span> | TPE TIME
     </footer>
 
     <script>
         let quotations = [];
         const dateInput = document.getElementById('date_input');
-        const displayDate = document.getElementById('display_date');
-        const contentBox = document.getElementById('content_box');
-        const backgroundBox = document.getElementById('background_box');
-        const sourceBox = document.getElementById('source_box');
+        const quoteText = document.getElementById('quote_text');
+        const dateLabel = document.getElementById('date_label');
+        const sourceText = document.getElementById('source_text');
 
-        // Initialize App
         async function init() {
             try {
-                const response = await fetch('data-cht.json');
-                quotations = await response.json();
+                // 讀取資料
+                const dataRes = await fetch('data-cht.json');
+                quotations = await dataRes.json();
+
                 setToToday();
-                updateLastModified();
-            } catch (error) {
-                console.error("無法載入資料:", error);
-                contentBox.value = "資料載入失敗，請確認 data-cht.json 是否存在。";
+                updateLastMod();
+            } catch (e) {
+                quoteText.innerText = "無法載入資源。";
             }
         }
 
         function setToToday() {
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const day = String(today.getDate()).padStart(2, '0');
-            dateInput.value = `${year}-${month}-${day}`;
-            updateContent();
+            const now = new Date();
+            dateInput.value = now.toISOString().split('T')[0];
+            updatePoster();
         }
 
-        function adjustDate(days) {
-            const current = new Date(dateInput.value);
-            current.setDate(current.getDate() + days);
-            const year = current.getFullYear();
-            const month = String(current.getMonth() + 1).padStart(2, '0');
-            const day = String(current.getDate()).padStart(2, '0');
-            dateInput.value = `${year}-${month}-${day}`;
-            updateContent();
+        function adjustDate(offset) {
+            const d = new Date(dateInput.value);
+            d.setDate(d.getDate() + offset);
+            dateInput.value = d.toISOString().split('T')[0];
+            updatePoster();
         }
 
         function handleDateChange() {
-            updateContent();
+            updatePoster();
         }
 
-        function updateContent() {
-            const selectedDate = new Date(dateInput.value);
-            const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-            const day = String(selectedDate.getDate()).padStart(2, '0');
-            const targetDateStr = `${month}月${day}日`;
+        // 處理點擊外部自動取消編輯狀態
+        document.addEventListener('click', (e) => {
+            const quote = document.getElementById('quote_text');
+            const source = document.getElementById('source_text');
 
-            displayDate.innerText = targetDateStr;
+            // 如果點選的不是編輯區塊，且目前正在編輯中，則強制取消焦點
+            if (e.target !== quote && e.target !== source) {
+                if (document.activeElement === quote || document.activeElement === source) {
+                    document.activeElement.blur();
+                }
+            }
+        });
 
-            const item = quotations.find(q => q.date === targetDateStr);
+        function updatePoster() {
+            const d = new Date(dateInput.value);
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const targetDate = `${mm}月${dd}日`;
+
+            dateLabel.innerText = targetDate;
+            const item = quotations.find(q => q.date === targetDate);
+
             if (item) {
-                contentBox.value = item.content.trim();
-                backgroundBox.value = item.background || "無景點資訊";
-                sourceBox.value = item.source.replace(/<\/?[^>]+(>|$)/g, "").trim(); // Remove HTML tags from source
+                quoteText.innerText = item.content;
+                sourceText.innerText = "— " + item.source.replace(/<\/?[^>]+(>|$)/g, "");
             } else {
-                contentBox.value = "此日期目前無相關箴言。";
-                backgroundBox.value = "";
-                sourceBox.value = "";
+                quoteText.innerText = "此日期目前無箴言。";
+                sourceText.innerText = "";
             }
         }
 
-        function updateLastModified() {
-            // Document.lastModified returns a string, let's format it to "YYYY-MM-DD HH:mm:ss"
-            const modDate = new Date(document.lastModified);
+        function downloadPoster() {
+            const btn = document.querySelector('#download_area .circle-btn');
+            const originalIcon = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-rounded">sync</span>';
 
-            // Note: Since we want "Taiwan Time", and the user provided a specific format, 
-            // the system time of the browser is used.
-            const year = modDate.getFullYear();
-            const month = String(modDate.getMonth() + 1).padStart(2, '0');
-            const day = String(modDate.getDate()).padStart(2, '0');
-            const hh = String(modDate.getHours()).padStart(2, '0');
-            const mm = String(modDate.getMinutes()).padStart(2, '0');
-            const ss = String(modDate.getSeconds()).padStart(2, '0');
+            // 縮小目標範圍至 .poster-wrapper
+            const target = document.querySelector('.poster-wrapper');
 
-            document.getElementById('last_modified').innerText = `${year}-${month}-${day} ${hh}:${mm}:${ss}`;
+            html2canvas(target, {
+                useCORS: true,
+                allowTaint: false,
+                backgroundColor: "#000000",
+                scale: 2,
+                logging: true
+            }).then(canvas => {
+                try {
+                    const link = document.createElement('a');
+                    link.download = `DailyQuotation_${dateLabel.innerText}.png`;
+                    link.href = canvas.toDataURL("image/png");
+                    link.click();
+                } catch (err) {
+                    console.error("下載失敗:", err);
+                    alert("海報產生失敗，這通常與圖片存取限制有關。");
+                }
+                btn.innerHTML = originalIcon;
+            }).catch(err => {
+                console.error("渲染失敗:", err);
+                alert("產生海報時發生錯誤。");
+                btn.innerHTML = originalIcon;
+            });
+        }
+
+        function updateLastMod() {
+            const m = new Date(document.lastModified);
+            document.getElementById('last_mod').innerText = m.toISOString().replace('T', ' ').split('.')[0];
         }
 
         init();
