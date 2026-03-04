@@ -145,19 +145,18 @@
         .quote-content::after {
             content: "”";
             position: absolute;
-            bottom: -35px;
-            /* Adjusted for smaller size */
+            bottom: -65px;
+            /* Moved down further to handle compact padding */
             right: 0px;
             font-size: 4rem;
-            /* Reduced from 5.5rem */
             color: var(--accent);
             opacity: 1;
             pointer-events: none;
         }
 
         .quote-source {
-            font-size: 1.4rem;
-            /* Larger */
+            font-size: 1.2rem;
+            /* Slightly smaller for better hierarchy */
             font-weight: 700;
             /* Bolder */
             color: var(--text-main);
