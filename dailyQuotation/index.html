@@ -13,7 +13,7 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Montserrat:wght@300;400;700&display=swap">
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Montserrat:wght@300;400;700&display=swap">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         :root {
@@ -40,7 +40,7 @@
         html {
             min-height: 100vh;
             overflow-x: hidden;
-            font-family: 'Montserrat', 'Noto Serif TC', serif;
+            font-family: 'Noto Sans TC', 'Montserrat', sans-serif;
             color: var(--text-main);
         }
 
@@ -80,7 +80,7 @@
 
         /* Main Poster Card */
         #poster_card {
-            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('background.png');
+            background: url('background.png');
             background-size: cover;
             background-position: center;
             backdrop-filter: var(--glass-blur);
@@ -109,7 +109,7 @@
             color: var(--accent);
             letter-spacing: 10px;
             margin-bottom: 0px;
-            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 3px 6px rgba(0, 0, 0, 0.9);
         }
 
         .date-label {
@@ -118,11 +118,12 @@
             color: var(--text-main);
             letter-spacing: 3px;
             margin-bottom: 5px;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 3px 6px rgba(0, 0, 0, 0.9);
             /* Adjusting space to quote box */
         }
 
         .quote-content {
-            font-family: 'Noto Serif TC', serif;
+            font-family: 'Noto Sans TC', sans-serif;
             font-size: 2.2rem;
             font-weight: 900;
             line-height: 1.4;
@@ -143,6 +144,7 @@
             outline: none;
             text-align: left;
             width: 100%;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 3px 6px rgba(0, 0, 0, 0.9);
             /* Removed overflow: hidden to prevent quote clipping */
         }
 
@@ -237,6 +239,7 @@
             transition: background 0.3s;
             cursor: text;
             outline: none;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 3px 6px rgba(0, 0, 0, 0.9);
         }
 
         .quote-source:focus {
@@ -251,6 +254,7 @@
             text-align: right;
             width: 100%;
             margin-top: 5px;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 3px 6px rgba(0, 0, 0, 0.9);
             /* Minimal gap above author */
         }
 
@@ -717,7 +721,7 @@
             const reader = new FileReader();
             reader.onload = function (e) {
                 const posterCard = document.getElementById('poster_card');
-                posterCard.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${e.target.result})`;
+                posterCard.style.backgroundImage = `url(${e.target.result})`;
                 // Reset input value to allow the same file to be picked again
                 event.target.value = '';
                 // Automatically close FAB menu
@@ -815,7 +819,7 @@
                     const imagePart = data.candidates[0].content.parts.find(p => p.inlineData);
                     if (imagePart) {
                         const base64Data = imagePart.inlineData.data;
-                        posterCard.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(data:image/png;base64,${base64Data})`;
+                        posterCard.style.backgroundImage = `url(data:image/png;base64,${base64Data})`;
                     } else {
                         const textResponse = data.candidates[0].content.parts[0].text;
                         throw new Error("模型未回傳影像資料。AI 回應：" + (textResponse || "無"));
