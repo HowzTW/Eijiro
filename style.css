@@ -32,7 +32,8 @@ header {
   top: 0;
   width: 100%;
   background-color: rgba(15, 23, 42, 0.85); /* Dark background matching the theme with slight transparency */
-  padding: 1rem 2rem; /* Added horizontal padding to align with grid */
+  padding: 1rem 2rem;
+  padding-top: calc(1rem + env(safe-area-inset-top)); /* Adjust for iOS notch */
   display: flex;
   align-items: center;
   border-bottom: 1px solid var(--glass-border);
