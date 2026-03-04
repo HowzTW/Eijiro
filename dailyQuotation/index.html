@@ -291,7 +291,56 @@
 
         .circle-btn:hover {
             background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* Expandable FAB Menu */
+        #fab_container {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .fab-sub-menu {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            gap: 15px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #fab_container.active .fab-sub-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        #main_fab {
+            background: var(--accent);
+            color: black;
+            border: none;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        #main_fab:hover {
+            background: #fff;
             transform: scale(1.1);
+        }
+
+        #main_fab span {
+            transition: transform 0.3s;
+        }
+
+        #fab_container.active #main_fab span {
+            transform: rotate(135deg);
         }
 
         .date-input-wrapper {
@@ -481,17 +530,35 @@
                 <span id="landmark_name"></span>
             </div>
         </div>
+
+        <!-- Hidden File Input for Manual Image Upload -->
+        <input type="file" id="bg_upload_input" accept="image/*" style="display: none;"
+            onchange="handleImageUpload(event)">
     </div>
 
-    <div id="download_area">
-        <div class="circle-btn" onclick="generateAIBackground()" title="生成 AI 背景圖片">
-            <span class="material-symbols-rounded">auto_awesome</span>
+    <div id="fab_container">
+        <!-- Main Toggle Button -->
+        <div id="main_fab" class="circle-btn" onclick="toggleFabMenu()" title="展開功能選單">
+            <span class="material-symbols-rounded">add</span>
         </div>
-        <div class="circle-btn" onclick="downloadPoster()" title="將箴言存為圖片">
-            <span class="material-symbols-rounded">download</span>
-        </div>
-        <div class="circle-btn" onclick="openPromptModal()" title="AI 提示詞產生器">
-            <span class="material-symbols-rounded">psychology</span>
+
+        <!-- Sub Menu Buttons -->
+        <div class="fab-sub-menu">
+            <div class="circle-btn" onclick="clearApiKey()" title="清除 API Key">
+                <span class="material-symbols-rounded">vpn_key_off</span>
+            </div>
+            <div class="circle-btn" onclick="triggerImageUpload()" title="上傳個人背景照片">
+                <span class="material-symbols-rounded">add_a_photo</span>
+            </div>
+            <div class="circle-btn" onclick="generateAIBackground()" title="生成 AI 背景">
+                <span class="material-symbols-rounded">auto_awesome</span>
+            </div>
+            <div class="circle-btn" onclick="downloadPoster()" title="存為圖片">
+                <span class="material-symbols-rounded">download</span>
+            </div>
+            <div class="circle-btn" onclick="openPromptModal()" title="提示詞產生器">
+                <span class="material-symbols-rounded">psychology</span>
+            </div>
         </div>
     </div>
 
@@ -638,12 +705,72 @@
         quoteText.addEventListener('input', autoFitFont);
         window.addEventListener('resize', autoFitFont);
 
-        // AI Background Generation Logic
-        const GEMINI_API_KEY = "AIzaSyAhrLNSM8b5_DJzlQ7vXCHLd0mu5QQ2LY0";
+        // Manual Image Upload Logic
+        function triggerImageUpload() {
+            document.getElementById('bg_upload_input').click();
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const posterCard = document.getElementById('poster_card');
+                posterCard.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${e.target.result})`;
+                // Reset input value to allow the same file to be picked again
+                event.target.value = '';
+                // Automatically close FAB menu
+                document.getElementById('fab_container').classList.remove('active');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // FAB Menu Logic
+        function toggleFabMenu() {
+            document.getElementById('fab_container').classList.toggle('active');
+        }
+
+        // Close FAB menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const container = document.getElementById('fab_container');
+            if (!container.contains(e.target) && container.classList.contains('active')) {
+                container.classList.remove('active');
+            }
+        });
+
+        // AI Background Generation Logic (Secure with localStorage)
+        function getApiKey() {
+            let key = localStorage.getItem('GEMINI_API_KEY');
+            if (!key) {
+                key = prompt("請輸入您的 Google Gemini API Key (這將安全地儲存在您的瀏覽器中，不會寫死在程式碼裡)：");
+                if (key) {
+                    localStorage.setItem('GEMINI_API_KEY', key.trim());
+                }
+            }
+            return key;
+        }
+
+        function clearApiKey() {
+            if (localStorage.getItem('GEMINI_API_KEY')) {
+                if (confirm("確定要清除儲存在此電腦上的 API Key 嗎？")) {
+                    localStorage.removeItem('GEMINI_API_KEY');
+                    alert("API Key 已清除。下次生成背景時將重新詢問。");
+                }
+            } else {
+                alert("目前電腦中沒有儲存任何 API Key。");
+            }
+        }
 
         async function generateAIBackground() {
             const overlay = document.getElementById('loading_overlay');
             const posterCard = document.getElementById('poster_card');
+
+            const apiKey = getApiKey();
+            if (!apiKey) {
+                alert("未輸入 API Key，無法生成背景。");
+                return;
+            }
 
             // Get current landmark info
             const d = new Date(dateInput.value);
@@ -655,14 +782,14 @@
             const backgroundCh = item.background || "精美的自然景觀";
             const backgroundEn = item['background-eng'] || "Beautiful natural landscape";
 
-            // Nano Banana Pro / Gemini 3 Pro Image specific prompt
+            // Prompt for Gemini 2.5 Flash Image
             const prompt = `Generate a high-quality, professional 3:4 vertical photography of ${backgroundEn} (${backgroundCh}). Cinematic lighting, high resolution, architectural perspective. Output format: 1 image.`;
 
             overlay.style.display = 'flex';
 
             try {
-                // Using Nano Banana Pro (Gemini 3 Pro Image Preview) via generateContent
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent?key=${GEMINI_API_KEY}`;
+                // Using Nano Banana (Gemini 2.5 Flash Image) which usually has free quota
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${apiKey}`;
 
                 const response = await fetch(apiUrl, {
                     method: 'POST',
@@ -674,6 +801,10 @@
 
                 if (!response.ok) {
                     const errorData = await response.json();
+                    if (errorData.error?.message.includes("leaked")) {
+                        localStorage.removeItem('GEMINI_API_KEY');
+                        throw new Error("API Key 已被 Google 偵測為洩漏並失效。請前往 AI Studio 撤銷舊 Key、建立新 Key，並重新整理網頁後再次輸入。");
+                    }
                     throw new Error(errorData.error?.message || "API 請求失敗");
                 }
 
@@ -686,7 +817,6 @@
                         const base64Data = imagePart.inlineData.data;
                         posterCard.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(data:image/png;base64,${base64Data})`;
                     } else {
-                        // Sometimes the model returns a text response if it refuses or fails
                         const textResponse = data.candidates[0].content.parts[0].text;
                         throw new Error("模型未回傳影像資料。AI 回應：" + (textResponse || "無"));
                     }
@@ -708,8 +838,8 @@
             textArea.innerText = "正在讀取範本...";
 
             try {
-                // 動態讀取範本
-                const response = await fetch('prompt-cht.txt');
+                // 動態讀取範本 (加上 cache-busting 確保讀取到最新內容)
+                const response = await fetch('prompt-cht.txt?v=' + Date.now(), { cache: 'no-store' });
                 let template = await response.text();
 
                 // 準備替換的內容
