@@ -198,11 +198,107 @@
             cursor: pointer;
         }
 
-        /* Downloader */
+        /* Floating Action Button (FAB) */
         #download_area {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+        }
+
+        #download_area .circle-btn {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            width: 70px;
+            height: 70px;
+        }
+
+        #download_area .circle-btn .material-symbols-rounded {
+            font-size: 32px;
+        }
+
+        /* Prompt Modal */
+        #prompt_modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-content {
+            background: rgba(20, 20, 35, 0.95);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--accent);
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        #prompt_text_area {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            color: #eee;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            max-height: 50vh;
+            overflow-y: auto;
+            outline: none;
+            cursor: text;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-copy {
+            background: var(--accent);
+            color: #000;
+        }
+
+        .btn-close {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
         footer {
@@ -265,8 +361,26 @@
     </div>
 
     <div id="download_area">
-        <div class="circle-btn" onclick="downloadPoster()" title="下載海報">
-            <span class="material-symbols-rounded">download</span>
+        <div class="circle-btn" onclick="openPromptModal()" title="AI 提示詞產生器">
+            <span class="material-symbols-rounded">psychology</span>
+        </div>
+    </div>
+
+    <!-- AI Prompt Modal -->
+    <div id="prompt_modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>AI 提示詞產生器</span>
+                <span class="material-symbols-rounded" style="cursor:pointer" onclick="closeModal()">close</span>
+            </div>
+            <div id="prompt_text_area" contenteditable="true" spellcheck="false">
+                正在產生提示詞...
+            </div>
+            <div class="modal-actions">
+                <button class="action-btn btn-copy" onclick="copyPrompt()">
+                    <span class="material-symbols-rounded">content_copy</span> 複製
+                </button>
+            </div>
         </div>
     </div>
 
@@ -311,16 +425,23 @@
             updatePoster();
         }
 
-        // 處理點擊外部自動取消編輯狀態
+        // 處理點擊外部自動取消編輯狀態與關閉彈出視窗
         document.addEventListener('click', (e) => {
             const quote = document.getElementById('quote_text');
             const source = document.getElementById('source_text');
+            const modal = document.getElementById('prompt_modal');
+            const modalBody = document.querySelector('.modal-content');
 
-            // 如果點選的不是編輯區塊，且目前正在編輯中，則強制取消焦點
+            // 處理內容編輯區域的失焦
             if (e.target !== quote && e.target !== source) {
                 if (document.activeElement === quote || document.activeElement === source) {
                     document.activeElement.blur();
                 }
+            }
+
+            // 處理彈出視窗點擊外部關閉
+            if (modal.style.display === 'flex' && e.target === modal) {
+                closeModal();
             }
         });
 
@@ -342,35 +463,76 @@
             }
         }
 
+        async function openPromptModal() {
+            const modal = document.getElementById('prompt_modal');
+            const textArea = document.getElementById('prompt_text_area');
+            modal.style.display = 'flex';
+            textArea.innerText = "正在讀取範本...";
+
+            try {
+                // 動態讀取範本
+                const response = await fetch('prompt-cht.txt');
+                let template = await response.text();
+
+                // 準備替換的內容
+                const d = new Date(dateInput.value);
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                const dateStr = `${mm}月${dd}日`;
+
+                const item = quotations.find(q => q.date === dateStr) || {};
+
+                // 優先使用目前畫面上可能已經編輯過的文字
+                const currentContent = quoteText.innerText;
+                const currentSource = sourceText.innerText.replace(/^—\s*/, "");
+                const backgroundCh = item.background || "自然風景";
+                const backgroundEn = item['background-eng'] || "Nature orientation";
+
+                // 進行佔位符替換
+                let prompt = template
+                    .replace(/《background》/g, backgroundCh)
+                    .replace(/《background-eng》/g, backgroundEn)
+                    .replace(/《date》/g, dateStr)
+                    .replace(/《content》/g, currentContent)
+                    .replace(/《source》/g, currentSource);
+
+                textArea.innerText = prompt;
+            } catch (err) {
+                console.error("無法產生提示詞:", err);
+                textArea.innerText = "無法載入 prompt-cht.txt 範本。內容如下：\n" + quoteText.innerText;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('prompt_modal').style.display = 'none';
+        }
+
+        function copyPrompt() {
+            const text = document.getElementById('prompt_text_area').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const copyBtn = document.querySelector('.btn-copy');
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<span class="material-symbols-rounded">done</span> 已複製';
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                }, 2000);
+            }).catch(err => {
+                alert("複製失敗，請手動選取文字。");
+            });
+        }
+
         function downloadPoster() {
-            const btn = document.querySelector('#download_area .circle-btn');
-            const originalIcon = btn.innerHTML;
-            btn.innerHTML = '<span class="material-symbols-rounded">sync</span>';
-
-            // 縮小目標範圍至 .poster-wrapper
+            // 保留下載功能供內部測試或未來恢復，但目前 UI 不呼叫它
             const target = document.querySelector('.poster-wrapper');
-
             html2canvas(target, {
                 useCORS: true,
-                allowTaint: false,
                 backgroundColor: "#000000",
-                scale: 2,
-                logging: true
+                scale: 2
             }).then(canvas => {
-                try {
-                    const link = document.createElement('a');
-                    link.download = `DailyQuotation_${dateLabel.innerText}.png`;
-                    link.href = canvas.toDataURL("image/png");
-                    link.click();
-                } catch (err) {
-                    console.error("下載失敗:", err);
-                    alert("海報產生失敗，這通常與圖片存取限制有關。");
-                }
-                btn.innerHTML = originalIcon;
-            }).catch(err => {
-                console.error("渲染失敗:", err);
-                alert("產生海報時發生錯誤。");
-                btn.innerHTML = originalIcon;
+                const link = document.createElement('a');
+                link.download = `Quote.png`;
+                link.href = canvas.toDataURL();
+                link.click();
             });
         }
 
