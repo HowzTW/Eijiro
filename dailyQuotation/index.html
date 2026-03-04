@@ -66,40 +66,56 @@
 
         /* Main Poster Card */
         #poster_card {
-            background: var(--glass-bg);
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('background.png');
+            background-size: cover;
+            background-position: center;
             backdrop-filter: var(--glass-blur);
             -webkit-backdrop-filter: var(--glass-blur);
             border: 1px solid var(--glass-border);
             border-radius: 30px;
             width: 100%;
             max-width: 500px;
-            padding: 50px 40px;
+            padding: 40px 25px;
+            /* Reduced from 50px 40px */
             text-align: center;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 25px;
+            gap: 20px;
+            /* Reduced from 25px */
             position: relative;
+            overflow: hidden;
+        }
+
+        .card-title {
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: var(--accent);
+            letter-spacing: 10px;
+            margin-bottom: 0px;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
         }
 
         .date-label {
-            font-size: 1.2rem;
-            font-weight: 300;
-            color: var(--text-sub);
-            letter-spacing: 2px;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: 3px;
+            margin-bottom: 5px;
         }
 
         .quote-content {
             font-family: 'Noto Serif TC', serif;
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 900;
             line-height: 1.6;
             color: var(--text-main);
-            word-break: break-all;
+            word-break: break-word;
             position: relative;
-            margin: 20px 0;
-            padding: 10px 10px 10px 20px;
+            margin: 15px 0;
+            padding: 30px 40px 50px 40px;
+            /* Synchronized left/right padding */
             border-radius: 10px;
             transition: background 0.3s;
             cursor: text;
@@ -117,17 +133,34 @@
             content: "“";
             position: absolute;
             top: -40px;
-            left: -20px;
-            font-size: 6rem;
+            /* Adjusted for tighter padding */
+            left: -15px;
+            font-size: 5.5rem;
             color: var(--accent);
-            opacity: 0.3;
+            opacity: 1;
+            pointer-events: none;
+        }
+
+        .quote-content::after {
+            content: "”";
+            position: absolute;
+            bottom: -60px;
+            /* Moved further down to avoid overlap */
+            right: -15px;
+            /* Moved further right */
+            font-size: 5.5rem;
+            color: var(--accent);
+            opacity: 1;
             pointer-events: none;
         }
 
         .quote-source {
-            font-size: 1.1rem;
-            font-weight: 400;
-            color: var(--text-sub);
+            font-size: 1.4rem;
+            /* Larger */
+            font-weight: 700;
+            /* Bolder */
+            color: var(--text-main);
+            /* Higher contrast */
             text-align: right;
             width: 100%;
             padding: 5px;
@@ -140,6 +173,18 @@
         .quote-source:focus {
             background: rgba(255, 255, 255, 0.05);
             box-shadow: 0 0 0 1px var(--glass-border);
+        }
+
+        .quote-author {
+            font-size: 1.6rem;
+            /* Larger */
+            font-weight: 900;
+            /* Extra bold */
+            color: var(--accent);
+            /* Consistent accent color */
+            text-align: right;
+            width: 100%;
+            margin-top: 15px;
         }
 
         .landmark-badge {
@@ -350,9 +395,15 @@
         </div>
 
         <div id="poster_card">
+            <div class="card-title">每日箴言</div>
             <div id="date_label" class="date-label"></div>
             <div id="quote_text" class="quote-content" contenteditable="true" spellcheck="false">正在載入智慧...</div>
-            <div id="source_text" class="quote-source" contenteditable="true" spellcheck="false"></div>
+
+            <div style="width: 100%; text-align: right;">
+                <div class="quote-author">——池田大作</div>
+                <div id="source_text" class="quote-source" contenteditable="true" spellcheck="false"></div>
+            </div>
+
             <div id="landmark_info" class="landmark-badge" style="display:none;">
                 <span class="material-symbols-rounded">location_on</span>
                 <span id="landmark_name"></span>
@@ -432,8 +483,8 @@
             const modal = document.getElementById('prompt_modal');
             const modalBody = document.querySelector('.modal-content');
 
-            // 處理內容編輯區域的失焦
-            if (e.target !== quote && e.target !== source) {
+            // 處理內容編輯區域的失焦：只有當點選的地方不是 quote 或 source 時才失焦
+            if (!quote.contains(e.target) && !source.contains(e.target)) {
                 if (document.activeElement === quote || document.activeElement === source) {
                     document.activeElement.blur();
                 }
@@ -456,10 +507,21 @@
 
             if (item) {
                 quoteText.innerText = item.content;
-                sourceText.innerText = "— " + item.source.replace(/<\/?[^>]+(>|$)/g, "");
+                sourceText.innerText = item.source.replace(/<\/?[^>]+(>|$)/g, "");
+
+                // 更新地標資訊
+                const landmarkInfo = document.getElementById('landmark_info');
+                const landmarkName = document.getElementById('landmark_name');
+                if (item.background) {
+                    landmarkName.innerText = item.background;
+                    landmarkInfo.style.display = 'flex';
+                } else {
+                    landmarkInfo.style.display = 'none';
+                }
             } else {
                 quoteText.innerText = "此日期目前無箴言。";
                 sourceText.innerText = "";
+                document.getElementById('landmark_info').style.display = 'none';
             }
         }
 
