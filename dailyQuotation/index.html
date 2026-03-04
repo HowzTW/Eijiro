@@ -261,6 +261,9 @@
             bottom: calc(30px + env(safe-area-inset-bottom));
             right: 30px;
             z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
         #download_area .circle-btn {
@@ -418,6 +421,9 @@
     </div>
 
     <div id="download_area">
+        <div class="circle-btn" onclick="downloadPoster()" title="將箴言存為圖片">
+            <span class="material-symbols-rounded">download</span>
+        </div>
         <div class="circle-btn" onclick="openPromptModal()" title="AI 提示詞產生器">
             <span class="material-symbols-rounded">psychology</span>
         </div>
@@ -590,17 +596,36 @@
         }
 
         function downloadPoster() {
-            // 保留下載功能供內部測試或未來恢復，但目前 UI 不呼叫它
-            const target = document.querySelector('.poster-wrapper');
+            const btn = event.currentTarget;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-rounded rotating">sync</span>';
+            btn.style.pointerEvents = 'none';
+
+            // 目標精確對準 #poster_card
+            const target = document.getElementById('poster_card');
+
+            // 檔名日期
+            const dateStr = document.getElementById('date_label').innerText;
+
             html2canvas(target, {
                 useCORS: true,
-                backgroundColor: "#000000",
-                scale: 2
+                backgroundColor: "#0f0c29", // 符合背景顏色
+                scale: 3, // 高解析度
+                logging: false
             }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `Quote.png`;
-                link.href = canvas.toDataURL();
+                link.download = `DailyQuote_${dateStr}.png`;
+                link.href = canvas.toDataURL('image/png');
                 link.click();
+
+                // 恢復按鈕狀態
+                btn.innerHTML = originalHTML;
+                btn.style.pointerEvents = 'auto';
+            }).catch(err => {
+                console.error("下載失敗:", err);
+                btn.innerHTML = originalHTML;
+                btn.style.pointerEvents = 'auto';
+                alert("圖片產生失敗，請再試一次。");
             });
         }
 
