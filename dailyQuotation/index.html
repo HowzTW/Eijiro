@@ -586,20 +586,30 @@
 
         <!-- Sub Menu Buttons -->
         <div class="fab-sub-menu">
-            <div class="circle-btn" onclick="clearApiKey()" title="清除 API Key">
-                <span class="material-symbols-rounded">vpn_key_off</span>
-            </div>
-            <div class="circle-btn" onclick="triggerImageUpload()" title="上傳個人背景照片">
-                <span class="material-symbols-rounded">add_a_photo</span>
-            </div>
+            <!-- Order from bottom to top (due to column-reverse) -->
+            <!-- 1. 生成 AI 背景 -->
             <div class="circle-btn" onclick="openAIConfigModal()" title="生成 AI 背景">
                 <span class="material-symbols-rounded">auto_awesome</span>
             </div>
-            <div class="circle-btn" onclick="downloadPoster()" title="存為圖片">
+            <!-- 2. 下載箴言小卡 -->
+            <div class="circle-btn" onclick="downloadPoster()" title="下載箴言小卡">
                 <span class="material-symbols-rounded">download</span>
             </div>
+            <!-- 3. 下載背景圖片 -->
+            <div class="circle-btn" onclick="downloadBackground()" title="下載背景圖片">
+                <span class="material-symbols-rounded">wallpaper</span>
+            </div>
+            <!-- 4. 上傳背景圖片 -->
+            <div class="circle-btn" onclick="triggerImageUpload()" title="上傳背景圖片">
+                <span class="material-symbols-rounded">add_a_photo</span>
+            </div>
+            <!-- 5. 提示詞產生器 -->
             <div class="circle-btn" onclick="openPromptModal()" title="提示詞產生器">
                 <span class="material-symbols-rounded">psychology</span>
+            </div>
+            <!-- 6. 清除 API Key -->
+            <div class="circle-btn" onclick="clearApiKey()" title="清除 API Key">
+                <span class="material-symbols-rounded">vpn_key_off</span>
             </div>
         </div>
     </div>
@@ -1003,6 +1013,34 @@
             }).catch(err => {
                 alert("複製失敗，請手動選取文字。");
             });
+        }
+
+        function downloadBackground() {
+            const target = document.getElementById('poster_card');
+            const style = window.getComputedStyle(target);
+            const bgImage = style.backgroundImage;
+
+            if (!bgImage || bgImage === 'none') {
+                alert("目前沒有背景圖片。");
+                return;
+            }
+
+            // Extract URL from url("...")
+            const urlMatch = bgImage.match(/url\(["']?([^"']+)["']?\)/);
+            if (!urlMatch) {
+                alert("無法解析背景圖片。");
+                return;
+            }
+
+            const imgUrl = urlMatch[1];
+            const dateStr = document.getElementById('date_label').innerText;
+
+            const link = document.createElement('a');
+            link.href = imgUrl;
+            link.download = `Background_${dateStr}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function downloadPoster() {
