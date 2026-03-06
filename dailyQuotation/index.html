@@ -786,8 +786,8 @@
             const backgroundCh = item.background || "精美的自然景觀";
             const backgroundEn = item['background-eng'] || "Beautiful natural landscape";
 
-            // Prompt for Gemini 2.5 Flash Image
-            const prompt = `Generate a high-quality, professional 3:4 vertical photography of ${backgroundEn} (${backgroundCh}). Cinematic lighting, high resolution, architectural perspective. Output format: 1 image.`;
+            // Prompt for Gemini: Option B (Descriptive & Artistic, strictly no text)
+            const prompt = `A professional 3:4 vertical masterpiece photography featuring ${backgroundEn} (${backgroundCh}). Focus only on the scenery and atmosphere. Strictly prohibit any text, writing, alphabets, or signatures. Cinematic lighting, photorealistic, 8k resolution, clean background.`;
 
             overlay.style.display = 'flex';
 
