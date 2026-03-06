@@ -481,6 +481,44 @@
             z-index: 100;
         }
 
+        /* Model Selector Styling in Modal */
+        .modal-select-wrapper {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        .modal-select-wrapper select {
+            background: transparent;
+            border: none;
+            color: var(--accent);
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            font-family: inherit;
+            flex: 1;
+        }
+
+        .modal-select-wrapper select option {
+            background: #2e2a59;
+            color: white;
+        }
+
+        .modal-label {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
         /* Responsive Mobile */
         @media (max-width: 500px) {
             .circle-btn {
@@ -554,7 +592,7 @@
             <div class="circle-btn" onclick="triggerImageUpload()" title="上傳個人背景照片">
                 <span class="material-symbols-rounded">add_a_photo</span>
             </div>
-            <div class="circle-btn" onclick="generateAIBackground()" title="生成 AI 背景">
+            <div class="circle-btn" onclick="openAIConfigModal()" title="生成 AI 背景">
                 <span class="material-symbols-rounded">auto_awesome</span>
             </div>
             <div class="circle-btn" onclick="downloadPoster()" title="存為圖片">
@@ -562,6 +600,48 @@
             </div>
             <div class="circle-btn" onclick="openPromptModal()" title="提示詞產生器">
                 <span class="material-symbols-rounded">psychology</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Config Modal (Confirmation before Generation) -->
+    <div id="ai_config_modal" class="modal-overlay"
+        style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); display:none; justify-content:center; align-items:center; z-index:2000;">
+        <div class="modal-content" style="max-height: 90vh;">
+            <div class="modal-header">
+                <span>AI 背景生成設定</span>
+                <span class="material-symbols-rounded" style="cursor:pointer"
+                    onclick="closeAIConfigModal()">close</span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <div>
+                    <div class="modal-label">選擇模型</div>
+                    <div class="modal-select-wrapper">
+                        <span class="material-symbols-rounded"
+                            style="color: var(--accent);">temp_preferences_custom</span>
+                        <select id="config_model_select" onchange="saveSelectedModel()">
+                            <option value="gemini-3.1-flash-image-preview">Nano Banana 2 (3.1 Flash)</option>
+                            <option value="gemini-3-pro-image-preview">Nano Banana Pro (3 Pro)</option>
+                            <option value="gemini-2.5-flash-image">Nano Banana (2.5 Flash)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="modal-label">生成提示詞 (Prompt)</div>
+                    <div id="config_prompt_area" contenteditable="true" spellcheck="false"
+                        style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 12px; padding: 15px; color: #eee; font-size: 0.9rem; line-height: 1.6; max-height: 40vh; overflow-y: auto; outline: none;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions" style="margin-top: 20px;">
+                <button class="action-btn btn-close" onclick="closeAIConfigModal()">取消</button>
+                <button class="action-btn btn-copy" style="background: var(--accent); color: black;"
+                    onclick="executeAIBackground()">
+                    <span class="material-symbols-rounded">play_arrow</span> 執行生成
+                </button>
             </div>
         </div>
     </div>
@@ -602,6 +682,7 @@
                 quotations = await dataRes.json();
 
                 setToToday();
+                setupModelSelection();
                 updateLastMod();
             } catch (e) {
                 quoteText.innerText = "無法載入資源。";
@@ -743,6 +824,48 @@
             }
         });
 
+        // Model Selection Logic
+        function setupModelSelection() {
+            const savedModel = localStorage.getItem('SELECTED_AI_MODEL');
+            const modelSelect = document.getElementById('config_model_select');
+            if (savedModel) {
+                modelSelect.value = savedModel;
+            } else {
+                modelSelect.value = 'gemini-3.1-flash-image-preview'; // Default
+            }
+        }
+
+        function saveSelectedModel() {
+            const modelSelect = document.getElementById('config_model_select');
+            localStorage.setItem('SELECTED_AI_MODEL', modelSelect.value);
+        }
+
+        // AI Background Config Modal Logic
+        function openAIConfigModal() {
+            const modal = document.getElementById('ai_config_modal');
+            const promptArea = document.getElementById('config_prompt_area');
+
+            // Prepare default prompt
+            const d = new Date(dateInput.value);
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const dateStr = `${mm}月${dd}日`;
+            const item = quotations.find(q => q.date === dateStr) || {};
+
+            const backgroundCh = item.background || "精美的自然景觀";
+            const backgroundEn = item['background-eng'] || "Beautiful natural landscape";
+
+            const defaultPrompt = `A professional 3:4 vertical masterpiece photography featuring ${backgroundEn} (${backgroundCh}). Focus only on the scenery and atmosphere. Strictly prohibit any text, writing, alphabets, or signatures. Cinematic lighting, photorealistic, 8k resolution, clean background.`;
+
+            promptArea.innerText = defaultPrompt;
+            setupModelSelection();
+            modal.style.display = 'flex';
+        }
+
+        function closeAIConfigModal() {
+            document.getElementById('ai_config_modal').style.display = 'none';
+        }
+
         // AI Background Generation Logic (Secure with localStorage)
         function getApiKey() {
             let key = localStorage.getItem('GEMINI_API_KEY');
@@ -766,9 +889,11 @@
             }
         }
 
-        async function generateAIBackground() {
+        async function executeAIBackground() {
             const overlay = document.getElementById('loading_overlay');
             const posterCard = document.getElementById('poster_card');
+            const prompt = document.getElementById('config_prompt_area').innerText;
+            const modelName = document.getElementById('config_model_select').value;
 
             const apiKey = getApiKey();
             if (!apiKey) {
@@ -776,24 +901,11 @@
                 return;
             }
 
-            // Get current landmark info
-            const d = new Date(dateInput.value);
-            const mm = String(d.getMonth() + 1).padStart(2, '0');
-            const dd = String(d.getDate()).padStart(2, '0');
-            const dateStr = `${mm}月${dd}日`;
-            const item = quotations.find(q => q.date === dateStr) || {};
-
-            const backgroundCh = item.background || "精美的自然景觀";
-            const backgroundEn = item['background-eng'] || "Beautiful natural landscape";
-
-            // Prompt for Gemini: Option B (Descriptive & Artistic, strictly no text)
-            const prompt = `A professional 3:4 vertical masterpiece photography featuring ${backgroundEn} (${backgroundCh}). Focus only on the scenery and atmosphere. Strictly prohibit any text, writing, alphabets, or signatures. Cinematic lighting, photorealistic, 8k resolution, clean background.`;
-
+            closeAIConfigModal();
             overlay.style.display = 'flex';
 
             try {
-                // Using Nano Banana (Gemini 2.5 Flash Image) which usually has free quota
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${apiKey}`;
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
                 const response = await fetch(apiUrl, {
                     method: 'POST',
