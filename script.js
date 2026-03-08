@@ -10,13 +10,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             const cardData = config.cards[key];
             if (!cardData) return;
 
+            const iconHTML = cardData.icon.endsWith('.png') || cardData.icon.endsWith('.jpg') || cardData.icon.endsWith('.svg')
+                ? `<img src="${cardData.href.replace('index.html', '')}${cardData.icon}" alt="${cardData.title}" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">`
+                : `<span class="material-symbols-rounded">${cardData.icon}</span>`;
+
             const cardHTML = `
                 <a href="${cardData.href}" class="card" target="_blank" rel="noopener noreferrer">
                     <button class="copy-btn" title="複製連結" onclick="copyLink(event, '${cardData.href}')">
                         <i class="ph-bold ph-copy"></i>
                     </button>
                     <div class="card-content">
-                        <div class="card-icon"><span class="material-symbols-rounded">${cardData.icon}</span></div>
+                        <div class="card-icon">${iconHTML}</div>
                         <h2 class="card-title">${cardData.title}</h2>
                         <p class="card-description">${cardData.description}</p>
                     </div>
