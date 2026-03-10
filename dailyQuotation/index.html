@@ -657,6 +657,47 @@
         </div>
     </div>
 
+    <!-- Hidden File Input for Manual Image Upload -->
+    <input type="file" id="bg_upload_input" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+
+    <!-- Image Upload Modal -->
+    <div id="upload_modal" class="modal-overlay" onclick="handleUploadOverlayClick(event)"
+        style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); display:none; justify-content:center; align-items:center; z-index:2000;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>上傳背景圖片</span>
+                <span class="material-symbols-rounded" style="cursor:pointer" onclick="closeUploadModal()">close</span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <div class="modal-label">您可以從電腦挑選圖片，或直接在此貼上 (Paste) 圖片。</div>
+                <div id="upload_preview_container"
+                    style="width: 100%; height: 200px; border: 2px dashed var(--glass-border); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; background: rgba(255,255,255,0.03);">
+                    <img id="upload_preview_img" style="max-width: 100%; max-height: 100%; display: none;">
+                    <div id="upload_placeholder"
+                        style="color: var(--text-sub); display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                        <span class="material-symbols-rounded" style="font-size: 48px;">add_photo_alternate</span>
+                        <span>點擊下方按鈕或貼上圖片</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions" style="margin-top: 20px;">
+                <button class="action-btn btn-close" onclick="closeUploadModal()">取消</button>
+                <button class="action-btn btn-copy"
+                    style="background: rgba(255,255,255,0.1); color: white; margin-right: auto;"
+                    onclick="triggerImageUpload()">
+                    <span class="material-symbols-rounded">folder_open</span> 選擇檔案
+                </button>
+                <button id="btn_apply_upload" class="action-btn btn-copy"
+                    style="background: var(--accent); color: black; opacity: 0.5; pointer-events: none;"
+                    onclick="applyUploadedImage()">
+                    <span class="material-symbols-rounded">check</span> 套用
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- AI Prompt Modal -->
     <div id="prompt_modal">
         <div class="modal-content">
@@ -840,6 +881,36 @@
         }
 
         // Manual Image Upload Logic
+        let pendingImageData = null;
+
+        function openUploadModal() {
+            const modal = document.getElementById('upload_modal');
+            modal.style.display = 'flex';
+            resetUploadModal();
+            // Listen for paste event specifically when modal is open
+            window.addEventListener('paste', handleClipboardPaste);
+        }
+
+        function closeUploadModal() {
+            const modal = document.getElementById('upload_modal');
+            modal.style.display = 'none';
+            window.removeEventListener('paste', handleClipboardPaste);
+        }
+
+        function handleUploadOverlayClick(event) {
+            if (event.target.id === 'upload_modal') {
+                closeUploadModal();
+            }
+        }
+
+        function resetUploadModal() {
+            pendingImageData = null;
+            document.getElementById('upload_preview_img').style.display = 'none';
+            document.getElementById('upload_placeholder').style.display = 'flex';
+            document.getElementById('btn_apply_upload').style.opacity = '0.5';
+            document.getElementById('btn_apply_upload').style.pointerEvents = 'none';
+        }
+
         function triggerImageUpload() {
             document.getElementById('bg_upload_input').click();
         }
@@ -847,17 +918,46 @@
         function handleImageUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
+            processImageFile(file);
+            event.target.value = ''; // Reset
+        }
 
+        function handleClipboardPaste(event) {
+            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+            for (let index in items) {
+                const item = items[index];
+                if (item.kind === 'file' && item.type.startsWith('image/')) {
+                    const blob = item.getAsFile();
+                    processImageFile(blob);
+                    break;
+                }
+            }
+        }
+
+        function processImageFile(file) {
             const reader = new FileReader();
             reader.onload = function (e) {
-                const posterCard = document.getElementById('poster_card');
-                posterCard.style.backgroundImage = `url(${e.target.result})`;
-                // Reset input value to allow the same file to be picked again
-                event.target.value = '';
-                // Automatically close FAB menu
-                document.getElementById('fab_container').classList.remove('active');
+                pendingImageData = e.target.result;
+                const previewImg = document.getElementById('upload_preview_img');
+                const placeholder = document.getElementById('upload_placeholder');
+                const applyBtn = document.getElementById('btn_apply_upload');
+
+                previewImg.src = pendingImageData;
+                previewImg.style.display = 'block';
+                placeholder.style.display = 'none';
+                applyBtn.style.opacity = '1';
+                applyBtn.style.pointerEvents = 'auto';
             };
             reader.readAsDataURL(file);
+        }
+
+        function applyUploadedImage() {
+            if (!pendingImageData) return;
+            const posterCard = document.getElementById('poster_card');
+            posterCard.style.backgroundImage = `url(${pendingImageData})`;
+            closeUploadModal();
+            // Automatically close FAB menu if open
+            document.getElementById('fab_container').classList.remove('active');
         }
 
         // FAB Menu Logic

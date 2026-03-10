@@ -10,7 +10,7 @@
         "id": "upload_bg",
         "title": "上傳背景圖片",
         "icon": "add_a_photo",
-        "action": "triggerImageUpload()",
+        "action": "openUploadModal()",
         "visible": true
     },
     {
