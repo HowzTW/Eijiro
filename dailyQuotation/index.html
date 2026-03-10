@@ -26,6 +26,8 @@
             --accent: #f1c40f;
             --text-main: #ffffff;
             --text-sub: rgba(255, 255, 255, 0.8);
+            --success: #2ecc71;
+            --danger: #e74c3c;
         }
 
         * {
@@ -539,6 +541,113 @@
             margin-bottom: 5px;
         }
 
+        /* API Key Modal Specifics */
+        .api-key-row {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .api-key-label {
+            font-size: 0.85rem;
+            color: var(--accent);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .api-key-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .api-key-input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 10px 15px;
+            color: white;
+            font-family: monospace;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .api-key-input:focus {
+            border-color: var(--accent);
+        }
+
+        .key-btn {
+            min-width: 90px;
+            height: 40px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .btn-set {
+            background: var(--accent);
+            color: black;
+            box-shadow: 0 4px 10px rgba(241, 196, 15, 0.3);
+        }
+
+        .btn-set:hover {
+            background: white;
+            box-shadow: 0 6px 15px rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-clear {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--danger);
+            border: 1.5px solid var(--danger) !important;
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.1);
+        }
+
+        .btn-clear:hover {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 6px 15px rgba(231, 76, 60, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .key-btn:active {
+            transform: scale(0.9);
+        }
+
+        .key-btn.success-animation {
+            animation: successPulse 0.5s ease;
+        }
+
+        @keyframes successPulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 0 15px var(--success);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
         /* Responsive Mobile */
         @media (max-width: 500px) {
             .circle-btn {
@@ -712,6 +821,68 @@
                 <button class="action-btn btn-copy" onclick="copyPrompt()">
                     <span class="material-symbols-rounded">content_copy</span> 複製
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Key Management Modal -->
+    <div id="api_key_modal" class="modal-overlay" onclick="handleApiKeyOverlayClick(event)"
+        style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); display:none; justify-content:center; align-items:center; z-index:2001;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>管理 API Key</span>
+                <span class="material-symbols-rounded" style="cursor:pointer" onclick="closeApiKeyModal()">close</span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; overflow-y: auto; max-height: 60vh; padding-right: 5px;">
+                <!-- Gemini -->
+                <div class="api-key-row">
+                    <div class="api-key-label">Google Gemini</div>
+                    <div class="api-key-input-group">
+                        <input type="password" id="key_gemini" class="api-key-input" placeholder="Enter API Key...">
+                        <button id="btn_gemini" class="key-btn btn-set" onclick="toggleApiKey('gemini')">
+                            <span class="material-symbols-rounded">settings</span> 設定
+                        </button>
+                    </div>
+                </div>
+
+                <!-- OpenAI -->
+                <div class="api-key-row">
+                    <div class="api-key-label">OpenAI</div>
+                    <div class="api-key-input-group">
+                        <input type="password" id="key_openai" class="api-key-input" placeholder="Enter API Key...">
+                        <button id="btn_openai" class="key-btn btn-set" onclick="toggleApiKey('openai')">
+                            <span class="material-symbols-rounded">settings</span> 設定
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Groq -->
+                <div class="api-key-row">
+                    <div class="api-key-label">Groq</div>
+                    <div class="api-key-input-group">
+                        <input type="password" id="key_groq" class="api-key-input" placeholder="Enter API Key...">
+                        <button id="btn_groq" class="key-btn btn-set" onclick="toggleApiKey('groq')">
+                            <span class="material-symbols-rounded">settings</span> 設定
+                        </button>
+                    </div>
+                </div>
+
+                <!-- NVIDIA NIM -->
+                <div class="api-key-row">
+                    <div class="api-key-label">NVIDIA NIM</div>
+                    <div class="api-key-input-group">
+                        <input type="password" id="key_nvidia" class="api-key-input" placeholder="Enter API Key...">
+                        <button id="btn_nvidia" class="key-btn btn-set" onclick="toggleApiKey('nvidia')">
+                            <span class="material-symbols-rounded">settings</span> 設定
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions" style="margin-top: 10px;">
+                <button class="action-btn btn-close" onclick="closeApiKeyModal()"
+                    style="width: 100%; justify-content: center;">關閉</button>
             </div>
         </div>
     </div>
@@ -1158,6 +1329,86 @@
 
         function closeModal() {
             document.getElementById('prompt_modal').style.display = 'none';
+        }
+
+        // API Key Management Logic
+        const API_PROVIDERS = {
+            gemini: 'GEMINI_API_KEY',
+            openai: 'OPENAI_API_KEY',
+            groq: 'GROQ_API_KEY',
+            nvidia: 'NVIDIA_API_KEY'
+        };
+
+        function openApiKeyModal() {
+            document.getElementById('api_key_modal').style.display = 'flex';
+            loadAllApiKeys();
+        }
+
+        function closeApiKeyModal() {
+            document.getElementById('api_key_modal').style.display = 'none';
+        }
+
+        function handleApiKeyOverlayClick(event) {
+            if (event.target.id === 'api_key_modal') {
+                closeApiKeyModal();
+            }
+        }
+
+        function loadAllApiKeys() {
+            for (const [id, storageKey] of Object.entries(API_PROVIDERS)) {
+                const value = localStorage.getItem(storageKey) || '';
+                const input = document.getElementById('key_' + id);
+                const btn = document.getElementById('btn_' + id);
+
+                input.value = value;
+                updateKeyButtonUI(id, !!value);
+            }
+        }
+
+        function updateKeyButtonUI(id, hasValue) {
+            const btn = document.getElementById('btn_' + id);
+            const input = document.getElementById('key_' + id);
+
+            if (hasValue) {
+                btn.innerHTML = '<span class="material-symbols-rounded">delete</span> 清除';
+                btn.className = 'key-btn btn-clear';
+                input.disabled = true;
+            } else {
+                btn.innerHTML = '<span class="material-symbols-rounded">settings</span> 設定';
+                btn.className = 'key-btn btn-set';
+                input.disabled = false;
+            }
+        }
+
+        function toggleApiKey(id) {
+            const storageKey = API_PROVIDERS[id];
+            const input = document.getElementById('key_' + id);
+            const btn = document.getElementById('btn_' + id);
+            const currentValue = localStorage.getItem(storageKey);
+
+            if (currentValue) {
+                // Clear action
+                localStorage.removeItem(storageKey);
+                input.value = '';
+                btn.classList.add('success-animation');
+                setTimeout(() => {
+                    updateKeyButtonUI(id, false);
+                    btn.classList.remove('success-animation');
+                }, 300);
+            } else {
+                // Set action
+                const newValue = input.value.trim();
+                if (!newValue) {
+                    alert("請先輸入 API Key");
+                    return;
+                }
+                localStorage.setItem(storageKey, newValue);
+                btn.classList.add('success-animation');
+                setTimeout(() => {
+                    updateKeyButtonUI(id, true);
+                    btn.classList.remove('success-animation');
+                }, 300);
+            }
         }
 
         function copyPrompt() {

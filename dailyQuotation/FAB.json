@@ -33,5 +33,12 @@
         "icon": "psychology",
         "action": "openPromptModal()",
         "visible": false
+    },
+    {
+        "id": "manage_api_keys",
+        "title": "管理 API Key",
+        "icon": "vpn_key",
+        "action": "openApiKeyModal()",
+        "visible": true
     }
 ]
