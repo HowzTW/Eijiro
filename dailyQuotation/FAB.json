@@ -1,0 +1,37 @@
+[
+    {
+        "id": "ai_config",
+        "title": "生成 AI 背景",
+        "icon": "auto_awesome",
+        "action": "openAIConfigModal()",
+        "visible": true
+    },
+    {
+        "id": "upload_bg",
+        "title": "上傳背景圖片",
+        "icon": "add_a_photo",
+        "action": "triggerImageUpload()",
+        "visible": true
+    },
+    {
+        "id": "download_poster",
+        "title": "下載箴言小卡",
+        "icon": "download",
+        "action": "downloadPoster()",
+        "visible": true
+    },
+    {
+        "id": "download_bg",
+        "title": "下載背景圖片",
+        "icon": "wallpaper",
+        "action": "downloadBackground()",
+        "visible": true
+    },
+    {
+        "id": "prompt_modal",
+        "title": "提示詞產生器",
+        "icon": "psychology",
+        "action": "openPromptModal()",
+        "visible": false
+    }
+]

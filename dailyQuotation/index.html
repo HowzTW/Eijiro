@@ -605,32 +605,8 @@
         </div>
 
         <!-- Sub Menu Buttons -->
-        <div class="fab-sub-menu">
-            <!-- Order from bottom to top (due to column-reverse) -->
-            <!-- 1. 生成 AI 背景 -->
-            <div class="circle-btn" onclick="openAIConfigModal()" title="生成 AI 背景">
-                <span class="material-symbols-rounded">auto_awesome</span>
-            </div>
-            <!-- 2. 下載箴言小卡 -->
-            <div class="circle-btn" onclick="downloadPoster()" title="下載箴言小卡">
-                <span class="material-symbols-rounded">download</span>
-            </div>
-            <!-- 3. 下載背景圖片 -->
-            <div class="circle-btn" onclick="downloadBackground()" title="下載背景圖片">
-                <span class="material-symbols-rounded">wallpaper</span>
-            </div>
-            <!-- 4. 上傳背景圖片 -->
-            <div class="circle-btn" onclick="triggerImageUpload()" title="上傳背景圖片">
-                <span class="material-symbols-rounded">add_a_photo</span>
-            </div>
-            <!-- 5. 提示詞產生器 -->
-            <div class="circle-btn" onclick="openPromptModal()" title="提示詞產生器">
-                <span class="material-symbols-rounded">psychology</span>
-            </div>
-            <!-- 6. 清除 API Key -->
-            <div class="circle-btn" onclick="clearApiKey()" title="清除 API Key">
-                <span class="material-symbols-rounded">vpn_key_off</span>
-            </div>
+        <div id="fab_sub_menu" class="fab-sub-menu">
+            <!-- Dynamically generated from FAB.json -->
         </div>
     </div>
 
@@ -717,6 +693,9 @@
                 // 讀取資料
                 const dataRes = await fetch('data-cht.json');
                 quotations = await dataRes.json();
+
+                // 讀取 FAB 設定
+                await initFabMenu();
 
                 setToToday();
                 setupModelSelection();
@@ -826,6 +805,39 @@
         // Listen for manual edits
         quoteText.addEventListener('input', autoFitFont);
         window.addEventListener('resize', autoFitFont);
+
+        async function initFabMenu() {
+            try {
+                const res = await fetch('FAB.json?v=' + Date.now());
+                const fabConfig = await res.json();
+                renderFabMenu(fabConfig);
+            } catch (e) {
+                console.error("無法載入 FAB.json，將顯示預設按鈕", e);
+                // Fallback or default buttons if needed
+            }
+        }
+
+        function renderFabMenu(config) {
+            const subMenu = document.getElementById('fab_sub_menu');
+            subMenu.innerHTML = '';
+
+            // Filter visible items and render them
+            // The container uses flex-direction: column-reverse, 
+            // so the FIRST item in the array will be at the BOTTOM (closest to main FAB).
+            config.filter(item => item.visible).forEach(item => {
+                const btn = document.createElement('div');
+                btn.className = 'circle-btn';
+                btn.title = item.title;
+                btn.setAttribute('onclick', item.action);
+
+                const span = document.createElement('span');
+                span.className = 'material-symbols-rounded';
+                span.innerText = item.icon;
+
+                btn.appendChild(span);
+                subMenu.appendChild(btn);
+            });
+        }
 
         // Manual Image Upload Logic
         function triggerImageUpload() {
@@ -944,16 +956,7 @@
             return key;
         }
 
-        function clearApiKey() {
-            if (localStorage.getItem('GEMINI_API_KEY')) {
-                if (confirm("確定要清除儲存在此電腦上的 API Key 嗎？")) {
-                    localStorage.removeItem('GEMINI_API_KEY');
-                    alert("API Key 已清除。下次生成背景時將重新詢問。");
-                }
-            } else {
-                alert("目前電腦中沒有儲存任何 API Key。");
-            }
-        }
+
 
         async function executeAIBackground() {
             const overlay = document.getElementById('loading_overlay');
