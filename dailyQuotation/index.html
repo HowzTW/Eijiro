@@ -730,16 +730,25 @@
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 15px;">
-                <div>
-                    <div class="modal-label">選擇模型</div>
-                    <div class="modal-select-wrapper">
-                        <span class="material-symbols-rounded"
-                            style="color: var(--accent);">temp_preferences_custom</span>
-                        <select id="config_model_select" onchange="saveSelectedModel()">
-                            <option value="gemini-3.1-flash-image-preview">Nano Banana 2 (3.1 Flash)</option>
-                            <option value="gemini-3-pro-image-preview">Nano Banana Pro (3 Pro)</option>
-                            <option value="gemini-2.5-flash-image">Nano Banana (2.5 Flash)</option>
-                        </select>
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex: 1;">
+                        <div class="modal-label">選擇供應商</div>
+                        <div class="modal-select-wrapper">
+                            <span class="material-symbols-rounded" style="color: var(--accent);">cloud_queue</span>
+                            <select id="config_provider_select" onchange="updateAiModels()">
+                                <option value="gemini">Google Gemini</option>
+                                <option value="openai">OpenAI</option>
+                                <option value="nvidia">NVIDIA NIM</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex: 1.5;">
+                        <div class="modal-label">選擇模型</div>
+                        <div class="modal-select-wrapper">
+                            <span class="material-symbols-rounded"
+                                style="color: var(--accent);">temp_preferences_custom</span>
+                            <select id="config_model_select"></select>
+                        </div>
                     </div>
                 </div>
 
@@ -852,17 +861,6 @@
                     <div class="api-key-input-group">
                         <input type="password" id="key_openai" class="api-key-input" placeholder="Enter API Key...">
                         <button id="btn_openai" class="key-btn btn-set" onclick="toggleApiKey('openai')">
-                            <span class="material-symbols-rounded">settings</span> 設定
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Groq -->
-                <div class="api-key-row">
-                    <div class="api-key-label">Groq</div>
-                    <div class="api-key-input-group">
-                        <input type="password" id="key_groq" class="api-key-input" placeholder="Enter API Key...">
-                        <button id="btn_groq" class="key-btn btn-set" onclick="toggleApiKey('groq')">
                             <span class="material-symbols-rounded">settings</span> 設定
                         </button>
                     </div>
@@ -1178,8 +1176,32 @@
             const defaultPrompt = `A professional 3:4 vertical masterpiece photography featuring ${backgroundEn} (${backgroundCh}). Focus only on the scenery and atmosphere. Strictly prohibit any text, writing, alphabets, or signatures. Cinematic lighting, photorealistic, 8k resolution, clean background.`;
 
             promptArea.innerText = defaultPrompt;
-            setupModelSelection();
+            updateAiModels(); // Initialize models based on default provider
             modal.style.display = 'flex';
+        }
+
+        const PROVIDER_MODELS = {
+            gemini: [
+                { id: 'gemini-2.5-flash-image', name: 'Nano Banana (Gemini 2.5 Flash Preview Image)' },
+                { id: 'gemini-3.1-flash-image-preview', name: 'Nano Banana 2 (Gemini 3.1 Flash Image)' },
+                { id: 'gemini-3-pro-image-preview', name: 'Nano Banana Pro (Gemini 3 Pro Image)' }
+            ],
+            openai: [
+                { id: 'dall-e-3', name: 'DALL-E 3 (High Quality)' },
+                { id: 'dall-e-2', name: 'DALL-E 2 (Standard)' }
+            ],
+            nvidia: [
+                { id: 'black-forest-labs/flux-1-schnell', name: 'FLUX.1 Schnell' },
+                { id: 'nvidia/stable-diffusion-xl', name: 'Stable Diffusion XL' }
+            ]
+        };
+
+        function updateAiModels() {
+            const provider = document.getElementById('config_provider_select').value;
+            const modelSelect = document.getElementById('config_model_select');
+            const models = PROVIDER_MODELS[provider] || [];
+
+            modelSelect.innerHTML = models.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
         }
 
         function closeAIConfigModal() {
@@ -1232,12 +1254,15 @@
         async function executeAIBackground() {
             const overlay = document.getElementById('loading_overlay');
             const posterCard = document.getElementById('poster_card');
-            const prompt = document.getElementById('config_prompt_area').innerText;
+            const promptValue = document.getElementById('config_prompt_area').innerText;
+            const provider = document.getElementById('config_provider_select').value;
             const modelName = document.getElementById('config_model_select').value;
 
-            const apiKey = getApiKey();
+            const storageKey = API_PROVIDERS[provider];
+            const apiKey = localStorage.getItem(storageKey);
+
             if (!apiKey) {
-                alert("未輸入 API Key，無法生成背景。");
+                alert(`未設定 ${provider.toUpperCase()} API Key，請先前往「管理 API Key」設定。`);
                 return;
             }
 
@@ -1245,39 +1270,78 @@
             overlay.style.display = 'flex';
 
             try {
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+                let apiUrl, body, headers, base64Data;
+
+                if (provider === 'gemini') {
+                    apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+                    headers = { 'Content-Type': 'application/json' };
+                    body = { contents: [{ parts: [{ text: promptValue }] }] };
+                } else if (provider === 'openai') {
+                    apiUrl = 'https://api.openai.com/v1/images/generations';
+                    headers = {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    };
+                    body = {
+                        model: modelName,
+                        prompt: promptValue,
+                        n: 1,
+                        size: "1024x1024",
+                        response_format: "b64_json"
+                    };
+                } else if (provider === 'nvidia') {
+                    apiUrl = `https://ai.api.nvidia.com/v1/genai/${modelName}`;
+                    headers = {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Accept': 'application/json'
+                    };
+                    body = {
+                        prompt: promptValue,
+                        accept: 'image/png'
+                    };
+                }
 
                 const response = await fetch(apiUrl, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }]
-                    })
+                    headers: headers,
+                    body: JSON.stringify(body)
                 });
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    if (errorData.error?.message.includes("leaked")) {
-                        localStorage.removeItem('GEMINI_API_KEY');
-                        throw new Error("API Key 已被 Google 偵測為洩漏並失效。請前往 AI Studio 撤銷舊 Key、建立新 Key，並重新整理網頁後再次輸入。");
-                    }
-                    throw new Error(errorData.error?.message || "API 請求失敗");
+                    throw new Error(errorData.error?.message || errorData.message || "API 請求失敗");
                 }
 
                 const data = await response.json();
 
-                // Extract image from standard Gemini generateContent response
-                if (data.candidates && data.candidates[0].content.parts) {
-                    const imagePart = data.candidates[0].content.parts.find(p => p.inlineData);
-                    if (imagePart) {
-                        const base64Data = imagePart.inlineData.data;
-                        posterCard.style.backgroundImage = `url(data:image/png;base64,${base64Data})`;
-                    } else {
-                        const textResponse = data.candidates[0].content.parts[0].text;
-                        throw new Error("模型未回傳影像資料。AI 回應：" + (textResponse || "無"));
+                if (provider === 'gemini') {
+                    if (data.candidates && data.candidates[0].content.parts) {
+                        const imagePart = data.candidates[0].content.parts.find(p => p.inlineData);
+                        if (imagePart) {
+                            base64Data = imagePart.inlineData.data;
+                        } else {
+                            throw new Error("Gemini 未回傳影像資料");
+                        }
                     }
-                } else {
-                    throw new Error("模型未回傳有效回應");
+                } else if (provider === 'openai') {
+                    if (data.data && data.data[0].b64_json) {
+                        base64Data = data.data[0].b64_json;
+                    } else {
+                        throw new Error("OpenAI 未回傳影像資料");
+                    }
+                } else if (provider === 'nvidia') {
+                    if (data.image) {
+                        base64Data = data.image; // NVIDIA NIM usually returns base64 in 'image' field for some models or binary
+                    } else if (data.artifacts && data.artifacts[0].base64) {
+                        base64Data = data.artifacts[0].base64;
+                    } else {
+                        throw new Error("NVIDIA NIM 未回傳有效影像資料");
+                    }
+                }
+
+                if (base64Data) {
+                    posterCard.style.backgroundImage = `url(data:image/png;base64,${base64Data})`;
                 }
             } catch (error) {
                 console.error("AI Background Generation Failed:", error);
@@ -1335,7 +1399,6 @@
         const API_PROVIDERS = {
             gemini: 'GEMINI_API_KEY',
             openai: 'OPENAI_API_KEY',
-            groq: 'GROQ_API_KEY',
             nvidia: 'NVIDIA_API_KEY'
         };
 
