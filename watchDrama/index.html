@@ -134,14 +134,14 @@
         /* --- Grid (Home & Library) --- */
         .drama-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); /* 卡片放寬方便閱讀 */
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); /* 卡片放寬方便閱讀 */
+            gap: 1.5rem;
         }
 
         /* 橫向卡片排列 (用於首頁) */
         .drama-list {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); /* 在電腦上可並排，手機上自動佔滿 */
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr)); /* 在電腦上可並排，手機上自動佔滿 */
             gap: 1.5rem;
         }
 
@@ -161,7 +161,7 @@
         .drama-card-horizontal:hover { border-color: var(--primary); background: #2d3748; }
         
         .drama-card-horizontal .img-box {
-            width: 140px;
+            width: clamp(100px, 35vw, 140px); /* 手機上自動縮小，保留文字空間 */
             flex-shrink: 0;
             aspect-ratio: 2/3;
             border-radius: 16px;
