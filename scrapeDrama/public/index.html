@@ -109,6 +109,23 @@
             box-shadow: 0 8px 25px var(--primary-glow);
         }
 
+        .btn-secondary {
+            background: #0ea5e9; /* Sky blue */
+            color: #fff;
+            border: none;
+        }
+
+        .btn-secondary:hover {
+            background: #38bdf8;
+            box-shadow: 0 8px 25px rgba(14, 165, 233, 0.3);
+        }
+
+        #navButtons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
         /* --- Dashboard View --- */
         .drama-grid {
             display: grid;
@@ -315,6 +332,10 @@
         <header>
             <h1><img src="icon.png" alt="Logo" class="logo-img"> 抓劇小幫手</h1>
             <div id="navButtons">
+                <!-- 新增的小鴨影音捷徑按鈕 -->
+                <a href="https://777tv.ai" target="_blank" class="btn btn-secondary">
+                    <span class="material-symbols-outlined">exit_to_app</span> 小鴨影音
+                </a>
                 <button id="showAddBtn" class="btn btn-primary">
                     <span class="material-symbols-outlined">add_circle</span> 新增劇集
                 </button>
