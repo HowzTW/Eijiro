@@ -441,7 +441,7 @@
         <div id="playerView" class="view">
             <div class="player-container">
                 <!-- 標題與返回 -->
-                <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+                <h2 style="margin-bottom: 1.5rem; display: flex; align-items: flex-start; justify-content: space-between;">
                     <div id="playerTitle" style="font-size: 1.8rem; font-weight: 800; color: #fff;"></div>
                     <button class="btn" onclick="goHome()" style="padding: 0.6rem 1.2rem; border-radius: 12px;">
                         <span class="material-symbols-outlined">arrow_back</span> 返回
@@ -459,10 +459,12 @@
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
-                        <button class="btn btn-primary" id="resumeBtn" style="flex: 1;">點擊續播</button>
-                        <button class="btn" id="prevBtn"><span class="material-symbols-outlined">skip_previous</span> 上一集</button>
-                        <button class="btn" id="nextBtn"><span class="material-symbols-outlined">skip_next</span> 下一集</button>
+                    <div style="display: flex; flex-direction: column; gap: 1.2rem; margin-bottom: 2rem;">
+                        <button class="btn btn-primary" id="resumeBtn" style="height: 70px; font-size: 1.4rem;">點擊續播</button>
+                        <div style="display: flex; gap: 1rem;">
+                            <button class="btn" id="prevBtn" style="flex: 1; height: 60px;"><span class="material-symbols-outlined">skip_previous</span> 上一集</button>
+                            <button class="btn" id="nextBtn" style="flex: 1; height: 60px;"><span class="material-symbols-outlined">skip_next</span> 下一集</button>
+                        </div>
                     </div>
 
                     <div id="lineSelector" class="line-selector"></div>
@@ -507,13 +509,24 @@
         let userLibrary = [];
         let userProgress = [];
         let currentDrama = null;
-        let currentLine = 0;
-        let currentEpIdx = 0;
+        let playingLineIdx = 0; // 正在播放/預載的線路索引
+        let playingEpIdx = 0;   // 正在播放/預載的集數索引
+        let viewingLineIdx = 0; // 目前正在切換標籤觀看的線路索引
 
         // --- 初始化 ---
         window.onload = async () => {
             updateFileModTime(); // 初始化顯示檔案最後修改時間
             const savedUser = localStorage.getItem('watch_user');
+
+            // 設定影片自動播放下一集
+            const video = document.getElementById('videoPlayer');
+            video.onended = () => {
+                const lines = JSON.parse(currentDrama.sources);
+                if (playingEpIdx < lines[playingLineIdx].episodes.length - 1) {
+                    playVideo(playingLineIdx, playingEpIdx + 1);
+                }
+            };
+
             if (savedUser) {
                 currentUser = JSON.parse(savedUser);
                 // 如果有緩存，先用緩存資料渲染首頁，避免白畫面
@@ -624,9 +637,18 @@
 
         // --- 畫面渲染 ---
         function showView(viewId) {
+            const activeView = document.querySelector('.view.active');
+            if (activeView && activeView.id === 'playerView' && viewId !== 'playerView') {
+                stopPlayback();
+            }
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
             window.scrollTo(0,0);
+        }
+
+        function stopPlayback() {
+            const video = document.getElementById('videoPlayer');
+            if (video) video.pause();
         }
 
         async function goHome() {
@@ -790,13 +812,13 @@
             `).join('');
 
             // 如果有進度，選取上次的線路，否則選第一個
-            currentLine = progress ? lines.findIndex(l => l.line_name === progress.lineName) : 0;
-            if (currentLine === -1) currentLine = 0;
-            selectLine(currentLine, progress ? progress.episodeName : null);
+            viewingLineIdx = progress ? lines.findIndex(l => l.line_name === progress.lineName) : 0;
+            if (viewingLineIdx === -1) viewingLineIdx = 0;
+            selectLine(viewingLineIdx);
         }
 
-        function selectLine(idx, highlightEp = null) {
-            currentLine = idx;
+        function selectLine(idx) {
+            viewingLineIdx = idx;
             document.querySelectorAll('.line-tab').forEach(t => t.classList.remove('active'));
             document.getElementById(`line-tab-${idx}`).classList.add('active');
 
@@ -804,28 +826,34 @@
             const episodes = lines[idx].episodes;
             const grid = document.getElementById('episodeGrid');
             
-            grid.innerHTML = episodes.map((ep, eIdx) => `
-                <button class="ep-btn ${highlightEp === ep.name ? 'active' : ''}" 
-                        onclick="playVideo(${idx}, ${eIdx})">
-                    ${ep.name}
-                </button>
-            `).join('');
-
-            if (highlightEp) {
-                document.getElementById('playerProgress').innerText = `上次觀看：${lines[idx].line_name} - ${highlightEp}`;
-            } else {
-                document.getElementById('playerProgress').innerText = '尚未開始觀看或紀錄中';
-            }
+            // 從這部劇的當前進度（含剛剛點選的）來決定 highlight
+            const progress = userProgress.find(p => p.dramaId.toString() === currentDrama.id.toString());
+            
+            grid.innerHTML = episodes.map((ep, eIdx) => {
+                const isCurrent = progress && progress.lineName === lines[idx].line_name && progress.episodeName === ep.name;
+                return `
+                    <button class="ep-btn ${isCurrent ? 'active' : ''}" 
+                            onclick="playVideo(${idx}, ${eIdx})">
+                        ${ep.name}
+                    </button>
+                `;
+            }).join('');
         }
 
         async function playVideo(lineIdx, epIdx, autoPlay = true) {
-            currentLine = lineIdx;
-            currentEpIdx = epIdx;
+            playingLineIdx = lineIdx;
+            playingEpIdx = epIdx;
             
             const lines = JSON.parse(currentDrama.sources);
             const line = lines[lineIdx];
             const ep = line.episodes[epIdx];
             const video = document.getElementById('videoPlayer');
+
+            // 立即同步本機進度，讓切換標籤時 highlight 能維持
+            const progIdx = userProgress.findIndex(p => p.dramaId.toString() === currentDrama.id.toString());
+            const newProg = { dramaId: currentDrama.id, lineName: line.line_name, episodeName: ep.name };
+            if (progIdx !== -1) userProgress[progIdx] = newProg;
+            else userProgress.push(newProg);
 
             // HLS 播放邏輯
             if (Hls.isSupported()) {
@@ -844,10 +872,18 @@
                 }
             }
 
-            // 更新高亮
-            document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.ep-btn')[epIdx].classList.add('active');
-            document.getElementById('playerProgress').innerText = `正在播放：${line.line_name} - ${ep.name}`;
+            // 更新高亮與按鈕狀態 (僅當目前觀看的線路就是播放的線路時)
+            if (viewingLineIdx === lineIdx) {
+                document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
+                const epButtons = document.querySelectorAll('.ep-btn');
+                if (epButtons[epIdx]) epButtons[epIdx].classList.add('active');
+            }
+            
+            document.getElementById('playerProgress').innerText = `${autoPlay ? '正在播放' : '備妥待播'}：${line.line_name} - ${ep.name}`;
+
+            // 更新 上一集 / 下一集 按鈕狀態
+            document.getElementById('prevBtn').disabled = (epIdx === 0);
+            document.getElementById('nextBtn').disabled = (epIdx === line.episodes.length - 1);
 
             // 同步進度到雲端
             await fetch(GAS_2, {
@@ -877,12 +913,12 @@
         };
 
         document.getElementById('prevBtn').onclick = () => {
-            if (currentEpIdx > 0) playVideo(currentLine, currentEpIdx - 1);
+            if (playingEpIdx > 0) playVideo(playingLineIdx, playingEpIdx - 1);
         };
 
         document.getElementById('nextBtn').onclick = () => {
             const lines = JSON.parse(currentDrama.sources);
-            if (currentEpIdx < lines[currentLine].episodes.length - 1) playVideo(currentLine, currentEpIdx + 1);
+            if (playingEpIdx < lines[playingLineIdx].episodes.length - 1) playVideo(playingLineIdx, playingEpIdx + 1);
         };
     </script>
 </body>
