@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>777TV 影視抓取助手</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+            --success: #22c55e;
+            --error: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            padding: 2rem;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.8rem;
+            color: #fff;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 1.2rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.8rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background: #475569;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-container {
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(to right, var(--primary), #c084fc);
+            transition: width 0.3s ease;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+        }
+
+        .log-container {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 0.8rem;
+            max-height: 150px;
+            overflow-y: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.8rem;
+            color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .log-entry {
+            margin-bottom: 0.4rem;
+            border-left: 2px solid var(--primary);
+            padding-left: 0.6rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .status-badge.success { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        .status-badge.error { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+        .loader {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>777TV Scraper</h1>
+            <p>即時抓取影視連結並同步至 Google Sheets</p>
+        </div>
+
+        <div class="card">
+            <div class="form-group">
+                <label for="id">影片 ID (例: 351808)</label>
+                <input type="text" id="id" placeholder="輸入 ID 開始執行任務" autocomplete="off">
+            </div>
+            
+            <button id="scrapeBtn">
+                <span id="btnText">啟動抓取任務</span>
+            </button>
+
+            <div id="progressSection" class="progress-container">
+                <div class="progress-info">
+                    <span id="progressMsg">準備中...</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div id="progressBar" class="progress-bar-fill"></div>
+                </div>
+                <div id="log" class="log-container">
+                    <div class="log-entry">等待任務啟動...</div>
+                </div>
+                <div id="finalStatus" style="display: none;">
+                    <div id="statusBadge" class="status-badge"></div>
+                    <div id="resultSummary" style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-dim);"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Real-time Scraper v2.0 • Node.js Backend
+        </div>
+    </div>
+
+    <script>
+        const scrapeBtn = document.getElementById('scrapeBtn');
+        const idInput = document.getElementById('id');
+        const progressSection = document.getElementById('progressSection');
+        const progressBar = document.getElementById('progressBar');
+        const progressMsg = document.getElementById('progressMsg');
+        const progressPercent = document.getElementById('progressPercent');
+        const log = document.getElementById('log');
+        const btnText = document.getElementById('btnText');
+        const finalStatus = document.getElementById('finalStatus');
+        const statusBadge = document.getElementById('statusBadge');
+        const resultSummary = document.getElementById('resultSummary');
+
+        scrapeBtn.addEventListener('click', () => {
+            const id = idInput.value.trim();
+            if (!id) return alert('請先輸入影片 ID');
+
+            // Reset UI
+            log.innerHTML = '';
+            progressSection.style.display = 'block';
+            finalStatus.style.display = 'none';
+            progressBar.style.width = '0%';
+            progressPercent.innerText = '0%';
+            setLoading(true);
+
+            // Start SSE Connection
+            const eventSource = new EventSource(`/api/scrape-progress?id=${id}`);
+
+            eventSource.addEventListener('status', (e) => {
+                const data = JSON.parse(e.data);
+                addLog(data.message);
+                progressMsg.innerText = data.message;
+            });
+
+            eventSource.addEventListener('progress', (e) => {
+                const data = JSON.parse(e.data);
+                const percent = Math.round((data.current / data.total) * 100);
+                progressBar.style.width = percent + '%';
+                progressPercent.innerText = percent + '%';
+                progressMsg.innerText = `正在抓取：${data.line}`;
+                addLog(`${data.line} - ${data.episode} (${data.current}/${data.total})`);
+            });
+
+            eventSource.addEventListener('done', (e) => {
+                const data = JSON.parse(e.data);
+                eventSource.close();
+                setLoading(false);
+                
+                finalStatus.style.display = 'block';
+                if (data.success) {
+                    statusBadge.className = 'status-badge success';
+                    statusBadge.innerText = '任務完成';
+                    
+                    let coverHtml = '';
+                    if (data.data.cover_image) {
+                        coverHtml = `<img src="${data.data.cover_image}" style="width: 100px; border-radius: 0.5rem; float: left; margin-right: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">`;
+                    }
+
+                    resultSummary.innerHTML = `
+                        <div style="overflow: hidden;">
+                            ${coverHtml}
+                            <strong>${data.data.name}</strong><br>
+                            <span style="font-size: 0.8rem; display: block; margin-top: 4px;">${data.status}</span>
+                        </div>
+                        <div style="clear: both;"></div>
+                    `;
+                    addLog('✅ 任務圓滿結束');
+                } else {
+                    statusBadge.className = 'status-badge error';
+                    statusBadge.innerText = '任務失敗';
+                    resultSummary.innerText = data.error;
+                    addLog('❌ 發生錯誤：' + data.error);
+                }
+            });
+
+            eventSource.onerror = (err) => {
+                console.error('SSE Error:', err);
+                eventSource.close();
+                setLoading(false);
+                showError('伺服器連線中斷或逾時');
+            };
+        });
+
+        function addLog(msg) {
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            div.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            log.appendChild(div);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function setLoading(isLoading) {
+            scrapeBtn.disabled = isLoading;
+            idInput.disabled = isLoading;
+            if (isLoading) {
+                btnText.innerHTML = '<div class="loader"></div> 正在連線伺服器...';
+            } else {
+                btnText.innerText = '啟動抓取任務';
+            }
+        }
+
+        function showError(msg) {
+            addLog('🛑 ' + msg);
+            finalStatus.style.display = 'block';
+            statusBadge.className = 'status-badge error';
+            statusBadge.innerText = '連線失敗';
+        }
+    </script>
+</body>
+</html>
