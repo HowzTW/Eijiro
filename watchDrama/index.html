@@ -141,7 +141,7 @@
         /* 橫向卡片排列 (用於首頁) */
         .drama-list {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr)); /* 在電腦上可並排，手機上自動佔滿 */
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); /* 在電腦上排版更緊湊，可容納三張 */
             gap: 1.5rem;
         }
 
@@ -155,7 +155,7 @@
             border: 2px solid transparent;
             cursor: pointer;
             transition: all 0.3s;
-            align-items: center;
+            align-items: stretch; /* 讓圖片與內容等高 */
         }
 
         .drama-card-horizontal:hover { border-color: var(--primary); background: #2d3748; }
@@ -179,7 +179,6 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
             overflow: hidden;
         }
 
@@ -187,26 +186,20 @@
             font-size: 1.8rem;
             font-weight: 800;
             color: #fff;
-            white-space: nowrap;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
             overflow: hidden;
-            text-overflow: ellipsis;
+            line-height: 1.4;
         }
 
         .drama-card-horizontal .progress-text {
             color: var(--primary);
             font-size: 1.1rem;
             font-weight: 800;
-            margin: 0.2rem 0;
-        }
-
-        .drama-card-horizontal .intro-text {
-            color: var(--text-dim);
-            font-size: 1.05rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            line-height: 1.5;
+            margin: 0;
+            margin-top: auto; /* 推到底部 */
+            text-align: right; /* 靠右對齊 */
         }
 
         .drama-card-horizontal { position: relative; } /* 為右上角按鈕做準備 */
@@ -683,7 +676,6 @@
                             <div class="progress-text">
                                 ${progress ? `上次觀看：${progress.lineName} - ${progress.episodeName}` : '尚未開始觀看或紀錄中'}
                             </div>
-                            <div class="intro-text">${drama.introduction}</div>
                         </div>
                     </div>
                 `;
