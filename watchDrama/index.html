@@ -39,13 +39,13 @@
         .header {
             position: fixed;
             top: 0; left: 0; right: 0;
-            height: 80px; /* 加高 Header */
+            height: calc(80px + env(safe-area-inset-top)); /* 考慮 iOS 劉海高度 */
+            padding: env(safe-area-inset-top) 1.5rem 0 1.5rem; /* 將內容往下推 */
             background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(15px);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 1.5rem;
             z-index: 1000;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -63,7 +63,7 @@
         }
 
         .main-content {
-            padding: 110px 1.5rem 2rem;
+            padding: calc(110px + env(safe-area-inset-top)) 1.5rem calc(2rem + env(safe-area-inset-bottom)); /* 支援 iOS 安全邊距 */
             max-width: 1200px;
             margin: 0 auto;
         }
@@ -311,7 +311,7 @@
             align-items: center;
             justify-content: center;
             z-index: 2000;
-            padding: 1.5rem;
+            padding: calc(1.5rem + env(safe-area-inset-top)) 1.5rem calc(1.5rem + env(safe-area-inset-bottom));
             backdrop-filter: blur(8px);
         }
 
