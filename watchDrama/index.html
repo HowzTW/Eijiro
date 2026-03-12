@@ -511,13 +511,30 @@
             updateFileModTime(); // 初始化顯示檔案最後修改時間
             const savedUser = localStorage.getItem('watch_user');
 
-            // 設定影片自動播放下一集
+            // 設定影片自動播放下一集與進度記錄
             const video = document.getElementById('videoPlayer');
             video.onended = () => {
                 const lines = JSON.parse(currentDrama.sources);
                 if (playingEpIdx < lines[playingLineIdx].episodes.length - 1) {
                     playVideo(playingLineIdx, playingEpIdx + 1);
                 }
+            };
+
+            video.ontimeupdate = () => {
+                if (!currentDrama || !currentUser) return;
+                const progIdx = userProgress.findIndex(p => p.dramaId.toString() === currentDrama.id.toString());
+                if (progIdx !== -1) {
+                    const MathFloorTs = Math.floor(video.currentTime);
+                    if (video._lastTs !== MathFloorTs) {
+                        video._lastTs = MathFloorTs;
+                        userProgress[progIdx].timestamp = MathFloorTs;
+                        localStorage.setItem(`cache_user_data_${currentUser.userId}`, JSON.stringify({library: userLibrary, progress: userProgress}));
+                    }
+                }
+            };
+
+            video.onpause = () => {
+                syncProgressToCloud();
             };
 
             if (savedUser) {
@@ -641,7 +658,29 @@
 
         function stopPlayback() {
             const video = document.getElementById('videoPlayer');
-            if (video) video.pause();
+            if (video) {
+                if (!video.paused) video.pause(); // 這會觸發 onpause 並呼叫 syncProgressToCloud
+                else syncProgressToCloud(); // 如果已經暫停，主動呼叫一次以防萬一
+            }
+        }
+
+        function syncProgressToCloud() {
+            if (!currentDrama || !currentUser) return;
+            const prog = userProgress.find(p => p.dramaId.toString() === currentDrama.id.toString());
+            if (!prog) return;
+
+            fetch(GAS_2, {
+                method: 'POST',
+                keepalive: true, // 確保頁面關閉時請求仍能發送
+                body: JSON.stringify({
+                    action: 'update_progress',
+                    userId: currentUser.userId,
+                    dramaId: currentDrama.id,
+                    lineName: prog.lineName,
+                    episodeName: prog.episodeName,
+                    timestamp: prog.timestamp || 0
+                })
+            }).catch(e => console.error("Sync progress failed", e));
         }
 
         async function goHome() {
@@ -841,11 +880,24 @@
             const ep = line.episodes[epIdx];
             const video = document.getElementById('videoPlayer');
 
-            // 立即同步本機進度，讓切換標籤時 highlight 能維持
+            // 取得先前的時間 (如果是續播同一集)
+            let startTimestamp = 0;
             const progIdx = userProgress.findIndex(p => p.dramaId.toString() === currentDrama.id.toString());
-            const newProg = { dramaId: currentDrama.id, lineName: line.line_name, episodeName: ep.name };
+            if (progIdx !== -1) {
+                const p = userProgress[progIdx];
+                if (p.lineName === line.line_name && p.episodeName === ep.name && p.timestamp) {
+                    startTimestamp = p.timestamp;
+                }
+            }
+
+            // 立即同步本機進度，讓切換標籤時 highlight 能維持
+            const newProg = { dramaId: currentDrama.id, lineName: line.line_name, episodeName: ep.name, timestamp: startTimestamp };
             if (progIdx !== -1) userProgress[progIdx] = newProg;
             else userProgress.push(newProg);
+            
+            // 寫入快取
+            localStorage.setItem(`cache_user_data_${currentUser.userId}`, JSON.stringify({library: userLibrary, progress: userProgress}));
+            video._lastTs = startTimestamp; // 重置影片記憶體標記
 
             // HLS 播放邏輯
             if (Hls.isSupported()) {
@@ -855,13 +907,15 @@
                 hls.loadSource(ep.play_url);
                 hls.attachMedia(video);
                 hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    if (startTimestamp > 0) video.currentTime = startTimestamp;
                     if (autoPlay) video.play();
                 });
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = ep.play_url;
-                if (autoPlay) {
-                    video.addEventListener('loadedmetadata', () => video.play(), { once: true });
-                }
+                video.addEventListener('loadedmetadata', () => {
+                    if (startTimestamp > 0) video.currentTime = startTimestamp;
+                    if (autoPlay) video.play();
+                }, { once: true });
             }
 
             // 更新高亮與按鈕狀態 (僅當目前觀看的線路就是播放的線路時)
@@ -878,17 +932,7 @@
             document.getElementById('nextBtn').disabled = (epIdx === line.episodes.length - 1);
 
             // 同步進度到雲端
-            await fetch(GAS_2, {
-                method: 'POST',
-                body: JSON.stringify({
-                    action: 'update_progress',
-                    userId: currentUser.userId,
-                    dramaId: currentDrama.id,
-                    lineName: line.line_name,
-                    episodeName: ep.name,
-                    timestamp: 0 // 未來可實作詳細秒數同步
-                })
-            });
+            syncProgressToCloud();
         }
 
         // 續播、上一集、下一集
