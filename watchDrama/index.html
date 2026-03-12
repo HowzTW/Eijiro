@@ -209,6 +209,32 @@
             line-height: 1.5;
         }
 
+        .drama-card-horizontal { position: relative; } /* 為右上角按鈕做準備 */
+
+        .remove-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 36px;
+            height: 36px;
+            background: rgba(244, 63, 94, 0.15);
+            color: var(--danger);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(244, 63, 94, 0.2);
+            z-index: 10;
+        }
+
+        .remove-btn:hover {
+            background: var(--danger);
+            color: #fff;
+            transform: scale(1.1);
+        }
+
         /* 探索清單樣式 (條列式) */
         .library-list {
             background: var(--card-bg);
@@ -275,6 +301,46 @@
         .loading { text-align: center; padding: 5rem; font-size: 1.2rem; color: var(--text-dim); }
         .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1.5rem; }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* --- Modal (Elderly Friendly) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 1.5rem;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 500px;
+            border-radius: 32px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            border: 2px solid rgba(255,255,255,0.1);
+            animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .modal-message {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 2.5rem;
+            line-height: 1.4;
+            color: #fff;
+        }
+
+        .modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
     </style>
 </head>
 <body>
@@ -285,8 +351,9 @@
             <h1 style="font-size: 1.4rem; font-weight: 800;">追劇小幫手</h1>
         </div>
         <div style="display: flex; gap: 1rem;">
-            <button class="btn" onclick="showView('libraryView')"><span class="material-symbols-outlined">explore</span> 找劇去</button>
-            <button class="btn" onclick="logout()" id="userBtn"></button>
+            <button class="btn" onclick="logout()" id="userBtn">
+                <span class="material-symbols-outlined">account_circle</span> <span></span>
+            </button>
         </div>
     </header>
 
@@ -300,14 +367,19 @@
 
         <!-- 2. 我要追的劇 (首頁) -->
         <div id="homeView" class="view">
-            <h2 style="margin-bottom: 2rem; display: flex; align-items: center; gap: 0.6rem;">
-                <span class="material-symbols-outlined" style="color: var(--primary);">favorite</span> 我的追劇清單
+            <h2 style="margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                    <span class="material-symbols-outlined" style="color: var(--primary);">favorite</span> 我的追劇清單
+                </div>
+                <button class="btn btn-primary" onclick="showView('libraryView')" style="padding: 0.6rem 1.2rem; border-radius: 12px;">
+                    <span class="material-symbols-outlined">settings_suggest</span> 管理
+                </button>
             </h2>
             <div id="myDramaGrid" class="drama-list"></div>
             
             <!-- 版本資訊與重新整理 -->
             <div style="margin-top: 4rem; text-align: center; color: var(--text-dim); font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 1rem; padding-bottom: 3rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 2rem;">
-                <span>最後修改時間：2026-03-12 17:05:00</span>
+                <span id="fileModTime">最後修改時間：載入中...</span>
                 <button class="btn" style="min-width: auto; width: 50px; height: 50px; border-radius: 50%; padding: 0;" onclick="location.reload()" title="重新整理頁面">
                     <span class="material-symbols-outlined">refresh</span>
                 </button>
@@ -316,8 +388,13 @@
 
         <!-- 3. 全域劇庫 (找劇) -->
         <div id="libraryView" class="view">
-            <h2 style="margin-bottom: 2rem; display: flex; align-items: center; gap: 0.6rem;">
-                <span class="material-symbols-outlined" style="color: var(--primary);">explore</span> 探索完整資料庫
+            <h2 style="margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                    <span class="material-symbols-outlined" style="color: var(--primary);">explore</span> 管理追劇清單
+                </div>
+                <button class="btn" onclick="goHome()" style="padding: 0.6rem 1.2rem; border-radius: 12px;">
+                    <span class="material-symbols-outlined">arrow_back</span> 返回
+                </button>
             </h2>
             <div id="globalDramaGrid" class="library-list"></div>
         </div>
@@ -350,6 +427,17 @@
         </div>
     </div>
 
+    <!-- 自定義確認視窗 (長輩大字版) -->
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal-content">
+            <div id="confirmMsg" class="modal-message"></div>
+            <div class="modal-actions">
+                <button class="btn btn-danger" style="height: 70px; font-size: 1.4rem;" id="modalConfirmBtn">確定，我要取消追蹤</button>
+                <button class="btn" style="height: 70px; font-size: 1.4rem;" onclick="closeModal()">我點錯了，不要取消</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // --- 設定 (由您提供的 URL) ---
         const GAS_1 = "https://script.google.com/macros/s/AKfycbzwHa2fa4e_QdyfD3z01tXepwY9ZyY98UlS_6mjVGOsPZaoHVloSyEc9_kJniuNn2_X/exec";
@@ -366,6 +454,7 @@
 
         // --- 初始化 ---
         window.onload = async () => {
+            updateFileModTime(); // 初始化顯示檔案最後修改時間
             const savedUser = localStorage.getItem('watch_user');
             if (savedUser) {
                 currentUser = JSON.parse(savedUser);
@@ -433,7 +522,8 @@
 
         async function startApp() {
             document.getElementById('appHeader').style.display = 'flex';
-            document.getElementById('userBtn').innerText = `👋 ${currentUser.userName}`;
+            const userBtn = document.getElementById('userBtn');
+            userBtn.querySelector('span:last-child').innerText = currentUser.userName;
             
             // 同步載入資料
             await Promise.all([syncGlobalList(), syncUserLibrary()]);
@@ -448,7 +538,7 @@
             } catch (e) { console.error("Global sync failed", e); }
         }
 
-        async function syncUserLibrary() {
+        async function syncUserLibrary(skipHomeRefresh = false) {
             try {
                 const res = await fetch(`${GAS_2}?action=get_user_data&userId=${currentUser.userId}`);
                 const data = await res.json();
@@ -458,9 +548,20 @@
                 // 緩存用戶專屬資料
                 localStorage.setItem(`cache_user_data_${currentUser.userId}`, JSON.stringify(data));
                 
-                renderHome();
+                if (!skipHomeRefresh) renderHome();
                 renderLibrary();
             } catch (e) { console.error("User sync failed", e); }
+        }
+
+        function updateFileModTime() {
+            const lastMod = new Date(document.lastModified);
+            const formatted = lastMod.getFullYear() + '-' + 
+                              (lastMod.getMonth() + 1).toString().padStart(2, '0') + '-' + 
+                              lastMod.getDate().toString().padStart(2, '0') + ' ' + 
+                              lastMod.getHours().toString().padStart(2, '0') + ':' + 
+                              lastMod.getMinutes().toString().padStart(2, '0') + ':' + 
+                              lastMod.getSeconds().toString().padStart(2, '0');
+            document.getElementById('fileModTime').innerText = `最後修改時間：${formatted}`;
         }
 
         // --- 畫面渲染 ---
@@ -478,7 +579,7 @@
         function renderHome() {
             const grid = document.getElementById('myDramaGrid');
             if (userLibrary.length === 0) {
-                grid.innerHTML = '<div style="text-align: center; padding: 4rem;">目前沒有追蹤的劇集，去「找劇」看看吧！</div>';
+                grid.innerHTML = '<div style="text-align: center; padding: 4rem;">目前沒有追蹤的劇集！</div>';
                 return;
             }
 
@@ -491,6 +592,9 @@
                 const progress = userProgress.find(p => p.dramaId.toString() === item.dramaId.toString());
                 return `
                     <div class="drama-card-horizontal" onclick="openPlayer('${drama.id}')">
+                        <div class="remove-btn" onclick="confirmUntrack(event, '${drama.id}', '${drama.name.replace(/'/g, "\\'")}')" title="取消追蹤">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                        </div>
                         <div class="img-box">
                             <img src="${drama.cover_image}">
                         </div>
@@ -530,7 +634,7 @@
                                 ${isFollowed ? '<span class="material-symbols-outlined" style="font-size:1rem; vertical-align:middle;">check_circle</span> 已在追蹤清單' : '尚未追蹤'} · 更新於 ${new Date(drama.update_time).toLocaleDateString()}
                             </div>
                         </div>
-                        <button class="btn ${isFollowed ? 'btn-danger' : 'btn-success'}" id="btn-follow-${drama.id}" onclick="toggleFollow('${drama.id}')">
+                        <button class="btn ${isFollowed ? 'btn-danger' : 'btn-success'}" id="btn-follow-${drama.id}" onclick="toggleFollow('${drama.id}', true)">
                             <span class="material-symbols-outlined">${isFollowed ? 'heart_minus' : 'heart_plus'}</span>
                             ${isFollowed ? '取消追蹤' : '追　　蹤'}
                         </button>
@@ -540,7 +644,7 @@
         }
 
         // --- 管理邏輯 ---
-        async function toggleFollow(dramaId) {
+        async function toggleFollow(dramaId, skipHomeRefresh = false) {
             const btn = document.getElementById(`btn-follow-${dramaId}`);
             if (btn) btn.disabled = true;
 
@@ -555,14 +659,33 @@
                 });
                 const result = await res.json();
                 if (result.success) {
-                    await syncUserLibrary(); // 重新整理資料
+                    await syncUserLibrary(skipHomeRefresh); // 根據來源決定是否重整首頁
                 }
             } catch (e) { 
                 console.error("Toggle follow failed", e);
-                alert("抱歉，連線失敗，請稍後再試。");
+                // 這裡不彈出 alert，以免跟 confirmUntrack 衝突，交由調用者處理
             } finally {
                 if (btn) btn.disabled = false;
             }
+        }
+
+        async function confirmUntrack(event, dramaId, dramaName) {
+            event.stopPropagation();
+            const modal = document.getElementById('confirmModal');
+            const msg = document.getElementById('confirmMsg');
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+
+            msg.innerText = `確定要取消追蹤「${dramaName}」嗎？\n取消後將一併刪除播放進度喔！`;
+            modal.style.display = 'flex';
+
+            confirmBtn.onclick = async () => {
+                closeModal();
+                await toggleFollow(dramaId);
+            };
+        }
+
+        function closeModal() {
+            document.getElementById('confirmModal').style.display = 'none';
         }
 
         // --- 播放邏輯 ---
