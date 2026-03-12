@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>追劇小幫手 - 您的私人影院</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        :root {
+            --primary: #f59e0b;
+            --primary-glow: rgba(245, 158, 11, 0.3);
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+            --danger: #f43f5e;
+            --success: #10b981;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- Layout --- */
+        .header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 70px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(15px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .main-content {
+            padding: 100px 2rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* --- Components --- */
+        .btn {
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .btn:hover { background: #2d3748; transform: translateY(-2px); }
+        .btn-primary { background: var(--primary); color: #000; border: none; }
+        .btn-primary:hover { background: #fbbf24; box-shadow: 0 5px 15px var(--primary-glow); }
+
+        /* --- Views --- */
+        .view { display: none; animation: fadeIn 0.4s ease-out; }
+        .view.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- User Selector --- */
+        #userView { text-align: center; padding-top: 10vh; }
+        .user-grid { display: flex; justify-content: center; gap: 2rem; margin-top: 3rem; }
+        .user-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 200px;
+        }
+        .user-card:hover { transform: scale(1.1); border-color: var(--primary); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+        .user-avatar { 
+            width: 80px; height: 80px; background: var(--primary); border-radius: 50%; 
+            margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; color: #000; font-weight: 600;
+        }
+
+        /* --- Grid (Home & Library) --- */
+        .drama-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 2rem;
+        }
+
+        .drama-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .drama-card:hover { transform: translateY(-10px); border-color: var(--primary); }
+        .drama-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+        .drama-card .info { padding: 1rem; }
+        .drama-card .title { font-weight: 600; height: 2.8rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+        .tag-badge {
+            position: absolute; top: 10px; right: 10px;
+            background: var(--success); color: #000;
+            padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 800;
+        }
+
+        /* --- Player View --- */
+        .player-container { max-width: 900px; margin: 0 auto; }
+        #videoPlayer { width: 100%; border-radius: 16px; background: #000; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .episode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.8rem; margin-top: 1.5rem; }
+        .ep-btn {
+            background: #2d3748; border: none; padding: 0.8rem; border-radius: 8px; 
+            color: #fff; cursor: pointer; transition: 0.2s; font-size: 0.9rem;
+        }
+        .ep-btn:hover { background: #3d495d; }
+        .ep-btn.active { background: var(--primary); color: #000; font-weight: 600; }
+
+        .line-selector { display: flex; gap: 1rem; margin: 1.5rem 0; overflow-x: auto; padding-bottom: 0.5rem; }
+        .line-tab {
+            padding: 0.5rem 1.2rem; background: rgba(255,255,255,0.05); border-radius: 20px;
+            cursor: pointer; white-space: nowrap; font-size: 0.9rem;
+        }
+        .line-tab.active { background: var(--primary); color: #000; font-weight: 600; }
+
+        /* --- Utils --- */
+        .loading { text-align: center; padding: 5rem; font-size: 1.2rem; color: var(--text-dim); }
+        .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1.5rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <header class="header" id="appHeader" style="display: none;">
+        <div style="display: flex; align-items: center; gap: 1rem; cursor: pointer;" onclick="showView('homeView')">
+            <span class="material-symbols-outlined" style="color: var(--primary);">movie_filter</span>
+            <h1 style="font-size: 1.2rem;">追劇小幫手</h1>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <button class="btn" onclick="showView('libraryView')"><span class="material-symbols-outlined">explore</span> 找劇去</button>
+            <button class="btn" onclick="logout()" id="userBtn"></button>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <!-- 1. 使用者選擇頁面 -->
+        <div id="userView" class="view">
+            <h1>歡迎回來</h1>
+            <p style="color: var(--text-dim); margin-top: 0.5rem;">請選擇您的使用者身份</p>
+            <div id="userList" class="user-grid"></div>
+        </div>
+
+        <!-- 2. 我要追的劇 (首頁) -->
+        <div id="homeView" class="view">
+            <h2 style="margin-bottom: 2rem; display: flex; align-items: center; gap: 0.6rem;">
+                <span class="material-symbols-outlined" style="color: var(--primary);">favorite</span> 我的追劇清單
+            </h2>
+            <div id="myDramaGrid" class="drama-grid"></div>
+        </div>
+
+        <!-- 3. 全域劇庫 (找劇) -->
+        <div id="libraryView" class="view">
+            <h2 style="margin-bottom: 2rem;">探索完整資料庫</h2>
+            <div id="globalDramaGrid" class="drama-grid"></div>
+        </div>
+
+        <!-- 4. 播放頁面 -->
+        <div id="playerView" class="view">
+            <div class="player-container">
+                <video id="videoPlayer" controls></video>
+                
+                <div id="dramaDetail" style="margin-top: 2rem;">
+                    <div style="display: flex; gap: 2rem; margin-bottom: 2rem;">
+                        <img id="playerCover" src="" style="width: 150px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                        <div style="flex: 1;">
+                            <h2 id="playerTitle"></h2>
+                            <p id="playerProgress" style="color: var(--primary); margin: 0.5rem 0; font-size: 0.9rem; font-weight: 600;"></p>
+                            <p id="playerIntro" style="color: var(--text-dim); font-size: 0.9rem; margin-top: 1rem; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;"></p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                        <button class="btn btn-primary" id="resumeBtn">點擊續播</button>
+                        <button class="btn" id="prevBtn"><span class="material-symbols-outlined">skip_previous</span> 上一集</button>
+                        <button class="btn" id="nextBtn"><span class="material-symbols-outlined">skip_next</span> 下一集</button>
+                    </div>
+
+                    <div id="lineSelector" class="line-selector"></div>
+                    <div id="episodeGrid" class="episode-grid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 設定 (由您提供的 URL) ---
+        const GAS_1 = "https://script.google.com/macros/s/AKfycbzwHa2fa4e_QdyfD3z01tXepwY9ZyY98UlS_6mjVGOsPZaoHVloSyEc9_kJniuNn2_X/exec";
+        const GAS_2 = "https://script.google.com/macros/s/AKfycbzw88UmoJlK2n8CNn65QsitfC0N4OUk3I4WbDB72gCwj7ptR4i_A5hoI8aDuEGpHfks/exec";
+
+        // --- 全域變數 ---
+        let currentUser = null;
+        let globalDramaList = [];
+        let userLibrary = [];
+        let userProgress = [];
+        let currentDrama = null;
+        let currentLine = 0;
+        let currentEpIdx = 0;
+
+        // --- 初始化 ---
+        window.onload = async () => {
+            const savedUser = localStorage.getItem('watch_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                await startApp();
+            } else {
+                await loadUsers();
+            }
+        };
+
+        // --- 核心流程 ---
+        async function loadUsers() {
+            showView('userView');
+            const res = await fetch(`${GAS_2}?action=get_users`);
+            const users = await res.json();
+            const list = document.getElementById('userList');
+            list.innerHTML = users.map(u => `
+                <div class="user-card" onclick='loginUser(${JSON.stringify(u)})'>
+                    <div class="user-avatar">${u.userName[0]}</div>
+                    <h3>${u.userName}</h3>
+                </div>
+            `).join('');
+        }
+
+        async function loginUser(user) {
+            currentUser = user;
+            localStorage.setItem('watch_user', JSON.stringify(user));
+            await startApp();
+        }
+
+        function logout() {
+            localStorage.removeItem('watch_user');
+            location.reload();
+        }
+
+        async function startApp() {
+            document.getElementById('appHeader').style.display = 'flex';
+            document.getElementById('userBtn').innerText = `👋 ${currentUser.userName}`;
+            
+            // 同步載入資料
+            await Promise.all([syncGlobalList(), syncUserLibrary()]);
+            showView('homeView');
+        }
+
+        async function syncGlobalList() {
+            const res = await fetch(GAS_1);
+            globalDramaList = await res.json();
+        }
+
+        async function syncUserLibrary() {
+            const res = await fetch(`${GAS_2}?action=get_user_data&userId=${currentUser.userId}`);
+            const data = await res.json();
+            userLibrary = data.library || [];
+            userProgress = data.progress || [];
+            renderHome();
+            renderLibrary();
+        }
+
+        // --- 畫面渲染 ---
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            window.scrollTo(0,0);
+        }
+
+        function renderHome() {
+            const grid = document.getElementById('myDramaGrid');
+            if (userLibrary.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 4rem;">目前沒有追蹤的劇集，去「找劇」看看吧！</div>';
+                return;
+            }
+
+            // 依最後觀看時間排序
+            const sortedLib = [...userLibrary].sort((a,b) => new Date(b.lastWatchedDate || 0) - new Date(a.lastWatchedDate || 0));
+            
+            grid.innerHTML = sortedLib.map(item => {
+                const drama = globalDramaList.find(d => d.id.toString() === item.dramaId.toString());
+                if (!drama) return '';
+                const progress = userProgress.find(p => p.dramaId.toString() === item.dramaId.toString());
+                return `
+                    <div class="drama-card" onclick="openPlayer('${drama.id}')">
+                        <img src="${drama.cover_image}">
+                        <div class="info">
+                            <div class="title">${drama.name}</div>
+                            ${progress ? `<div style="font-size: 0.75rem; color: var(--primary); margin-top: 4px;">上次看至: ${progress.episodeName}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderLibrary() {
+            const grid = document.getElementById('globalDramaGrid');
+            grid.innerHTML = globalDramaList.map(drama => {
+                const isFollowed = userLibrary.some(item => item.dramaId.toString() === drama.id.toString());
+                return `
+                    <div class="drama-card" onclick="toggleFollow('${drama.id}')">
+                        <img src="${drama.cover_image}">
+                        ${isFollowed ? '<div class="tag-badge">追蹤中</div>' : ''}
+                        <div class="info">
+                            <div class="title">${drama.name}</div>
+                            <button class="btn" style="width: 100%; margin-top: 10px; font-size: 0.8rem;">
+                                ${isFollowed ? '取消追蹤' : '加入追劇'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // --- 管理邏輯 ---
+        async function toggleFollow(dramaId) {
+            const res = await fetch(GAS_2, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'toggle_follow', userId: currentUser.userId, dramaId: dramaId })
+            });
+            await syncUserLibrary();
+        }
+
+        // --- 播放邏輯 ---
+        function openPlayer(dramaId) {
+            currentDrama = globalDramaList.find(d => d.id.toString() === dramaId.toString());
+            const progress = userProgress.find(p => p.dramaId.toString() === dramaId.toString());
+            
+            document.getElementById('playerCover').src = currentDrama.cover_image;
+            document.getElementById('playerTitle').innerText = currentDrama.name;
+            document.getElementById('playerIntro').innerText = currentDrama.introduction;
+            
+            const lines = JSON.parse(currentDrama.sources);
+            renderLines(lines, progress);
+            
+            showView('playerView');
+        }
+
+        function renderLines(lines, progress) {
+            const selector = document.getElementById('lineSelector');
+            selector.innerHTML = lines.map((line, idx) => `
+                <div class="line-tab ${progress && progress.lineName === line.line_name ? 'active' : ''}" 
+                     id="line-tab-${idx}" onclick="selectLine(${idx})">
+                    ${line.line_name}
+                </div>
+            `).join('');
+
+            // 如果有進度，選取上次的線路，否則選第一個
+            currentLine = progress ? lines.findIndex(l => l.line_name === progress.lineName) : 0;
+            if (currentLine === -1) currentLine = 0;
+            selectLine(currentLine, progress ? progress.episodeName : null);
+        }
+
+        function selectLine(idx, highlightEp = null) {
+            currentLine = idx;
+            document.querySelectorAll('.line-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(`line-tab-${idx}`).classList.add('active');
+
+            const lines = JSON.parse(currentDrama.sources);
+            const episodes = lines[idx].episodes;
+            const grid = document.getElementById('episodeGrid');
+            
+            grid.innerHTML = episodes.map((ep, eIdx) => `
+                <button class="ep-btn ${highlightEp === ep.name ? 'active' : ''}" 
+                        onclick="playVideo(${idx}, ${eIdx})">
+                    ${ep.name}
+                </button>
+            `).join('');
+
+            if (highlightEp) {
+                document.getElementById('playerProgress').innerText = `上次觀看：${lines[idx].line_name} - ${highlightEp}`;
+            } else {
+                document.getElementById('playerProgress').innerText = '尚未開始觀看或紀錄中';
+            }
+        }
+
+        async function playVideo(lineIdx, epIdx) {
+            currentLine = lineIdx;
+            currentEpIdx = epIdx;
+            
+            const lines = JSON.parse(currentDrama.sources);
+            const line = lines[lineIdx];
+            const ep = line.episodes[epIdx];
+            const video = document.getElementById('videoPlayer');
+
+            // HLS 播放邏輯
+            if (Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(ep.play_url);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = ep.play_url;
+                video.addEventListener('loadedmetadata', () => video.play());
+            }
+
+            // 更新高亮
+            document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.ep-btn')[epIdx].classList.add('active');
+            document.getElementById('playerProgress').innerText = `正在播放：${line.line_name} - ${ep.name}`;
+
+            // 同步進度到雲端
+            await fetch(GAS_2, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'update_progress',
+                    userId: currentUser.userId,
+                    dramaId: currentDrama.id,
+                    lineName: line.line_name,
+                    episodeName: ep.name,
+                    timestamp: 0 // 未來可實作詳細秒數同步
+                })
+            });
+        }
+
+        // 續播、上一集、下一集
+        document.getElementById('resumeBtn').onclick = () => {
+            const progress = userProgress.find(p => p.dramaId.toString() === currentDrama.id.toString());
+            const lines = JSON.parse(currentDrama.sources);
+            if (progress) {
+                const lIdx = lines.findIndex(l => l.line_name === progress.lineName);
+                const eIdx = lines[lIdx].episodes.findIndex(e => e.name === progress.episodeName);
+                playVideo(lIdx, eIdx);
+            } else {
+                playVideo(0, 0);
+            }
+        };
+
+        document.getElementById('prevBtn').onclick = () => {
+            if (currentEpIdx > 0) playVideo(currentLine, currentEpIdx - 1);
+        };
+
+        document.getElementById('nextBtn').onclick = () => {
+            const lines = JSON.parse(currentDrama.sources);
+            if (currentEpIdx < lines[currentLine].episodes.length - 1) playVideo(currentLine, currentEpIdx + 1);
+        };
+    </script>
+</body>
+</html>
