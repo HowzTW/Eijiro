@@ -176,6 +176,31 @@ app.get('/api/scrape-progress', async (req, res) => {
     res.end();
 });
 
+// 新增：列出所有劇集
+app.get('/api/list-dramas', async (req, res) => {
+    try {
+        if (!GAS_URL) return res.json([]);
+        const response = await axios.get(GAS_URL);
+        res.json(response.data);
+    } catch (error) {
+        console.error('List dramas error:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// 新增：刪除劇集
+app.post('/api/delete-drama', async (req, res) => {
+    const { id } = req.body;
+    if (!id) return res.status(400).send('ID is required');
+    try {
+        const response = await axios.post(GAS_URL, { action: 'delete', id: id });
+        res.send(response.data);
+    } catch (error) {
+        console.error('Delete drama error:', error.message);
+        res.status(500).send(error.message);
+    }
+});
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
