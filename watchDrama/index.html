@@ -341,6 +341,44 @@
             flex-direction: column;
             gap: 1.2rem;
         }
+
+        /* --- Intro Modal (Large Text & Scrollable) --- */
+        #playerIntro { cursor: pointer; transition: color 0.2s; }
+        #playerIntro:hover { color: var(--primary); }
+
+        .intro-modal-content {
+            background: var(--card-bg);
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            border-radius: 32px;
+            display: flex;
+            flex-direction: column;
+            border: 2px solid rgba(255,255,255,0.1);
+            animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: hidden;
+        }
+
+        .intro-modal-header {
+            padding: 2rem 2rem 1rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .intro-modal-body {
+            padding: 2rem;
+            overflow-y: auto;
+            font-size: 1.4rem;
+            line-height: 1.6;
+            color: #fff;
+            text-align: justify;
+            flex: 1;
+        }
+
+        .intro-modal-footer {
+            padding: 1.5rem 2rem 2rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
     </style>
 </head>
 <body>
@@ -402,20 +440,27 @@
         <!-- 4. 播放頁面 -->
         <div id="playerView" class="view">
             <div class="player-container">
+                <!-- 標題與返回 -->
+                <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+                    <div id="playerTitle" style="font-size: 1.8rem; font-weight: 800; color: #fff;"></div>
+                    <button class="btn" onclick="goHome()" style="padding: 0.6rem 1.2rem; border-radius: 12px;">
+                        <span class="material-symbols-outlined">arrow_back</span> 返回
+                    </button>
+                </h2>
+
                 <video id="videoPlayer" controls></video>
                 
                 <div id="dramaDetail" style="margin-top: 2rem;">
-                    <div style="display: flex; gap: 2rem; margin-bottom: 2rem;">
-                        <img id="playerCover" src="" style="width: 150px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                        <div style="flex: 1;">
-                            <h2 id="playerTitle"></h2>
-                            <p id="playerProgress" style="color: var(--primary); margin: 0.5rem 0; font-size: 0.9rem; font-weight: 600;"></p>
-                            <p id="playerIntro" style="color: var(--text-dim); font-size: 0.9rem; margin-top: 1rem; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;"></p>
+                    <div style="display: flex; gap: 2rem; margin-bottom: 2rem; align-items: flex-start;">
+                        <img id="playerCover" src="" style="width: 140px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); flex-shrink: 0;">
+                        <div style="flex: 1; min-width: 0;">
+                            <p id="playerProgress" style="color: var(--primary); margin: 0.2rem 0 0.8rem 0; font-size: 1.1rem; font-weight: 800;"></p>
+                            <p id="playerIntro" onclick="showFullIntro()" style="color: var(--text-dim); font-size: 1.05rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden;" title="點擊查看完整內容"></p>
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-                        <button class="btn btn-primary" id="resumeBtn">點擊續播</button>
+                    <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                        <button class="btn btn-primary" id="resumeBtn" style="flex: 1;">點擊續播</button>
                         <button class="btn" id="prevBtn"><span class="material-symbols-outlined">skip_previous</span> 上一集</button>
                         <button class="btn" id="nextBtn"><span class="material-symbols-outlined">skip_next</span> 下一集</button>
                     </div>
@@ -434,6 +479,19 @@
             <div class="modal-actions">
                 <button class="btn btn-danger" style="height: 70px; font-size: 1.4rem;" id="modalConfirmBtn">確定，我要取消追蹤</button>
                 <button class="btn" style="height: 70px; font-size: 1.4rem;" onclick="closeModal()">我點錯了，不要取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 劇情介紹完整版視窗 -->
+    <div id="introModal" class="modal-overlay">
+        <div class="intro-modal-content">
+            <div class="intro-modal-header">
+                <h2 style="margin: 0;">劇情介紹</h2>
+            </div>
+            <div id="fullIntroBody" class="intro-modal-body"></div>
+            <div class="intro-modal-footer">
+                <button class="btn btn-primary" style="width: 100%; height: 70px; font-size: 1.4rem;" onclick="closeIntroModal()">看完返回</button>
             </div>
         </div>
     </div>
@@ -688,6 +746,17 @@
             document.getElementById('confirmModal').style.display = 'none';
         }
 
+        function showFullIntro() {
+            if (!currentDrama) return;
+            const modal = document.getElementById('introModal');
+            document.getElementById('fullIntroBody').innerText = currentDrama.introduction;
+            modal.style.display = 'flex';
+        }
+
+        function closeIntroModal() {
+            document.getElementById('introModal').style.display = 'none';
+        }
+
         // --- 播放邏輯 ---
         function openPlayer(dramaId) {
             currentDrama = globalDramaList.find(d => d.id.toString() === dramaId.toString());
@@ -700,6 +769,14 @@
             const lines = JSON.parse(currentDrama.sources);
             renderLines(lines, progress);
             
+            // 預載：自動讀取進度對應的集數，但不播放
+            const lIdx = progress ? lines.findIndex(l => l.line_name === progress.lineName) : 0;
+            const episodeName = progress ? progress.episodeName : (lines[0] && lines[0].episodes[0] ? lines[0].episodes[0].name : null);
+            if (episodeName) {
+                const eIdx = lines[lIdx].episodes.findIndex(e => e.name === episodeName);
+                if (eIdx !== -1) playVideo(lIdx, eIdx, false); // false 代表不自動播放
+            }
+
             showView('playerView');
         }
 
@@ -741,7 +818,7 @@
             }
         }
 
-        async function playVideo(lineIdx, epIdx) {
+        async function playVideo(lineIdx, epIdx, autoPlay = true) {
             currentLine = lineIdx;
             currentEpIdx = epIdx;
             
@@ -752,13 +829,19 @@
 
             // HLS 播放邏輯
             if (Hls.isSupported()) {
+                if (window.currentHls) window.currentHls.destroy();
                 const hls = new Hls();
+                window.currentHls = hls;
                 hls.loadSource(ep.play_url);
                 hls.attachMedia(video);
-                hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    if (autoPlay) video.play();
+                });
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = ep.play_url;
-                video.addEventListener('loadedmetadata', () => video.play());
+                if (autoPlay) {
+                    video.addEventListener('loadedmetadata', () => video.play(), { once: true });
+                }
             }
 
             // 更新高亮
