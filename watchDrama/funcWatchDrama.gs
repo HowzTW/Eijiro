@@ -74,6 +74,17 @@ function handleToggleFollow(ss, data) {
   
   if (foundIndex > -1) {
     sheet.deleteRow(foundIndex);
+    
+    // 同步刪除 UserProgress 中的進度資料
+    var progSheet = ss.getSheetByName("UserProgress");
+    var progRows = progSheet.getDataRange().getValues();
+    // 由後往前刪除以避免索引位置偏移
+    for (var k = progRows.length - 1; k >= 1; k--) {
+      if (progRows[k][0] === userId && progRows[k][1].toString() === dramaId) {
+        progSheet.deleteRow(k + 1);
+      }
+    }
+    
     return { success: true, status: "removed" };
   } else {
     sheet.appendRow([userId, dramaId, new Date(), ""]);

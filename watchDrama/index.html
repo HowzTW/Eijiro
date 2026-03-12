@@ -56,7 +56,7 @@
             background: var(--card-bg);
             color: var(--text);
             border: 1px solid rgba(255,255,255,0.1);
-            padding: 0.8rem 1.5rem; /* 按鈕加大 */
+            padding: 0.8rem 1.2rem; /* 稍微縮小內距以平衡寬度 */
             border-radius: 16px;
             cursor: pointer;
             font-weight: 600;
@@ -65,12 +65,22 @@
             justify-content: center;
             gap: 0.6rem;
             transition: all 0.3s;
-            font-size: 1.1rem; /* 按鈕文字加大 */
+            font-size: 1.1rem;
+            flex-shrink: 0;      /* 禁止被壓縮 */
+            min-width: 160px;   /* 固定最小寬度 */
+            white-space: nowrap; /* 禁止文字換行 */
         }
 
         .btn:active { transform: scale(0.95); } /* 點擊回饋 */
         .btn-primary { background: var(--primary); color: #000; border: none; }
         .btn-primary:hover { background: #fbbf24; box-shadow: 0 5px 20px var(--primary-glow); }
+        
+        /* 新增：追蹤(綠)/取消(紅) 樣式 */
+        .btn-success { background: var(--success); color: #fff; border: none; }
+        .btn-success:hover { background: #059669; box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4); }
+        .btn-danger { background: var(--danger); color: #fff; border: none; }
+        .btn-danger:hover { background: #e11d48; box-shadow: 0 5px 20px rgba(244, 63, 94, 0.4); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         /* --- Views --- */
         .view { display: none; animation: fadeIn 0.4s ease-out; }
@@ -182,6 +192,51 @@
             line-height: 1.5;
         }
 
+        /* 探索清單樣式 (條列式) */
+        .library-list {
+            background: var(--card-bg);
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .library-item {
+            display: flex;
+            align-items: center; /* 標題換行時按鈕居中 */
+            justify-content: space-between;
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: background 0.2s;
+            gap: 1.5rem; /* 字與按鈕間距 */
+        }
+
+        .library-item:last-child { border-bottom: none; }
+        .library-item:hover { background: rgba(255,255,255,0.03); }
+
+        .library-item-content {
+            flex: 1; /* 佔滿剩餘空間 */
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            min-width: 0; /* 允許內部文字換行 */
+        }
+
+        .library-item-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .library-item-meta {
+            font-size: 0.95rem;
+            color: var(--text-dim);
+        }
+
+        .library-item-meta.followed {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
         /* --- Player View --- */
         .player-container { max-width: 1000px; margin: 0 auto; }
         #videoPlayer { width: 100%; border-radius: 20px; background: #000; margin-bottom: 1.5rem; }
@@ -236,8 +291,10 @@
 
         <!-- 3. 全域劇庫 (找劇) -->
         <div id="libraryView" class="view">
-            <h2 style="margin-bottom: 2rem;">探索完整資料庫</h2>
-            <div id="globalDramaGrid" class="drama-grid"></div>
+            <h2 style="margin-bottom: 2rem; display: flex; align-items: center; gap: 0.6rem;">
+                <span class="material-symbols-outlined" style="color: var(--primary);">explore</span> 探索完整資料庫
+            </h2>
+            <div id="globalDramaGrid" class="library-list"></div>
         </div>
 
         <!-- 4. 播放頁面 -->
@@ -275,7 +332,7 @@
 
         // --- 全域變數 ---
         let currentUser = null;
-        let globalDramaList = [];
+        let globalDramaList = JSON.parse(localStorage.getItem('cache_global_list') || '[]');
         let userLibrary = [];
         let userProgress = [];
         let currentDrama = null;
@@ -287,17 +344,48 @@
             const savedUser = localStorage.getItem('watch_user');
             if (savedUser) {
                 currentUser = JSON.parse(savedUser);
+                // 如果有緩存，先用緩存資料渲染首頁，避免白畫面
+                syncFromCache();
                 await startApp();
             } else {
                 await loadUsers();
             }
         };
 
+        function syncFromCache() {
+            const cachedData = localStorage.getItem(`cache_user_data_${currentUser.userId}`);
+            if (cachedData) {
+                const data = JSON.parse(cachedData);
+                userLibrary = data.library || [];
+                userProgress = data.progress || [];
+                renderHome();
+            }
+        }
+
         // --- 核心流程 ---
         async function loadUsers() {
             showView('userView');
-            const res = await fetch(`${GAS_2}?action=get_users`);
-            const users = await res.json();
+            const list = document.getElementById('userList');
+            
+            // 先看緩存
+            const cachedUsers = localStorage.getItem('cache_users');
+            if (cachedUsers) {
+                renderUserCards(JSON.parse(cachedUsers));
+            } else {
+                list.innerHTML = '<div class="spinner"></div><p>正在連線中...</p>';
+            }
+
+            try {
+                const res = await fetch(`${GAS_2}?action=get_users`);
+                const users = await res.json();
+                localStorage.setItem('cache_users', JSON.stringify(users));
+                renderUserCards(users);
+            } catch (e) {
+                console.error("Load users failed", e);
+            }
+        }
+
+        function renderUserCards(users) {
             const list = document.getElementById('userList');
             list.innerHTML = users.map(u => `
                 <div class="user-card" onclick='loginUser(${JSON.stringify(u)})'>
@@ -328,17 +416,26 @@
         }
 
         async function syncGlobalList() {
-            const res = await fetch(GAS_1);
-            globalDramaList = await res.json();
+            try {
+                const res = await fetch(GAS_1);
+                globalDramaList = await res.json();
+                localStorage.setItem('cache_global_list', JSON.stringify(globalDramaList));
+            } catch (e) { console.error("Global sync failed", e); }
         }
 
         async function syncUserLibrary() {
-            const res = await fetch(`${GAS_2}?action=get_user_data&userId=${currentUser.userId}`);
-            const data = await res.json();
-            userLibrary = data.library || [];
-            userProgress = data.progress || [];
-            renderHome();
-            renderLibrary();
+            try {
+                const res = await fetch(`${GAS_2}?action=get_user_data&userId=${currentUser.userId}`);
+                const data = await res.json();
+                userLibrary = data.library || [];
+                userProgress = data.progress || [];
+                
+                // 緩存用戶專屬資料
+                localStorage.setItem(`cache_user_data_${currentUser.userId}`, JSON.stringify(data));
+                
+                renderHome();
+                renderLibrary();
+            } catch (e) { console.error("User sync failed", e); }
         }
 
         // --- 畫面渲染 ---
@@ -381,18 +478,32 @@
 
         function renderLibrary() {
             const grid = document.getElementById('globalDramaGrid');
-            grid.innerHTML = globalDramaList.map(drama => {
+            
+            // 排序邏輯：有追蹤的在前，沒追蹤的在後；各組內依更新時間降冪
+            const sortedList = [...globalDramaList].sort((a, b) => {
+                const isFollowedA = userLibrary.some(item => item.dramaId.toString() === a.id.toString());
+                const isFollowedB = userLibrary.some(item => item.dramaId.toString() === b.id.toString());
+                
+                if (isFollowedA !== isFollowedB) {
+                    return isFollowedA ? -1 : 1;
+                }
+                return new Date(b.update_time) - new Date(a.update_time);
+            });
+
+            grid.innerHTML = sortedList.map(drama => {
                 const isFollowed = userLibrary.some(item => item.dramaId.toString() === drama.id.toString());
                 return `
-                    <div class="drama-card" onclick="toggleFollow('${drama.id}')">
-                        <img src="${drama.cover_image}">
-                        ${isFollowed ? '<div class="tag-badge">追蹤中</div>' : ''}
-                        <div class="info">
-                            <div class="title">${drama.name}</div>
-                            <button class="btn" style="width: 100%; margin-top: 10px; font-size: 0.8rem;">
-                                ${isFollowed ? '取消追蹤' : '加入追劇'}
-                            </button>
+                    <div class="library-item">
+                        <div class="library-item-content">
+                            <div class="library-item-title">${drama.name}</div>
+                            <div class="library-item-meta ${isFollowed ? 'followed' : ''}">
+                                ${isFollowed ? '<span class="material-symbols-outlined" style="font-size:1rem; vertical-align:middle;">check_circle</span> 已在追蹤清單' : '尚未追蹤'} · 更新於 ${new Date(drama.update_time).toLocaleDateString()}
+                            </div>
                         </div>
+                        <button class="btn ${isFollowed ? 'btn-danger' : 'btn-success'}" id="btn-follow-${drama.id}" onclick="toggleFollow('${drama.id}')">
+                            <span class="material-symbols-outlined">${isFollowed ? 'heart_minus' : 'heart_plus'}</span>
+                            ${isFollowed ? '取消追蹤' : '追　　蹤'}
+                        </button>
                     </div>
                 `;
             }).join('');
@@ -400,11 +511,28 @@
 
         // --- 管理邏輯 ---
         async function toggleFollow(dramaId) {
-            const res = await fetch(GAS_2, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'toggle_follow', userId: currentUser.userId, dramaId: dramaId })
-            });
-            await syncUserLibrary();
+            const btn = document.getElementById(`btn-follow-${dramaId}`);
+            if (btn) btn.disabled = true;
+
+            try {
+                const res = await fetch(GAS_2, {
+                    method: 'POST',
+                    body: JSON.stringify({ 
+                        action: 'toggle_follow', 
+                        userId: currentUser.userId, 
+                        dramaId: dramaId 
+                    })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    await syncUserLibrary(); // 重新整理資料
+                }
+            } catch (e) { 
+                console.error("Toggle follow failed", e);
+                alert("抱歉，連線失敗，請稍後再試。");
+            } finally {
+                if (btn) btn.disabled = false;
+            }
         }
 
         // --- 播放邏輯 ---
