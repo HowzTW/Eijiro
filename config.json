@@ -1,7 +1,6 @@
 {
     "displayOrder": [
         "watchDrama",
-        "scrapeDrama",
         "dailyQuotation",
         "navermapsMemo",
         "oaInvitation",
@@ -21,14 +20,14 @@
     "cards": {
         "watchDrama": {
             "href": "watchDrama/index.html",
-            "icon": "tv_gen",
+            "icon": "featured_video",
             "title": "追劇小幫手",
             "description": "個人化雲端追劇平台，支援多使用者切換與播放進度同步。",
             "stats": "HLS Player"
         },
         "scrapeDrama": {
             "href": "scrapeDrama/public/index.html",
-            "icon": "Traveling",
+            "icon": "settings_suggest",
             "title": "抓劇小幫手",
             "description": "強大的劇集抓取與管理系統，自動同步至雲端資料庫。",
             "stats": "Management"

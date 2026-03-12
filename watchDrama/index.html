@@ -27,25 +27,26 @@
             line-height: 1.6;
             min-height: 100vh;
             overflow-x: hidden;
+            font-size: 1.15rem; /* 整體字級加大 */
         }
 
         /* --- Layout --- */
         .header {
             position: fixed;
             top: 0; left: 0; right: 0;
-            height: 70px;
-            background: rgba(15, 23, 42, 0.8);
+            height: 80px; /* 加高 Header */
+            background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(15px);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 2rem;
+            padding: 0 1.5rem;
             z-index: 1000;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .main-content {
-            padding: 100px 2rem 2rem;
+            padding: 110px 1.5rem 2rem;
             max-width: 1200px;
             margin: 0 auto;
         }
@@ -55,19 +56,21 @@
             background: var(--card-bg);
             color: var(--text);
             border: 1px solid rgba(255,255,255,0.1);
-            padding: 0.6rem 1.2rem;
-            border-radius: 12px;
+            padding: 0.8rem 1.5rem; /* 按鈕加大 */
+            border-radius: 16px;
             cursor: pointer;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            justify-content: center;
+            gap: 0.6rem;
             transition: all 0.3s;
+            font-size: 1.1rem; /* 按鈕文字加大 */
         }
 
-        .btn:hover { background: #2d3748; transform: translateY(-2px); }
+        .btn:active { transform: scale(0.95); } /* 點擊回饋 */
         .btn-primary { background: var(--primary); color: #000; border: none; }
-        .btn-primary:hover { background: #fbbf24; box-shadow: 0 5px 15px var(--primary-glow); }
+        .btn-primary:hover { background: #fbbf24; box-shadow: 0 5px 20px var(--primary-glow); }
 
         /* --- Views --- */
         .view { display: none; animation: fadeIn 0.4s ease-out; }
@@ -76,68 +79,76 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- User Selector --- */
-        #userView { text-align: center; padding-top: 10vh; }
-        .user-grid { display: flex; justify-content: center; gap: 2rem; margin-top: 3rem; }
+        #userView { text-align: center; padding-top: 5vh; }
+        #userView h1 { font-size: 2.2rem; margin-bottom: 1rem; }
+        .user-grid { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; margin-top: 2rem; }
         .user-card {
             background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 24px;
+            padding: 1.5rem;
+            border-radius: 28px;
             cursor: pointer;
             transition: all 0.3s;
-            width: 200px;
+            width: 85%;
+            max-width: 300px;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            border: 2px solid transparent;
         }
-        .user-card:hover { transform: scale(1.1); border-color: var(--primary); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+        .user-card:hover { border-color: var(--primary); background: #2d3748; }
         .user-avatar { 
-            width: 80px; height: 80px; background: var(--primary); border-radius: 50%; 
-            margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;
-            font-size: 2.5rem; color: #000; font-weight: 600;
+            width: 70px; height: 70px; background: var(--primary); border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; color: #000; font-weight: 800;
+            flex-shrink: 0;
         }
+        .user-card h3 { font-size: 1.4rem; }
 
         /* --- Grid (Home & Library) --- */
         .drama-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); /* 卡片放寬方便閱讀 */
             gap: 2rem;
         }
 
         .drama-card {
             background: var(--card-bg);
-            border-radius: 20px;
+            border-radius: 24px;
             overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.08);
             cursor: pointer;
             position: relative;
         }
 
-        .drama-card:hover { transform: translateY(-10px); border-color: var(--primary); }
-        .drama-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
-        .drama-card .info { padding: 1rem; }
-        .drama-card .title { font-weight: 600; height: 2.8rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .drama-card:hover { border-color: var(--primary); }
+        .drama-card img { width: 100%; aspect-ratio: 16/10; object-fit: cover; } /* 圖片比例調整，減少垂直捲動 */
+        .drama-card .info { padding: 1.2rem; }
+        .drama-card .title { font-weight: 600; font-size: 1.3rem; line-height: 1.4; margin-bottom: 0.5rem; }
 
         .tag-badge {
-            position: absolute; top: 10px; right: 10px;
-            background: var(--success); color: #000;
-            padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 800;
+            position: absolute; top: 12px; right: 12px;
+            background: var(--primary); color: #000;
+            padding: 4px 12px; border-radius: 10px; font-size: 0.9rem; font-weight: 800;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
         /* --- Player View --- */
-        .player-container { max-width: 900px; margin: 0 auto; }
-        #videoPlayer { width: 100%; border-radius: 16px; background: #000; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .episode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.8rem; margin-top: 1.5rem; }
+        .player-container { max-width: 1000px; margin: 0 auto; }
+        #videoPlayer { width: 100%; border-radius: 20px; background: #000; margin-bottom: 1.5rem; }
+        .episode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
         .ep-btn {
-            background: #2d3748; border: none; padding: 0.8rem; border-radius: 8px; 
-            color: #fff; cursor: pointer; transition: 0.2s; font-size: 0.9rem;
+            background: #2d3748; border: 1px solid rgba(255,255,255,0.1); padding: 1.2rem 0.5rem; border-radius: 14px; 
+            color: #fff; cursor: pointer; transition: 0.2s; font-size: 1.1rem; font-weight: 600;
         }
-        .ep-btn:hover { background: #3d495d; }
-        .ep-btn.active { background: var(--primary); color: #000; font-weight: 600; }
+        .ep-btn.active { background: var(--primary); color: #000; border: none; box-shadow: 0 0 15px var(--primary-glow); }
 
-        .line-selector { display: flex; gap: 1rem; margin: 1.5rem 0; overflow-x: auto; padding-bottom: 0.5rem; }
+        .line-selector { display: flex; gap: 0.8rem; margin: 1.5rem 0; overflow-x: auto; padding-bottom: 0.8rem; }
         .line-tab {
-            padding: 0.5rem 1.2rem; background: rgba(255,255,255,0.05); border-radius: 20px;
-            cursor: pointer; white-space: nowrap; font-size: 0.9rem;
+            padding: 0.7rem 1.5rem; background: rgba(255,255,255,0.08); border-radius: 24px;
+            cursor: pointer; white-space: nowrap; font-size: 1.1rem; font-weight: 600;
         }
-        .line-tab.active { background: var(--primary); color: #000; font-weight: 600; }
+        .line-tab.active { background: var(--primary); color: #000; border: none; }
 
         /* --- Utils --- */
         .loading { text-align: center; padding: 5rem; font-size: 1.2rem; color: var(--text-dim); }
