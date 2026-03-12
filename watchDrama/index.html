@@ -111,26 +111,75 @@
             gap: 2rem;
         }
 
-        .drama-card {
+        /* 橫向卡片排列 (用於首頁) */
+        .drama-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); /* 在電腦上可並排，手機上自動佔滿 */
+            gap: 1.5rem;
+        }
+
+        .drama-card-horizontal {
             background: var(--card-bg);
             border-radius: 24px;
             overflow: hidden;
-            transition: all 0.3s;
-            border: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            gap: 1.5rem;
+            padding: 1.2rem;
+            border: 2px solid transparent;
             cursor: pointer;
-            position: relative;
+            transition: all 0.3s;
+            align-items: center;
         }
 
-        .drama-card:hover { border-color: var(--primary); }
-        .drama-card img { width: 100%; aspect-ratio: 16/10; object-fit: cover; } /* 圖片比例調整，減少垂直捲動 */
-        .drama-card .info { padding: 1.2rem; }
-        .drama-card .title { font-weight: 600; font-size: 1.3rem; line-height: 1.4; margin-bottom: 0.5rem; }
+        .drama-card-horizontal:hover { border-color: var(--primary); background: #2d3748; }
+        
+        .drama-card-horizontal .img-box {
+            width: 140px;
+            flex-shrink: 0;
+            aspect-ratio: 2/3;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
 
-        .tag-badge {
-            position: absolute; top: 12px; right: 12px;
-            background: var(--primary); color: #000;
-            padding: 4px 12px; border-radius: 10px; font-size: 0.9rem; font-weight: 800;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        .drama-card-horizontal .img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .drama-card-horizontal .content-box {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow: hidden;
+        }
+
+        .drama-card-horizontal .title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .drama-card-horizontal .progress-text {
+            color: var(--primary);
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin: 0.2rem 0;
+        }
+
+        .drama-card-horizontal .intro-text {
+            color: var(--text-dim);
+            font-size: 1.05rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.5;
         }
 
         /* --- Player View --- */
@@ -182,7 +231,7 @@
             <h2 style="margin-bottom: 2rem; display: flex; align-items: center; gap: 0.6rem;">
                 <span class="material-symbols-outlined" style="color: var(--primary);">favorite</span> 我的追劇清單
             </h2>
-            <div id="myDramaGrid" class="drama-grid"></div>
+            <div id="myDramaGrid" class="drama-list"></div>
         </div>
 
         <!-- 3. 全域劇庫 (找劇) -->
@@ -302,7 +351,7 @@
         function renderHome() {
             const grid = document.getElementById('myDramaGrid');
             if (userLibrary.length === 0) {
-                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 4rem;">目前沒有追蹤的劇集，去「找劇」看看吧！</div>';
+                grid.innerHTML = '<div style="text-align: center; padding: 4rem;">目前沒有追蹤的劇集，去「找劇」看看吧！</div>';
                 return;
             }
 
@@ -314,11 +363,16 @@
                 if (!drama) return '';
                 const progress = userProgress.find(p => p.dramaId.toString() === item.dramaId.toString());
                 return `
-                    <div class="drama-card" onclick="openPlayer('${drama.id}')">
-                        <img src="${drama.cover_image}">
-                        <div class="info">
+                    <div class="drama-card-horizontal" onclick="openPlayer('${drama.id}')">
+                        <div class="img-box">
+                            <img src="${drama.cover_image}">
+                        </div>
+                        <div class="content-box">
                             <div class="title">${drama.name}</div>
-                            ${progress ? `<div style="font-size: 0.75rem; color: var(--primary); margin-top: 4px;">上次看至: ${progress.episodeName}</div>` : ''}
+                            <div class="progress-text">
+                                ${progress ? `上次觀看：${progress.lineName} - ${progress.episodeName}` : '尚未開始觀看或紀錄中'}
+                            </div>
+                            <div class="intro-text">${drama.introduction}</div>
                         </div>
                     </div>
                 `;
