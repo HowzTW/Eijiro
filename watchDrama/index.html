@@ -737,6 +737,7 @@
 
             grid.innerHTML = sortedList.map(drama => {
                 const isFollowed = userLibrary.some(item => item.dramaId.toString() === drama.id.toString());
+                const dramaNameEscaped = drama.name.replace(/'/g, "\\'");
                 return `
                     <div class="library-item">
                         <div class="library-item-content">
@@ -745,7 +746,8 @@
                                 ${isFollowed ? '<span class="material-symbols-outlined" style="font-size:1rem; vertical-align:middle;">check_circle</span> 已在追蹤清單' : '尚未追蹤'} · 更新於 ${new Date(drama.update_time).toLocaleDateString()}
                             </div>
                         </div>
-                        <button class="btn ${isFollowed ? 'btn-danger' : 'btn-success'}" id="btn-follow-${drama.id}" onclick="toggleFollow('${drama.id}', true)">
+                        <button class="btn ${isFollowed ? 'btn-danger' : 'btn-success'}" id="btn-follow-${drama.id}" 
+                            onclick="${isFollowed ? `confirmUntrack(event, '${drama.id}', '${dramaNameEscaped}', true)` : `toggleFollow('${drama.id}', true)`}">
                             <span class="material-symbols-outlined">${isFollowed ? 'heart_minus' : 'heart_plus'}</span>
                             ${isFollowed ? '取消追蹤' : '追　　蹤'}
                         </button>
@@ -780,7 +782,7 @@
             }
         }
 
-        async function confirmUntrack(event, dramaId, dramaName) {
+        async function confirmUntrack(event, dramaId, dramaName, skipHomeRefresh = false) {
             event.stopPropagation();
             const modal = document.getElementById('confirmModal');
             const msg = document.getElementById('confirmMsg');
@@ -791,7 +793,7 @@
 
             confirmBtn.onclick = async () => {
                 closeModal();
-                await toggleFollow(dramaId);
+                await toggleFollow(dramaId, skipHomeRefresh);
             };
         }
 
