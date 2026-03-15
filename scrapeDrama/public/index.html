@@ -324,6 +324,59 @@
             margin-bottom: 1.5rem;
             opacity: 0.3;
         }
+
+        /* --- Responsive Design / Mobile --- */
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem;
+            }
+            .container {
+                padding-top: 140px;
+            }
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            header h1 {
+                font-size: 1.5rem;
+            }
+            .logo-img {
+                width: 35px;
+                height: 35px;
+            }
+            #navButtons {
+                width: 100%;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+            .btn {
+                padding: 0.6rem 0.8rem;
+                font-size: 0.9rem;
+                flex: 1;
+                justify-content: center;
+            }
+            .drama-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 1rem;
+            }
+            .drama-info {
+                padding: 0.8rem;
+            }
+            .drama-title {
+                font-size: 0.95rem;
+                height: 2.6rem;
+                margin-bottom: 0.5rem;
+            }
+            .input-wrapper {
+                flex-direction: column;
+            }
+            #scrapeView .btn {
+                flex: none;
+                width: 100%;
+                padding: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
