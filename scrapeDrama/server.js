@@ -22,7 +22,15 @@ async function scrapeDrama(id, sendEvent) {
         sendEvent('status', { message: `[1/3] 正在獲取影片詳情 (ID: ${id})...` });
         
         const detailUrl = `${BASE_URL}/vod/detail/id/${id}.html`;
-        const { data: html } = await axios.get(detailUrl);
+        const { data: html } = await axios.get(detailUrl, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+                'Referer': BASE_URL + '/',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+                'Accept-Language': 'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7',
+                'Cache-Control': 'max-age=0'
+            }
+        });
         const $ = cheerio.load(html);
 
         const title = $('h1').first().text().trim();
