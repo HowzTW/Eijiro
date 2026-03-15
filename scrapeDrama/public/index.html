@@ -485,7 +485,7 @@
                 dramaGrid.innerHTML = items.map(item => `
                     <div class="drama-card" id="item-${item.id}">
                         <div class="img-container">
-                            <img src="${item.cover_image || 'https://via.placeholder.com/300x450?text=無封面圖'}" alt="${item.name}">
+                            <img src="${item.cover_image || 'https://via.placeholder.com/300x450?text=無封面圖'}" alt="${item.name}" onerror="this.parentElement.style.display='none'">
                         </div>
                         <div class="drama-info">
                             <div class="drama-title" title="${item.name}">${item.name}</div>

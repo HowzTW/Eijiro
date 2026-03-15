@@ -188,6 +188,7 @@
             color: #fff;
             display: -webkit-box;
             -webkit-line-clamp: 3;
+            line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
             line-height: 1.4;
@@ -445,10 +446,10 @@
                 
                 <div id="dramaDetail" style="margin-top: 2rem;">
                     <div style="display: flex; gap: 2rem; margin-bottom: 2rem; align-items: flex-start;">
-                        <img id="playerCover" src="" style="width: 140px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); flex-shrink: 0;">
+                        <img id="playerCover" src="" style="width: 140px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); flex-shrink: 0;" onerror="this.style.display='none'">
                         <div style="flex: 1; min-width: 0;">
                             <p id="playerProgress" style="color: var(--primary); margin: 0.2rem 0 0.8rem 0; font-size: 1.1rem; font-weight: 800;"></p>
-                            <p id="playerIntro" onclick="showFullIntro()" style="color: var(--text-dim); font-size: 1.05rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden;" title="點擊查看完整內容"></p>
+                            <p id="playerIntro" onclick="showFullIntro()" style="color: var(--text-dim); font-size: 1.05rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 5; line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden;" title="點擊查看完整內容"></p>
                         </div>
                     </div>
 
@@ -708,7 +709,7 @@
                             <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
                         </div>
                         <div class="img-box">
-                            <img src="${drama.cover_image}">
+                            <img src="${drama.cover_image}" onerror="this.parentElement.style.display='none'">
                         </div>
                         <div class="content-box">
                             <div class="title">${drama.name}</div>
@@ -817,7 +818,9 @@
             currentDrama = globalDramaList.find(d => d.id.toString() === dramaId.toString());
             const progress = userProgress.find(p => p.dramaId.toString() === dramaId.toString());
             
-            document.getElementById('playerCover').src = currentDrama.cover_image;
+            const playerCover = document.getElementById('playerCover');
+            playerCover.style.display = ''; // 恢復顯示，避免前一部圖破掉被隱藏
+            playerCover.src = currentDrama.cover_image;
             document.getElementById('playerTitle').innerText = currentDrama.name;
             document.getElementById('playerIntro').innerText = currentDrama.introduction;
             
