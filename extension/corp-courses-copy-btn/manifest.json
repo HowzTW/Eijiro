@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "OrangeApple 教室名稱複製按鈕",
+  "version": "1.0",
+  "description": "在 corp.orangeapple.co 課程頁面的麵包屑導覽後，新增一個複製教室名稱的按鈕",
+  "content_scripts": [
+    {
+      "matches": ["https://corp.orangeapple.co/courses/dt/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

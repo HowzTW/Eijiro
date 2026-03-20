@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "EVOX Quick Dial",
+  "version": "1.0",
+  "description": "在 OrangeApple 頁面的電話號碼旁自動加上 EVOX 撥號按鈕",
+  "permissions": [],
+  "content_scripts": [
+    {
+      "matches": ["https://corp.orangeapple.co/marketing/sales*"],
+      "js": ["content.js"],
+      "css": ["style.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}

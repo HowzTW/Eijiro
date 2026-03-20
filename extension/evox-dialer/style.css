@@ -1,0 +1,40 @@
+/* EVOX Quick Dial Button */
+
+.evox-dial-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 3px 10px;
+  background: #00b050;
+  color: #fff !important;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none !important;
+  cursor: pointer;
+  border: none;
+  vertical-align: middle;
+  line-height: 1.5;
+  transition: background 0.15s ease, transform 0.1s ease;
+  white-space: nowrap;
+}
+
+.evox-dial-btn:hover {
+  background: #009140;
+  transform: scale(1.05);
+}
+
+.evox-dial-btn:active {
+  background: #007a36;
+  transform: scale(0.97);
+}
+
+.evox-icon {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.evox-label {
+  letter-spacing: 0.02em;
+}
