@@ -9,11 +9,9 @@ struct SidebarView: View {
                 
                 // 表頭 Logo 與應用名稱
                 VStack(spacing: 12) {
-                    Image("icon", bundle: .module)
+                    Image("icon-app", bundle: .module)
                         .resizable()
                         .scaledToFit()
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                        .shadow(color: .black.opacity(0.15), radius: 6, x: 0, y: 3)
                         .padding(.horizontal, 4)
                         .padding(.top, 24)
                     

@@ -1,18 +1,17 @@
 import SwiftUI
 
 struct SplashView: View {
-    @State private var opacity = 0.0
-    @State private var scale = 0.8
+    @State private var isAnimating = false
     
     var body: some View {
         VStack(spacing: 24) {
-            Image("icon", bundle: .module)
+            // Logo
+            Image("icon-app", bundle: .module)
                 .resizable()
-                .scaledToFit()
-                .frame(width: 150, height: 150)
-                .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
-                .shadow(color: .black.opacity(0.3), radius: 15, y: 8)
-                .scaleEffect(scale)
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 160, height: 160)
+                .scaleEffect(isAnimating ? 1.0 : 0.8)
+                .opacity(isAnimating ? 1.0 : 0.0)
             
             VStack(spacing: 8) {
                 Text("抓劇小幫手")
@@ -28,11 +27,10 @@ struct SplashView: View {
                 .padding(.top, 40)
         }
         .padding(80)
-        .opacity(opacity)
+        .opacity(isAnimating ? 1.0 : 0.0) // 使用 isAnimating 統一控制
         .onAppear {
             withAnimation(.spring(response: 0.8, dampingFraction: 0.7)) {
-                opacity = 1.0
-                scale = 1.0
+                isAnimating = true
             }
         }
     }

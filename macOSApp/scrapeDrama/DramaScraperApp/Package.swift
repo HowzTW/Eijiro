@@ -17,7 +17,8 @@ let package = Package(
             ],
             path: "Sources/DramaScraperApp",
             resources: [
-                .process("Assets.xcassets")
+                .process("Assets.xcassets"),
+                .process("icon-app.png")
             ]
         )
     ]
