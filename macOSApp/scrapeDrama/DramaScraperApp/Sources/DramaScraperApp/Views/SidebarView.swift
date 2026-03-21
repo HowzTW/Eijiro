@@ -6,6 +6,26 @@ struct SidebarView: View {
     var body: some View {
         NavigationSplitView {
             List(selection: $selection) {
+                
+                // 表頭 Logo 與應用名稱
+                VStack(spacing: 12) {
+                    Image("icon", bundle: .module)
+                        .resizable()
+                        .scaledToFit()
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .shadow(color: .black.opacity(0.15), radius: 6, x: 0, y: 3)
+                        .padding(.horizontal, 4)
+                        .padding(.top, 24)
+                    
+                    Text("抓劇小幫手")
+                        .font(.title) // 更大的字體
+                        .fontWeight(.heavy)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.bottom, 24)
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+                
                 NavigationLink(value: "Dashboard") {
                     Label("管理劇集", systemImage: "square.grid.2x2")
                 }

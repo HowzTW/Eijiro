@@ -15,7 +15,10 @@ let package = Package(
             dependencies: [
                 "SwiftSoup"
             ],
-            path: "Sources/DramaScraperApp"
+            path: "Sources/DramaScraperApp",
+            resources: [
+                .process("Assets.xcassets")
+            ]
         )
     ]
 )

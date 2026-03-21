@@ -98,9 +98,9 @@ struct DramaCardView: View {
                 .clipped()
             
             // 資訊與操作
-            HStack {
+            HStack(alignment: .center) {
                 Text(drama.name)
-                    .font(.subheadline)
+                    .font(.title3)
                     .fontWeight(.bold)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)

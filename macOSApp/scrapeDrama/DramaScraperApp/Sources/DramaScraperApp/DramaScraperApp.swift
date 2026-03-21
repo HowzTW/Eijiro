@@ -10,12 +10,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 @main
 struct DramaScraperApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @State private var showSplash = true
     
     var body: some Scene {
-        // 設定最小與最適合此應用的初始視窗大小
         WindowGroup {
-            SidebarView()
-                .frame(minWidth: 800, minHeight: 600)
+            ZStack {
+                if showSplash {
+                    SplashView()
+                        .transition(.opacity)
+                } else {
+                    SidebarView()
+                        .frame(minWidth: 800, minHeight: 600)
+                        .transition(.opacity)
+                }
+            }
+            .animation(.easeInOut(duration: 0.8), value: showSplash)
+            .onAppear {
+                Task {
+                    try? await Task.sleep(nanoseconds: 2_500_000_000)
+                    showSplash = false
+                }
+            }
         }
         .windowStyle(.titleBar)
         .commands {
