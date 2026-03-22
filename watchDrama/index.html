@@ -403,7 +403,7 @@
                 <div style="display: flex; align-items: center; gap: 0.6rem;">
                     <span class="material-symbols-outlined" style="color: var(--primary);">favorite</span> 我的追劇清單
                 </div>
-                <button class="btn btn-primary" onclick="showView('libraryView')" style="padding: 0.6rem 1.2rem; border-radius: 12px;">
+                <button class="btn btn-primary" onclick="showPasswordModal()" style="padding: 0.6rem 1.2rem; border-radius: 12px;">
                     <span class="material-symbols-outlined">settings_suggest</span> 管理
                 </button>
             </h2>
@@ -488,6 +488,22 @@
             <div id="fullIntroBody" class="intro-modal-body"></div>
             <div class="intro-modal-footer">
                 <button class="btn btn-primary" style="width: 100%; height: 70px; font-size: 1.4rem;" onclick="closeIntroModal()">看完返回</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理者密碼驗證視窗 (長輩大字版) -->
+    <div id="passwordModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-message">請輸入四位數管理密碼</div>
+            <div style="display: flex; justify-content: center; margin-bottom: 2rem;">
+                <input type="password" id="passwordInput" maxlength="4" inputmode="numeric" 
+                       style="width: 240px; height: 80px; font-size: 3rem; text-align: center; border-radius: 20px; border: 2px solid var(--primary); background: #0f172a; color: var(--primary); letter-spacing: 1.2rem; padding-left: 1.2rem;">
+            </div>
+            <div id="passwordError" style="color: var(--danger); margin-bottom: 1.5rem; display: none; font-size: 1.2rem; font-weight: 600;">⚠️ 密碼錯誤，請重新輸入</div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" style="height: 70px; font-size: 1.4rem;" onclick="validatePassword()">確定進入</button>
+                <button class="btn" style="height: 70px; font-size: 1.4rem;" onclick="closePasswordModal()">不進去了</button>
             </div>
         </div>
     </div>
@@ -811,6 +827,34 @@
 
         function closeIntroModal() {
             document.getElementById('introModal').style.display = 'none';
+        }
+
+        // --- 管理權限邏輯 ---
+        function showPasswordModal() {
+            const modal = document.getElementById('passwordModal');
+            const input = document.getElementById('passwordInput');
+            const error = document.getElementById('passwordError');
+            input.value = '';
+            error.style.display = 'none';
+            modal.style.display = 'flex';
+            input.focus();
+        }
+
+        function validatePassword() {
+            const input = document.getElementById('passwordInput');
+            const error = document.getElementById('passwordError');
+            if (input.value === '0000') {
+                closePasswordModal();
+                showView('libraryView');
+            } else {
+                error.style.display = 'block';
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').style.display = 'none';
         }
 
         // --- 播放邏輯 ---
