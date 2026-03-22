@@ -1,0 +1,76 @@
+{
+  "" : {
+    "const-values" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DramaScraperApp-primary.swiftconstvalues",
+    "dependencies" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DramaScraperApp-primary.d",
+    "diagnostics" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DramaScraperApp-primary.dia",
+    "emit-module-dependencies" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DramaScraperApp-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DramaScraperApp-primary-emit-module.dia",
+    "pch" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DramaScraperApp-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DramaScraperApp-primary.swiftdeps"
+  },
+  "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "index-unit-output-path" : "/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/GeneratedAssetSymbols.o"
+  },
+  "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/DerivedSources/resource_bundle_accessor.swift" : {
+    "index-unit-output-path" : "/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/resource_bundle_accessor.o",
+    "llvm-bc" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/resource_bundle_accessor.bc",
+    "object" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/resource_bundle_accessor.o"
+  },
+  "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/Sources/DramaScraperApp/DramaScraperApp.swift" : {
+    "index-unit-output-path" : "/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DramaScraperApp.o",
+    "llvm-bc" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DramaScraperApp.bc",
+    "object" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DramaScraperApp.o"
+  },
+  "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/Sources/DramaScraperApp/Models/Drama.swift" : {
+    "index-unit-output-path" : "/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/Drama.o",
+    "llvm-bc" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/Drama.bc",
+    "object" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/Drama.o"
+  },
+  "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/Sources/DramaScraperApp/Models/ScrapeProgress.swift" : {
+    "index-unit-output-path" : "/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/ScrapeProgress.o",
+    "llvm-bc" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/ScrapeProgress.bc",
+    "object" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/ScrapeProgress.o"
+  },
+  "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/Sources/DramaScraperApp/Services/GASNetworkManager.swift" : {
+    "index-unit-output-path" : "/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/GASNetworkManager.o",
+    "llvm-bc" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/GASNetworkManager.bc",
+    "object" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/GASNetworkManager.o"
+  },
+  "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/Sources/DramaScraperApp/Services/ScraperEngine.swift" : {
+    "index-unit-output-path" : "/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/ScraperEngine.o",
+    "llvm-bc" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/ScraperEngine.bc",
+    "object" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/ScraperEngine.o"
+  },
+  "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/Sources/DramaScraperApp/ViewModels/DashboardViewModel.swift" : {
+    "index-unit-output-path" : "/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DashboardViewModel.o",
+    "llvm-bc" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DashboardViewModel.bc",
+    "object" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DashboardViewModel.o"
+  },
+  "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/Sources/DramaScraperApp/ViewModels/ScrapeViewModel.swift" : {
+    "index-unit-output-path" : "/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/ScrapeViewModel.o",
+    "llvm-bc" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/ScrapeViewModel.bc",
+    "object" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/ScrapeViewModel.o"
+  },
+  "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/Sources/DramaScraperApp/Views/DashboardView.swift" : {
+    "index-unit-output-path" : "/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DashboardView.o",
+    "llvm-bc" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DashboardView.bc",
+    "object" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DashboardView.o"
+  },
+  "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/Sources/DramaScraperApp/Views/ScrapeView.swift" : {
+    "index-unit-output-path" : "/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/ScrapeView.o",
+    "llvm-bc" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/ScrapeView.bc",
+    "object" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/ScrapeView.o"
+  },
+  "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/Sources/DramaScraperApp/Views/SidebarView.swift" : {
+    "index-unit-output-path" : "/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/SidebarView.o",
+    "llvm-bc" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/SidebarView.bc",
+    "object" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/SidebarView.o"
+  },
+  "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/Sources/DramaScraperApp/Views/SplashView.swift" : {
+    "index-unit-output-path" : "/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/SplashView.o",
+    "llvm-bc" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/SplashView.bc",
+    "object" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/SplashView.o"
+  }
+}

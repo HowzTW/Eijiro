@@ -1,0 +1,11 @@
+{
+  "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/DerivedSources/resource_bundle_accessor.swift" : {
+    "abi-baseline-json" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DramaScraperApp.abi.json",
+    "const-values" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DramaScraperApp-primary.swiftconstvalues",
+    "dependencies" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DramaScraperApp-primary.d",
+    "diagnostics" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DramaScraperApp-primary.dia",
+    "swiftdoc" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DramaScraperApp.swiftdoc",
+    "swiftmodule" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DramaScraperApp.swiftmodule",
+    "swiftsourceinfo" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/DramaScraperApp.build/Release/DramaScraperApp.build/Objects-normal/arm64/DramaScraperApp.swiftsourceinfo"
+  }
+}

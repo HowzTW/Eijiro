@@ -1,0 +1,96 @@
+{
+  "source": "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/Sources/DramaScraperApp/Views/DashboardView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "管理劇集",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 53
+        }
+      },
+      {
+        "comment": "",
+        "key": "同步資料庫中...",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 13
+        }
+      },
+      {
+        "comment": "",
+        "key": "載入發生錯誤",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 20
+        }
+      },
+      {
+        "comment": "",
+        "key": "重試",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 24
+        }
+      },
+      {
+        "comment": "",
+        "key": "目前沒有已儲存的劇集",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 35
+        }
+      },
+      {
+        "comment": "",
+        "key": "請至「新增劇集」開始抓取",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 38
+        }
+      },
+      {
+        "comment": "",
+        "key": "重新整理",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 57
+        }
+      },
+      {
+        "comment": "",
+        "key": "確定要從資料庫中移除「%@」嗎？",
+        "location": {
+          "startingColumn": 13,
+          "startingLine": 136
+        }
+      },
+      {
+        "comment": "",
+        "key": "刪除",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 139
+        }
+      },
+      {
+        "comment": "",
+        "key": "取消",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 140
+        }
+      },
+      {
+        "comment": "",
+        "key": "此動作無法復原。",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 142
+        }
+      }
+    ]
+  },
+  "version": 1
+}

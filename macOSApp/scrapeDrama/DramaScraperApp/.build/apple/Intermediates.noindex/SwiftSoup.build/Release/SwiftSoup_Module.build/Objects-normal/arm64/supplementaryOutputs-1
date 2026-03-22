@@ -1,0 +1,12 @@
+{
+  "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/checkouts/SwiftSoup/Sources/Attribute.swift" : {
+    "abi-baseline-json" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/SwiftSoup.build/Release/SwiftSoup_Module.build/Objects-normal/arm64/SwiftSoup.abi.json",
+    "const-values" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/SwiftSoup.build/Release/SwiftSoup_Module.build/Objects-normal/arm64/SwiftSoup_Module-primary.swiftconstvalues",
+    "dependencies" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/SwiftSoup.build/Release/SwiftSoup_Module.build/Objects-normal/arm64/SwiftSoup_Module-primary.d",
+    "diagnostics" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/SwiftSoup.build/Release/SwiftSoup_Module.build/Objects-normal/arm64/SwiftSoup_Module-primary.dia",
+    "objc-header" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/SwiftSoup.build/Release/SwiftSoup_Module.build/Objects-normal/arm64/SwiftSoup-Swift.h",
+    "swiftdoc" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/SwiftSoup.build/Release/SwiftSoup_Module.build/Objects-normal/arm64/SwiftSoup.swiftdoc",
+    "swiftmodule" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/SwiftSoup.build/Release/SwiftSoup_Module.build/Objects-normal/arm64/SwiftSoup.swiftmodule",
+    "swiftsourceinfo" : "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/.build/apple/Intermediates.noindex/SwiftSoup.build/Release/SwiftSoup_Module.build/Objects-normal/arm64/SwiftSoup.swiftsourceinfo"
+  }
+}

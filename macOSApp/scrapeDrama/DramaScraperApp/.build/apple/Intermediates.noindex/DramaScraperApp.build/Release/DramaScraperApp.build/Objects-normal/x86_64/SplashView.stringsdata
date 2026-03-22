@@ -1,0 +1,32 @@
+{
+  "source": "/Users/Howz/Documents/Eijiro/macOSApp/scrapeDrama/DramaScraperApp/Sources/DramaScraperApp/Views/SplashView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "最後版本時間：%@",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 24
+        }
+      },
+      {
+        "comment": "",
+        "key": "抓劇小幫手",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 17
+        }
+      },
+      {
+        "comment": "",
+        "key": "Drama Scraper",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 19
+        }
+      }
+    ]
+  },
+  "version": 1
+}

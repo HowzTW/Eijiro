@@ -48,6 +48,13 @@ class ScraperEngine {
                         coverImageURL = try metaImg.attr("content")
                     }
                     
+                    // 強制轉為 https
+                    if coverImageURL.hasPrefix("http://") {
+                        coverImageURL = coverImageURL.replacingOccurrences(of: "http://", with: "https://")
+                    } else if coverImageURL.hasPrefix("//") {
+                        coverImageURL = "https:" + coverImageURL
+                    }
+                    
                     let introduction = try document.select(".stui-content__desc").first()?.text().trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
                     
                     // 解析播放線路
