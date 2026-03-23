@@ -25,7 +25,7 @@
         "title": "下載背景圖片",
         "icon": "wallpaper",
         "action": "downloadBackground()",
-        "visible": true
+        "visible": false
     },
     {
         "id": "prompt_modal",
@@ -39,6 +39,6 @@
         "title": "管理 API Key",
         "icon": "vpn_key",
         "action": "openApiKeyModal()",
-        "visible": true
+        "visible": false
     }
 ]
