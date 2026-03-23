@@ -730,7 +730,7 @@
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 15px;">
-                <div style="display: flex; gap: 10px;">
+                <div style="display: none; gap: 10px;">
                     <div style="flex: 1;">
                         <div class="modal-label">選擇供應商</div>
                         <div class="modal-select-wrapper">
@@ -763,11 +763,11 @@
             <div class="modal-actions" style="margin-top: 20px;">
                 <button class="action-btn btn-close" onclick="closeAIConfigModal()">取消</button>
                 <button class="action-btn btn-copy"
-                    style="background: rgba(255,255,255,0.1); color: white; margin-right: auto; transition: all 0.2s ease;"
+                    style="background: var(--accent); color: black; margin-right: auto; transition: all 0.2s ease;"
                     onclick="copyConfigPrompt(this)">
                     <span class="material-symbols-rounded">content_copy</span> 複製提示詞
                 </button>
-                <button class="action-btn btn-copy" style="background: var(--accent); color: black;"
+                <button class="action-btn btn-copy" style="background: var(--accent); color: black; display: none;"
                     onclick="executeAIBackground()">
                     <span class="material-symbols-rounded">play_arrow</span> 執行生成
                 </button>
