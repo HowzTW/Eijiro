@@ -38,3 +38,16 @@
 .evox-label {
   letter-spacing: 0.02em;
 }
+
+/* 撥號中狀態 */
+.evox-dial-btn.is-dialing {
+  background: #9aa1a9 !important; /* 灰色 */
+  cursor: not-allowed;
+  opacity: 0.85;
+  transform: none !important;
+}
+
+.evox-dial-btn.is-dialing:hover {
+  background: #9aa1a9 !important;
+  transform: none !important;
+}

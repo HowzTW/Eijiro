@@ -21,7 +21,24 @@ function createDialButton(number) {
   btn.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // 防止重複點擊
+    if (btn.classList.contains('is-dialing')) return;
+
+    // 進入撥號中狀態
+    btn.classList.add('is-dialing');
+    const labelSpan = btn.querySelector('.evox-label');
+    const originalText = labelSpan.textContent;
+    labelSpan.textContent = '撥號中';
+
+    // 執行撥號
     window.location.href = `evox://${number}`;
+
+    // 3 秒後恢復原狀
+    setTimeout(() => {
+      btn.classList.remove('is-dialing');
+      labelSpan.textContent = originalText;
+    }, 3000);
   });
   return btn;
 }
