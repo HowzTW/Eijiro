@@ -49,9 +49,14 @@
     }
     if (!classroomTextNode) return;
 
-    // 從 text node 擷取教室名稱（去掉前面的 " > "）
+    // 從 text node 擷取教室名稱，並切割 Text Node 以便讓按鈕插入中間
     const rawText = classroomTextNode.textContent;
     const gtIndex = rawText.lastIndexOf('>');
+    if (gtIndex >= 0) {
+      // 在 > 之後切開，classroomTextNode 會保留 " > "，其後的新節點才是教室名稱
+      classroomTextNode.splitText(gtIndex + 1);
+    }
+
     const classroomName = gtIndex >= 0
       ? rawText.substring(gtIndex + 1).trim()
       : rawText.trim();
@@ -63,7 +68,7 @@
     btn.textContent = '複製';
     btn.title = `複製：${classroomName}`;
     btn.style.cssText = `
-      margin-left: 10px;
+      margin: 0 8px;
       padding: 2px 10px;
       font-size: 12px;
       cursor: pointer;
@@ -96,7 +101,7 @@
       }, 2000);
     });
 
-    // 插入到教室名稱 text node 之後
+    // 插入到 " > " 之後，教室名稱之前
     classroomTextNode.after(btn);
     console.log('[OA Copy Btn] 已插入複製按鈕，教室名稱：', classroomName);
   }
