@@ -162,6 +162,41 @@ h2 {
     gap: 12px;
 }
 
+.date-nav-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.date-input-wrapper {
+    flex: 1;
+}
+
+.btn-date-nav {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-main);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.btn-date-nav:hover {
+    background: var(--accent);
+    color: #000;
+}
+
+.btn-date-nav .material-symbols-rounded {
+    font-size: 24px;
+}
+
 label {
     font-size: 1.1rem;
     color: var(--text-sub);
@@ -428,7 +463,40 @@ footer {
         padding: 40px 20px 25px 20px;
     }
     .card-viewer {
-        max-width: 320px;
+        max-width: 90%;
         margin: 20px auto;
+    }
+
+    #step_3 .actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    #step_3 .btn-accent {
+        width: 100%;
+        order: -1; /* Move ChatGPT button to top */
+    }
+
+    #step_3 .btn-secondary,
+    #step_3 .btn-primary {
+        flex: 1;
+        width: 100%;
+    }
+
+    /* Wrap the prev/next buttons in a sub-flex for Step 3 if needed */
+    /* Alternatively, force the buttons to be 100% or half width */
+
+    .upload-container {
+        padding: 20px;
+        min-height: 120px;
+    }
+    
+    .upload-container span:not(.material-symbols-rounded) {
+        font-size: 0.9rem;
+    }
+    
+    .upload-container .material-symbols-rounded {
+        font-size: 32px;
+        margin-bottom: 8px;
     }
 }

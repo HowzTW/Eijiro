@@ -36,9 +36,13 @@
                 <button class="btn-reset-top" onclick="resetWizard()" title="重來"><span
                         class="material-symbols-rounded">refresh</span></button>
                 <h2>第 1 步：選擇日期</h2>
-                <div class="input-group">
-                    <label for="date_input">請選擇目標日期：</label>
-                    <input type="date" id="date_input">
+                <div class="input-group date-nav-group">
+                    <button class="btn-date-nav" onclick="changeDate(-1)" title="前一日"><span class="material-symbols-rounded">chevron_left</span></button>
+                    <div class="date-input-wrapper">
+                        <label for="date_input">請選擇目標日期：</label>
+                        <input type="date" id="date_input" onchange="updateUI()">
+                    </div>
+                    <button class="btn-date-nav" onclick="changeDate(1)" title="後一日"><span class="material-symbols-rounded">chevron_right</span></button>
                 </div>
                 <div class="actions">
                     <button class="btn btn-primary" onclick="nextStep()">下一步 <span

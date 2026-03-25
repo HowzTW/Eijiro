@@ -260,6 +260,16 @@ async function downloadPoster() {
 
 
 
+function changeDate(offset) {
+    if (!dateInput.value) {
+        dateInput.value = new Date().toISOString().split('T')[0];
+    }
+    const current = new Date(dateInput.value);
+    current.setDate(current.getDate() + offset);
+    dateInput.value = current.toISOString().split('T')[0];
+    updateUI();
+}
+
 function updateLastMod() {
     const lastModElem = document.getElementById('last_mod');
     if (!lastModElem) return;
