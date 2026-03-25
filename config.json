@@ -2,6 +2,7 @@
     "displayOrder": [
         "watchDrama",
         "dailyQuotation",
+        "dailyQuotationNew",
         "navermapsMemo",
         "oaInvitation",
         "bloodStatus",
@@ -136,6 +137,13 @@
             "title": "每日箴言",
             "description": "沉浸式每日金句讀取器，支援文字編輯與 AI 提示詞產生。",
             "stats": "Inspiration"
+        },
+        "dailyQuotationNew": {
+            "href": "dailyQuotationNew/index.html",
+            "icon": "auto_awesome",
+            "title": "每日箴言 (新版)",
+            "description": "引導式每日金句產生器，支援高畫質圖片下載與 AI 提示詞助手。",
+            "stats": "Wizard App"
         }
     }
 }
