@@ -170,12 +170,14 @@ h2 {
 .date-nav-group {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 12px;
     width: 100%;
 }
 
 .date-input-wrapper {
-    flex: 1;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .btn-date-nav {
@@ -183,8 +185,8 @@ h2 {
     color: var(--text-main);
     border: 1px solid var(--glass-border);
     border-radius: 12px;
-    width: 50px;
-    height: 50px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -222,6 +224,10 @@ input[type="date"], textarea {
 
 input[type="date"] {
     text-align: center;
+    min-width: 0;
+    max-width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 /* Safari / WebKit fix for date input centering */
@@ -229,9 +235,15 @@ input[type="date"]::-webkit-date-and-time-value {
     text-align: center;
 }
 input[type="date"]::-webkit-datetime-edit {
-    display: block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 100%;
     text-align: center;
+}
+input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+    display: flex;
+    justify-content: center;
 }
 
 input:focus, textarea:focus {
