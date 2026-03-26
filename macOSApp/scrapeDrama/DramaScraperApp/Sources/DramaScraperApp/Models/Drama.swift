@@ -7,13 +7,13 @@ struct Drama: Identifiable, Codable {
     var introduction: String
     var cover_image: String
     var update_time: String
-    var sources: String // 為 JSON 格式的來源列表字串
+    var sources: [DramaLine]
     
     enum CodingKeys: String, CodingKey {
         case id, name, introduction, cover_image, update_time, sources
     }
     
-    init(id: String, name: String, introduction: String, cover_image: String, update_time: String, sources: String) {
+    init(id: String, name: String, introduction: String, cover_image: String, update_time: String, sources: [DramaLine]) {
         self.id = id
         self.name = name
         self.introduction = introduction
@@ -36,7 +36,18 @@ struct Drama: Identifiable, Codable {
         introduction = try container.decode(String.self, forKey: .introduction)
         cover_image = try container.decode(String.self, forKey: .cover_image)
         update_time = try container.decode(String.self, forKey: .update_time)
-        sources = try container.decode(String.self, forKey: .sources)
+        
+        // 如果 sources 是字串（舊格式），則嘗試解析它；否則直接解碼為陣列
+        if let sourcesStr = try? container.decode(String.self, forKey: .sources) {
+            if let data = sourcesStr.data(using: .utf8),
+               let decodedSources = try? JSONDecoder().decode([DramaLine].self, from: data) {
+                sources = decodedSources
+            } else {
+                sources = []
+            }
+        } else {
+            sources = try container.decode([DramaLine].self, forKey: .sources)
+        }
     }
     
     func encode(to encoder: Encoder) throws {
@@ -50,10 +61,16 @@ struct Drama: Identifiable, Codable {
     }
 }
 
-// 用於解析 sources JSON 字串
-struct DramaSource: Codable, Identifiable {
-    var id: String { url }
-    var name: String
-    var episode: String
-    var url: String
+struct DramaLine: Codable, Identifiable {
+    var id: String { line_name }
+    var line_name: String
+    var episodes: [DramaEpisode]
 }
+
+struct DramaEpisode: Codable, Identifiable {
+    var id: String { playPageUrl }
+    var name: String
+    var playPageUrl: String
+    var play_url: String
+}
+

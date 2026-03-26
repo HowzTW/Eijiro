@@ -58,7 +58,7 @@ class ScraperEngine {
                     let introduction = try document.select(".stui-content__desc").first()?.text().trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
                     
                     // 解析播放線路
-                    var sourcesArr: [[String: Any]] = []
+                    var rawSourcesArr: [(lineName: String, episodes: [(name: String, playPageUrl: String)])] = []
                     let panels = try document.select(".stui-pannel")
                     let blackList = ["劇情介紹", "猜你喜歡", "熱門推薦", "相關推薦", "系列", "評論"]
                     
@@ -73,72 +73,93 @@ class ScraperEngine {
                             let isBlacklisted = blackList.contains { lineName.contains($0) }
                             
                             if !isBlacklisted {
-                                var episodesList: [[String: String]] = []
+                                var episodesList: [(name: String, playPageUrl: String)] = []
                                 let episodeLinks = try playlistEl.select("li a")
                                 
                                 for el in episodeLinks.array() {
                                     let epName = try el.text().trimmingCharacters(in: .whitespacesAndNewlines)
-                                    var epUrl = try el.attr("href")
+                                    let epUrl = try el.attr("href")
                                     
-                                    if epUrl.hasPrefix("//") {
-                                        epUrl = "https:" + epUrl
-                                    } else if epUrl.hasPrefix("/") {
-                                        epUrl = "https://play.777tv.ai" + epUrl
-                                    } else if !epUrl.hasPrefix("http") {
-                                        epUrl = "https://777tv.ai/" + epUrl
-                                    }
-                                    
-                                    episodesList.append([
-                                        "name": epName,
-                                        "playPageUrl": epUrl
-                                    ])
+                                    episodesList.append((name: epName, playPageUrl: epUrl))
                                     totalEpisodesToFetch += 1
                                 }
                                 
                                 if !episodesList.isEmpty {
-                                    sourcesArr.append([
-                                        "line_name": lineName,
-                                        "episodes": episodesList
-                                    ])
+                                    rawSourcesArr.append((lineName: lineName, episodes: episodesList))
                                 }
                             }
                         }
                     }
                     
-                    continuation.yield(.processing(message: "找到 \(sourcesArr.count) 條線路，準備抓取影片串流位址..."))
+                    continuation.yield(.processing(message: "找到 \(rawSourcesArr.count) 條線路，準備抓取影片串流位址..."))
                     
                     // 遍歷所有集數並獲取真實的 m3u8 url
                     var processedCount = 0
-                    var finalSourcesArr: [[String: Any]] = []
+                    var finalLines: [DramaLine] = []
                     
-                    for source in sourcesArr {
-                        if let lineName = source["line_name"] as? String,
-                           let episodes = source["episodes"] as? [[String: String]] {
+                    for rawLine in rawSourcesArr {
+                        var resolvedEpisodes: [DramaEpisode] = []
+                        
+                        for rawEp in rawLine.episodes {
+                            processedCount += 1
+                            continuation.yield(.parsing(message: "正在抓取", current: processedCount, total: totalEpisodesToFetch, line: rawLine.lineName, episode: rawEp.name))
                             
-                            var resolvedEpisodes: [[String: String]] = []
+                            // 組合完整的播放頁面 URL 用於抓取
+                            var fullPlayPageUrlString = rawEp.playPageUrl
+                            if fullPlayPageUrlString.hasPrefix("//") {
+                                fullPlayPageUrlString = "https:" + fullPlayPageUrlString
+                            } else if fullPlayPageUrlString.hasPrefix("/") {
+                                fullPlayPageUrlString = "https://play.777tv.ai" + fullPlayPageUrlString
+                            } else if !fullPlayPageUrlString.hasPrefix("http") {
+                                fullPlayPageUrlString = "https://777tv.ai/" + fullPlayPageUrlString
+                            }
                             
-                            for ep in episodes {
-                                processedCount += 1
-                                let epName = ep["name"] ?? ""
-                                let playPageUrl = ep["playPageUrl"] ?? ""
+                            // 格式化所需的 playPageUrl (相對協定 //)
+                            let formattedPlayPageUrl: String
+                            if rawEp.playPageUrl.hasPrefix("//") {
+                                formattedPlayPageUrl = rawEp.playPageUrl
+                            } else if rawEp.playPageUrl.hasPrefix("/") {
+                                formattedPlayPageUrl = "//play.777tv.ai" + rawEp.playPageUrl
+                            } else {
+                                formattedPlayPageUrl = rawEp.playPageUrl
+                            }
+                            
+                            var finalPlayUrl = ""
+                            // 抓取真實連結
+                            if let playURLObj = URL(string: fullPlayPageUrlString) {
+                                var playReq = URLRequest(url: playURLObj)
+                                playReq.setValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36", forHTTPHeaderField: "User-Agent")
                                 
-                                continuation.yield(.parsing(message: "正在抓取", current: processedCount, total: totalEpisodesToFetch, line: lineName, episode: epName))
-                                
-                                var finalPlayUrl = ""
-                                // 抓取真實連結
-                                if let playURLObj = URL(string: playPageUrl) {
-                                    var playReq = URLRequest(url: playURLObj)
-                                    playReq.setValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36", forHTTPHeaderField: "User-Agent")
+                                if let (playData, _) = try? await URLSession.shared.data(for: playReq),
+                                   let playHtml = String(data: playData, encoding: .utf8) {
                                     
-                                    if let (playData, _) = try? await URLSession.shared.data(for: playReq),
-                                       let playHtml = String(data: playData, encoding: .utf8) {
+                                    // 尋找變數宣告位置
+                                    if let range = playHtml.range(of: "var player_data=") ?? playHtml.range(of: "var MacPlayer=") {
+                                        let searchStartIndex = range.upperBound
                                         
-                                        // 用正則匹配 MacPlayer 變數
-                                        let pattern = "var\\s+(?:player_data|MacPlayer)\\s*=\\s*({.*?})[\\s;]*</script>"
-                                        if let regex = try? NSRegularExpression(pattern: pattern, options: .dotMatchesLineSeparators) {
-                                            let nsString = playHtml as NSString
-                                            if let match = regex.firstMatch(in: playHtml, options: [], range: NSRange(location: 0, length: nsString.length)) {
-                                                let jsonStr = nsString.substring(with: match.range(at: 1))
+                                        // 尋找第一個 '{'
+                                        if let openBraceIndex = playHtml[searchStartIndex...].firstIndex(of: "{") {
+                                            var braceCount = 0
+                                            var closeBraceIndex: String.Index? = nil
+                                            
+                                            // 遍歷以找到對應的 '}'
+                                            for index in playHtml.indices[openBraceIndex...] {
+                                                let char = playHtml[index]
+                                                if char == "{" {
+                                                    braceCount += 1
+                                                } else if char == "}" {
+                                                    braceCount -= 1
+                                                    if braceCount == 0 {
+                                                        closeBraceIndex = index
+                                                        break
+                                                    }
+                                                }
+                                            }
+                                            
+                                            if let closeIndex = closeBraceIndex {
+                                                let jsonRange = openBraceIndex...closeIndex
+                                                let jsonStr = String(playHtml[jsonRange])
+                                                
                                                 if let jsonData = jsonStr.data(using: .utf8),
                                                    let jsonObject = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any] {
                                                     finalPlayUrl = (jsonObject["url"] as? String) ?? (jsonObject["PlayUrl"] as? String) ?? ""
@@ -146,28 +167,25 @@ class ScraperEngine {
                                             }
                                         }
                                     }
+
                                 }
-                                
-                                resolvedEpisodes.append([
-                                    "name": epName,
-                                    "playPageUrl": playPageUrl,
-                                    "play_url": finalPlayUrl
-                                ])
-                                
-                                // 微小延遲避免被伺服器封鎖
-                                try await Task.sleep(nanoseconds: 100_000_000)
                             }
                             
-                            finalSourcesArr.append([
-                                "line_name": lineName,
-                                "episodes": resolvedEpisodes
-                            ])
+                            resolvedEpisodes.append(DramaEpisode(
+                                name: rawEp.name,
+                                playPageUrl: formattedPlayPageUrl,
+                                play_url: finalPlayUrl
+                            ))
+                            
+                            // 微小延遲避免被伺服器封鎖
+                            try await Task.sleep(nanoseconds: 200_000_000)
                         }
+                        
+                        finalLines.append(DramaLine(
+                            line_name: rawLine.lineName,
+                            episodes: resolvedEpisodes
+                        ))
                     }
-                    
-                    let sourcesJsonData = try JSONSerialization.data(withJSONObject: finalSourcesArr, options: [])
-                    let sourcesJsonString = String(data: sourcesJsonData, encoding: .utf8) ?? "[]"
-
                     
                     continuation.yield(.saving)
                     let drama = Drama(
@@ -176,7 +194,7 @@ class ScraperEngine {
                         introduction: introduction,
                         cover_image: coverImageURL,
                         update_time: "", // GAS 會覆寫
-                        sources: sourcesJsonString
+                        sources: finalLines
                     )
                     
                     _ = try await GASNetworkManager.shared.syncDrama(drama: drama)
@@ -192,3 +210,4 @@ class ScraperEngine {
         }
     }
 }
+

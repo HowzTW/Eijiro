@@ -44,7 +44,7 @@ class GASNetworkManager {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
         do {
-            // Because drama.sources is a JSON string of Array, we can safely re-encode it
+            // Encode drama object (sources is now a structured array)
             request.httpBody = try JSONEncoder().encode(drama)
         } catch {
             print("Encoding error: \(error)")
