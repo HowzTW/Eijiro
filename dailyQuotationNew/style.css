@@ -360,6 +360,7 @@ input:focus, textarea:focus {
     color: var(--text-main);
     word-break: break-word;
     position: relative;
+    z-index: 1; /* Fix for missing quotes in preview */
     margin: 0;
     padding: 20px 30px;
     flex: 1;
