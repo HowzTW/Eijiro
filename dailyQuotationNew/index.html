@@ -22,9 +22,10 @@
             <div class="header-top">
                 <div class="logo">
                     <img src="icon.png" alt="Logo">
-                    <span>箴言小幫手</span>
+                    <span>箴言小幫手C</span>
                 </div>
-                <button class="btn-reset-top" onclick="resetWizard()" title="重來"><span class="material-symbols-rounded">refresh</span></button>
+                <button class="btn-reset-top" onclick="resetWizard()" title="重來"><span
+                        class="material-symbols-rounded">refresh</span></button>
             </div>
             <div class="progress-bar">
                 <div class="step-indicator" id="step_indicator">步驟 1 / 5</div>
@@ -40,11 +41,13 @@
 
                 <h2>第 1 步：選擇日期</h2>
                 <div class="date-nav-group">
-                    <button class="btn-date-nav" onclick="changeDate(-1)" title="前一日"><span class="material-symbols-rounded">chevron_left</span></button>
+                    <button class="btn-date-nav" onclick="changeDate(-1)" title="前一日"><span
+                            class="material-symbols-rounded">chevron_left</span></button>
                     <div class="date-input-wrapper">
                         <input type="date" id="date_input" onchange="updateUI()">
                     </div>
-                    <button class="btn-date-nav" onclick="changeDate(1)" title="後一日"><span class="material-symbols-rounded">chevron_right</span></button>
+                    <button class="btn-date-nav" onclick="changeDate(1)" title="後一日"><span
+                            class="material-symbols-rounded">chevron_right</span></button>
                 </div>
                 <div class="actions">
                     <button class="btn btn-primary" onclick="nextStep()">下一步 <span
@@ -121,22 +124,22 @@
                 <h2>第 5 步：預覽與下載</h2>
                 <div class="card-scroll-wrapper">
                     <div class="card-viewer">
-                    <!-- The actual card (Responsive like original) -->
-                    <div id="poster_card" class="poster-card">
-                        <div class="card-title">每日箴言</div>
-                        <div id="card_date" class="date-label"></div>
-                        <div id="card_quote_container" class="quote-content">
-                            <div id="card_quote_inner"></div>
+                        <!-- The actual card (Responsive like original) -->
+                        <div id="poster_card" class="poster-card">
+                            <div class="card-title">每日箴言</div>
+                            <div id="card_date" class="date-label"></div>
+                            <div id="card_quote_container" class="quote-content">
+                                <div id="card_quote_inner"></div>
+                            </div>
+                            <div style="width: 100%; text-align: right;">
+                                <div class="quote-author">——池田大作</div>
+                                <div id="card_source" class="quote-source"></div>
+                            </div>
+                            <div id="card_landmark" class="landmark-badge" style="display:none;">
+                                <span class="material-symbols-rounded">location_on</span>
+                                <span id="card_location"></span>
+                            </div>
                         </div>
-                        <div style="width: 100%; text-align: right;">
-                            <div class="quote-author">——池田大作</div>
-                            <div id="card_source" class="quote-source"></div>
-                        </div>
-                        <div id="card_landmark" class="landmark-badge" style="display:none;">
-                            <span class="material-symbols-rounded">location_on</span>
-                            <span id="card_location"></span>
-                        </div>
-                    </div>
                     </div>
                 </div>
                 <div class="actions">
