@@ -228,19 +228,21 @@ async function downloadPoster() {
             allowTaint: true,
             scale: 3,
             width: 500,
-            height: 666.67, // Explicitly constrain 3:4 calculation
-            backgroundColor: null, // Avoid drawing black backgrounds natively
+            height: 667, // Ensure integer canvas height (generates 1500x2001)
+            backgroundColor: null, 
             logging: false,
             imageTimeout: 0,
             onclone: (clonedDoc) => {
                 const clonedTarget = clonedDoc.getElementById('poster_card');
-                clonedTarget.style.width = '500px'; // Lock width
-                clonedTarget.style.height = '666.67px'; // Lock height explicitly
+                clonedTarget.style.width = '500px'; 
+                // Over-extend height slightly to 668px to guarantee 100% paint coverage 
+                // and absolutely eliminate any transparent/white blank lines at the bottom
+                clonedTarget.style.height = '668px'; 
                 clonedTarget.style.maxWidth = 'none';
                 clonedTarget.style.maxHeight = 'none';
-                clonedTarget.style.boxShadow = 'none'; // Fix extra edge artifacts
-                clonedTarget.style.border = 'none'; // Extra safety
-                clonedTarget.style.overflow = 'hidden'; // Ensure content cannot expand the clone
+                clonedTarget.style.boxShadow = 'none'; 
+                clonedTarget.style.border = 'none'; 
+                clonedTarget.style.overflow = 'hidden'; 
             }
         });
 
@@ -248,7 +250,6 @@ async function downloadPoster() {
         const link = document.createElement('a');
         link.download = `DailyQuote_${dateStr.replace('月', '').replace('日', '')}.png`;
         
-        // Ensure strictly 1500x2000 mapping: We explicitly CROP instead of stretch
         const finalCanvas = document.createElement('canvas');
         finalCanvas.width = 1500;
         finalCanvas.height = 2000;
@@ -256,11 +257,9 @@ async function downloadPoster() {
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
         
-        // Take explicitly the top 1500x2000 rendering of HTML2Canvas, discarding any trailing
-        // extra bounds allocated by `html2canvas` due to shadow layouts
-        const sourceW = Math.min(canvas.width, 1500);
-        const sourceH = Math.min(canvas.height, 2000);
-        ctx.drawImage(canvas, 0, 0, sourceW, sourceH, 0, 0, 1500, 2000);
+        // The inner canvas is 1500x2001 and strictly painted across 100% of its area.
+        // We smoothly compress the 1/2000th difference down to 1500x2000 perfectly.
+        ctx.drawImage(canvas, 0, 0, 1500, 2001, 0, 0, 1500, 2000);
 
         finalCanvas.toBlob((blob) => {
             if (!blob) throw new Error("Canvas toBlob failed");

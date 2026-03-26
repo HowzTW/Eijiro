@@ -24,14 +24,14 @@ body {
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     overflow-x: hidden;
 }
 
 .app-container {
     width: 100%;
     max-width: 800px;
-    padding: 40px 20px;
+    padding: 0px 20px 40px 20px;
     display: flex;
     flex-direction: column;
     gap: 30px;
@@ -39,15 +39,24 @@ body {
 
 /* Header & Progress */
 header {
-    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg-dark);
+    padding: 40px 0 20px 0;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
 .logo {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 15px;
-    margin-bottom: 25px;
 }
 
 .logo img {
@@ -108,14 +117,9 @@ main {
     gap: 25px;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
     animation: slideIn 0.5s ease;
-    position: relative; /* For top-right reset button */
-    overflow-x: auto;
 }
 
 .btn-reset-top {
-    position: absolute;
-    top: 15px;
-    right: 15px;
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -216,6 +220,20 @@ input[type="date"], textarea {
     width: 100%;
 }
 
+input[type="date"] {
+    text-align: center;
+}
+
+/* Safari / WebKit fix for date input centering */
+input[type="date"]::-webkit-date-and-time-value {
+    text-align: center;
+}
+input[type="date"]::-webkit-datetime-edit {
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
 input:focus, textarea:focus {
     border-color: var(--accent);
 }
@@ -275,10 +293,18 @@ input:focus, textarea:focus {
 .upload-container {
     border: 2px dashed var(--glass-border);
     border-radius: 18px;
-    padding: 40px;
-    text-align: center;
+    padding: 20px;
     cursor: pointer;
     transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.upload-container p {
+    margin: 0;
+    font-size: 1.1rem;
 }
 
 .upload-container:hover {
@@ -287,7 +313,7 @@ input:focus, textarea:focus {
 }
 
 .upload-container .material-symbols-rounded {
-    font-size: 4rem;
+    font-size: 2.2rem;
     color: var(--accent);
 }
 
@@ -306,6 +332,12 @@ input:focus, textarea:focus {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+}
+
+.card-scroll-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 20px;
 }
 
 /* Card Viewer (Fixed Size) */
@@ -450,7 +482,11 @@ footer {
 /* Mobile Adjustments */
 @media (max-width: 600px) {
     .app-container {
-        padding: 20px 10px;
+        padding: 0 10px 20px 10px;
+    }
+    
+    header {
+        padding: 20px 0 15px 0;
     }
     .step-section {
         padding: 40px 20px 25px 20px;
@@ -459,36 +495,20 @@ footer {
         margin: 20px auto;
     }
 
-    #step_3 .actions {
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    #step_3 .btn-accent {
-        width: 100%;
-        order: -1; /* Move ChatGPT button to top */
-    }
-
-    #step_3 .btn-secondary,
-    #step_3 .btn-primary {
-        flex: 1;
-        width: 100%;
-    }
+/* Step 3 layout overrides removed */
 
     /* Wrap the prev/next buttons in a sub-flex for Step 3 if needed */
     /* Alternatively, force the buttons to be 100% or half width */
 
     .upload-container {
-        padding: 20px;
-        min-height: 120px;
+        padding: 15px;
     }
     
-    .upload-container span:not(.material-symbols-rounded) {
-        font-size: 0.9rem;
+    .upload-container p {
+        font-size: 1rem;
     }
     
     .upload-container .material-symbols-rounded {
-        font-size: 32px;
-        margin-bottom: 8px;
+        font-size: 1.8rem;
     }
 }
