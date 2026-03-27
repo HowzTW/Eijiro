@@ -74,14 +74,7 @@ function prevStep() {
 
 function resetWizard() {
     if (confirm("確定要取消並重來嗎？這將清除目前的編輯內容。")) {
-        currentStep = 1;
-        selectedDateData = null;
-        uploadedImageData = null;
-        contentInput.value = "";
-        previewImg.src = "";
-        previewImg.style.display = "none";
-        btnStep4Next.disabled = true;
-        updateUI();
+        location.reload();
     }
 }
 
