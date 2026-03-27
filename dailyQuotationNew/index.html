@@ -22,7 +22,7 @@
             <div class="header-top">
                 <div class="logo">
                     <img src="icon.png" alt="Logo">
-                    <span>箴言小幫手C</span>
+                    <span>箴言小幫手F</span>
                 </div>
                 <button class="btn-reset-top" onclick="resetWizard()" title="重來"><span
                         class="material-symbols-rounded">refresh</span></button>
@@ -124,20 +124,22 @@
                 <h2>第 5 步：預覽與下載</h2>
                 <div class="card-scroll-wrapper">
                     <div class="card-viewer">
-                        <!-- The actual card (Responsive like original) -->
-                        <div id="poster_card" class="poster-card">
-                            <div class="card-title">每日箴言</div>
-                            <div id="card_date" class="date-label"></div>
-                            <div id="card_quote_container" class="quote-content">
-                                <div id="card_quote_inner"></div>
-                            </div>
-                            <div style="width: 100%; text-align: right;">
-                                <div class="quote-author">——池田大作</div>
-                                <div id="card_source" class="quote-source"></div>
-                            </div>
-                            <div id="card_landmark" class="landmark-badge" style="display:none;">
-                                <span class="material-symbols-rounded">location_on</span>
-                                <span id="card_location"></span>
+                        <!-- The Master Card (Fixed 1500x2000, scaled for viewing) -->
+                        <div class="card-scaler" id="card_scaler">
+                            <div id="poster_card" class="poster-card">
+                                <div class="card-title">每日箴言</div>
+                                <div id="card_date" class="date-label"></div>
+                                <div id="card_quote_container" class="quote-content">
+                                    <div id="card_quote_inner"></div>
+                                </div>
+                                <div style="width: 100%; text-align: right;">
+                                    <div class="quote-author">——池田大作</div>
+                                    <div id="card_source" class="quote-source"></div>
+                                </div>
+                                <div id="card_landmark" class="landmark-badge" style="display:none;">
+                                    <span class="material-symbols-rounded">location_on</span>
+                                    <span id="card_location"></span>
+                                </div>
                             </div>
                         </div>
                     </div>

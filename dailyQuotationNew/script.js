@@ -151,6 +151,17 @@ function handleFileUpload(event) {
     reader.readAsDataURL(file);
 }
 
+function updatePreviewScale() {
+    const scaler = document.getElementById('card_scaler');
+    const viewer = document.querySelector('.card-viewer');
+    if (!scaler || !viewer) return;
+
+    // Calculate scale based on container width (max 600px as per CSS)
+    const viewerWidth = Math.min(viewer.clientWidth, 600);
+    const scale = viewerWidth / 1500;
+    scaler.style.transform = `scale(${scale})`;
+}
+
 function prepareFinalCard() {
     const cardQuoteInner = document.getElementById('card_quote_inner');
     const cardDate = document.getElementById('card_date');
@@ -181,8 +192,11 @@ function prepareFinalCard() {
         posterCard.style.backgroundImage = `url(${uploadedImageData})`;
     }
 
-    // Auto fit font size (Original logic)
-    setTimeout(autoFitCardFont, 50);
+    // Update layout and fit fonts
+    setTimeout(() => {
+        updatePreviewScale();
+        autoFitCardFont();
+    }, 50);
 }
 
 function autoFitCardFont() {
@@ -190,19 +204,22 @@ function autoFitCardFont() {
     const inner = document.getElementById('card_quote_inner');
     if (!container || !inner) return;
 
-    // Reset to a large font size to start shrinking (Original approach)
-    let fontSize = 3.5; 
+    // Start with a very large font size to maximize space for short quotes
+    let fontSize = 12; 
     container.style.fontSize = fontSize + 'rem';
 
-    // Wait for frame
+    // Wait for frame to ensure rendering is settled
     requestAnimationFrame(() => {
         const style = window.getComputedStyle(container);
         const paddingTop = parseFloat(style.paddingTop);
         const paddingBottom = parseFloat(style.paddingBottom);
-        const availableHeight = container.clientHeight - paddingTop - paddingBottom - 20;
+        
+        // availableHeight in the 2000px master card
+        const availableHeight = container.clientHeight - paddingTop - paddingBottom - 60;
 
         let iterations = 0;
-        while (inner.scrollHeight > availableHeight && fontSize > 0.6 && iterations < 60) {
+        // Shrink until it fits the height
+        while (inner.scrollHeight > availableHeight && fontSize > 1.0 && iterations < 150) {
             fontSize -= 0.1;
             container.style.fontSize = fontSize + 'rem';
             iterations++;
@@ -211,7 +228,7 @@ function autoFitCardFont() {
 }
 
 async function downloadPoster() {
-    const target = document.getElementById('poster_card');
+    const masterCard = document.getElementById('poster_card');
     const dateStr = document.getElementById('card_date').innerText;
 
     // Show loading state
@@ -221,26 +238,30 @@ async function downloadPoster() {
     btn.disabled = true;
 
     try {
-        // [CRITICAL] To capture exactly 1500x2000 from a 500px responsive element:
-        // Use scale: 3 (500 * 3 = 1500)
-        const canvas = await html2canvas(target, {
+        // html2canvas handles the transform: scale on parent automatically or we can assist it.
+        // But since we want the UNTRANSFORMED 1500x2000 version for capture:
+        const canvas = await html2canvas(masterCard, {
             useCORS: true,
             allowTaint: true,
-            scale: 2.5,       // 600 * 2.5 = 1500px, 800 * 2.5 = 2000px (exact, integer)
-            width: 600,
-            height: 800,      // 600 * 4/3 = 800 (integer, no decimal rounding!)
-            backgroundColor: null,
+            scale: 1, // Capture at its native 1500x2000 resolution
+            width: 1500,
+            height: 2000,
+            backgroundColor: '#000000',
             logging: false,
             imageTimeout: 0,
             onclone: (clonedDoc) => {
-                const clonedTarget = clonedDoc.getElementById('poster_card');
-                clonedTarget.style.width = '600px';
-                clonedTarget.style.height = '800px'; // exact integer, no rounding issues
-                clonedTarget.style.maxWidth = 'none';
-                clonedTarget.style.maxHeight = 'none';
-                clonedTarget.style.boxShadow = 'none';
-                clonedTarget.style.border = 'none';
-                clonedTarget.style.overflow = 'hidden';
+                // Ensure the card in the cloned doc is perfectly positioned and unscaled
+                const clonedCard = clonedDoc.getElementById('poster_card');
+                const clonedScaler = clonedDoc.getElementById('card_scaler');
+                if (clonedScaler) {
+                    clonedScaler.style.transform = 'none';
+                    clonedScaler.style.width = '1500px';
+                    clonedScaler.style.height = '2000px';
+                }
+                if (clonedCard) {
+                    clonedCard.style.position = 'relative';
+                    clonedCard.style.margin = '0';
+                }
             }
         });
 
@@ -248,14 +269,7 @@ async function downloadPoster() {
         const link = document.createElement('a');
         link.download = `DailyQuote_${dateStr.replace('月', '').replace('日', '')}.png`;
 
-        // canvas is now exactly 1500x2000 — no cropping or stretching needed
-        const finalCanvas = document.createElement('canvas');
-        finalCanvas.width = 1500;
-        finalCanvas.height = 2000;
-        const ctx = finalCanvas.getContext('2d');
-        ctx.drawImage(canvas, 0, 0);
-
-        finalCanvas.toBlob((blob) => {
+        canvas.toBlob((blob) => {
             if (!blob) throw new Error("Canvas toBlob failed");
             const url = URL.createObjectURL(blob);
             link.href = url;
@@ -264,13 +278,14 @@ async function downloadPoster() {
         }, 'image/png', 1.0);
 
     } catch (error) {
-        console.error("Screenshot failed:", error);
-        alert("截圖失敗，請重試。\n錯誤: " + error.message);
+        console.error("Export failed:", error);
+        alert("匯出失敗，請重試。\n錯誤: " + error.message);
     } finally {
         btn.innerHTML = originalContent;
         btn.disabled = false;
     }
 }
+window.addEventListener('resize', updatePreviewScale);
 
 
 
