@@ -34,6 +34,15 @@ function createDialButton(number) {
     // 執行撥號
     window.location.href = `evox://${number}`;
 
+    // 新增：填入搜尋欄位並觸發搜尋 (id="q")
+    const searchInput = document.getElementById('q');
+    if (searchInput) {
+      searchInput.value = ''; // 先清除內容
+      searchInput.value = number; // 填入電話號碼
+      // 觸發 input 事件以啟動頁面原本的搜尋機制 (Stimulus input->search#send)
+      searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
     // 3 秒後恢復原狀
     setTimeout(() => {
       btn.classList.remove('is-dialing');
