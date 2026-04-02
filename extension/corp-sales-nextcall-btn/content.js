@@ -6,37 +6,110 @@
  * 下次預約標籤範例:
  * <a data-turbo-frame="remote_modal" href="/potential_students/491652/next_call"> </a>
  * 
- * 如果 innerText 為空或是空白字元，自動取代為 "[預約時間]"。
+ * 如果內容為空，自動轉換為「預約時間」按鈕樣式。
  */
 
 (function () {
-  const TARGET_PHRASE = '[預約時間]';
+  const BUTTON_LABEL = '預約時間';
+  const BUTTON_HTML = `<span class="oa-label">${BUTTON_LABEL}</span>`;
+  const STYLE_ID = 'oa-nextcall-styles';
+
+  /**
+   * 注入 CSS 樣式 (確保比外部 CSS 更有權威)
+   */
+  function injectStyles() {
+    if (document.getElementById(STYLE_ID)) return;
+    const style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = `
+      .oa-nextcall-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 3px 10px !important;
+        background-color: #e67e22 !important; /* 強制橘色 */
+        color: #ffffff !important;           /* 強制白色文字 */
+        border-radius: 4px !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        text-decoration: none !important;
+        cursor: pointer !important;
+        border: none !important;
+        vertical-align: middle !important;
+        line-height: 1.5 !important;
+        transition: background 0.15s ease !important;
+        white-space: nowrap !important;
+        margin: 2px 0;
+      }
+      .oa-nextcall-btn:hover {
+        background-color: #d35400 !important;
+      }
+      .oa-label {
+        letter-spacing: 0.02em !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
 
   /**
    * 掃描並更新所有符合條件的連結
    */
   function updateNextCallLinks() {
+    injectStyles(); // 依然保留 CSS Class 作為備援與 Hover 效果
+    
     // 尋找具有 data-turbo-frame 且 href 包含 next_call 的連結
     const links = document.querySelectorAll('a[data-turbo-frame="remote_modal"][href*="/next_call"]');
 
     links.forEach(link => {
       const text = link.textContent.trim();
-      const isAlreadyProcessed = link.dataset.oaProcessed === 'true';
+      const isProcessed = link.dataset.oaProcessed === 'true';
+
+      // --- 置中處理 ---
+      // 為了讓按鈕不變形且維持置中，我們設定父層 td 置中，按鈕本身維持 inline-flex
+      if (link.parentElement) {
+        link.parentElement.style.textAlign = 'center';
+      }
+      link.style.setProperty('display', 'inline-flex', 'important');
+      link.style.setProperty('width', 'auto', 'important');
+      link.style.setProperty('justify-content', 'center', 'important');
 
       // 情況 1：目前的內容是空白 (或是原本的空白)
-      if (text === '' || text === ' ') {
-        link.textContent = TARGET_PHRASE;
-        link.style.color = '#e67e22'; // 橘色提醒，與一般日期區分
-        link.style.fontWeight = 'bold';
-        link.dataset.oaProcessed = 'true';
+      if (text === '' || text === ' ' || (isProcessed && text === BUTTON_LABEL)) {
+        if (!isProcessed || link.innerHTML !== BUTTON_HTML) {
+            link.innerHTML = BUTTON_HTML;
+            link.className = 'oa-nextcall-btn';
+            
+            // 使用 Inline Style 確保最高優先級
+            link.style.setProperty('height', 'auto', 'important');
+            link.style.setProperty('padding', '3px 10px', 'important');
+            link.style.setProperty('background-color', '#e67e22', 'important');
+            link.style.setProperty('color', '#ffffff', 'important');
+            link.style.setProperty('border-radius', '4px', 'important');
+            link.style.setProperty('font-size', '12px', 'important');
+            link.style.setProperty('font-weight', '600', 'important');
+            link.style.setProperty('text-decoration', 'none', 'important');
+            link.style.setProperty('cursor', 'pointer', 'important');
+            link.style.setProperty('vertical-align', 'middle', 'important');
+            link.style.setProperty('line-height', '1.5', 'important');
+            link.style.setProperty('white-space', 'nowrap', 'important');
+            
+            link.dataset.oaProcessed = 'true';
+        }
       } 
-      // 情況 2：如果目前的內容是日期 (非空白且非 [預約時間])，但我們之前標記過它是空值
-      else if (text !== TARGET_PHRASE && isAlreadyProcessed) {
-        // 這代表 Turbo 已經更新了內容，填入了正式日期
-        // 我們應該還原樣式
-        link.style.color = ''; 
+      // 情況 2：如果目前的內容是日期，但我們之前標記過它是補上去的按鈕
+      else if (isProcessed && text !== BUTTON_LABEL && !text.includes(BUTTON_LABEL)) {
+        link.className = '';
+        // 清除按鈕專用樣式，但保留置中樣式
+        link.style.height = ''; 
+        link.style.backgroundColor = '';
+        link.style.color = '';
+        link.style.padding = '';
+        link.style.borderRadius = '';
         link.style.fontWeight = '';
-        link.dataset.oaProcessed = 'false'; // 標記為不再是空值狀態
+        link.style.fontSize = '';
+        link.style.lineHeight = '';
+        
+        link.dataset.oaProcessed = 'false'; 
       }
     });
   }
@@ -46,7 +119,6 @@
 
   // 2. 監聽 DOM 變化（應對 Turbo / Hotwire 局部更新或分頁載入）
   const observer = new MutationObserver((mutations) => {
-    // 效能優化：只有當有節點新增或是子樹變更時才執行
     const hasAddedNodes = mutations.some(m => m.addedNodes.length > 0);
     if (hasAddedNodes) {
       updateNextCallLinks();
@@ -58,7 +130,5 @@
     subtree: true
   });
 
-  // 輔助：監聽點擊事件，如果點擊的是我們標記的連結，代表可能要開 Modal 了
-  // 這部分通常不需要額外處理，因為 Turbo 會接手，但我們可以在控制台記錄
-  console.log('[OA Sales NextCall] Extension loaded and observing...');
+  console.log('[OA Sales NextCall] Styles re-injected and logic refined.');
 })();

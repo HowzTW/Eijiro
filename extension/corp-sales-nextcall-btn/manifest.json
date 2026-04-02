@@ -6,6 +6,7 @@
   "content_scripts": [
     {
       "matches": ["https://corp.orangeapple.co/marketing/sales*"],
+      "css": ["style.css"],
       "js": ["content.js"],
       "run_at": "document_idle"
     }
