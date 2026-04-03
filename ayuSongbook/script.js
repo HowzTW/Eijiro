@@ -6,6 +6,9 @@
  */
 const GAS_URL = 'https://script.google.com/macros/s/AKfycby2ws9yM1RTe_8FFOnZvrM5QYBfPoWCYTNjb93AMeJOyXBCr1PWHk6ln5b0Glskdfow5w/exec';
 
+// 全域狀態：已加入資料庫的歌曲編號 (Set)
+let addedSongCodes = new Set();
+
 const DOM = {
     splash: document.getElementById('splash'),
     splashDate: document.getElementById('splash-last-updated'),
@@ -102,9 +105,12 @@ function setupEventListeners() {
     // 搜尋按鈕點擊
     DOM.searchSubmitBtn.onclick = handleSearch;
 
-    // 收合結果按鈕
+    // 清除搜尋結果與輸入框
     DOM.closeResultsBtn.onclick = () => {
         DOM.resultsSection.classList.add('hidden-collapsed');
+        DOM.searchInput.value = '';
+        DOM.searchClearBtn.classList.add('hidden');
+        DOM.searchSubmitBtn.disabled = true;
     };
 
     // 彈窗取消按鈕
@@ -167,6 +173,8 @@ async function fetchSonglist() {
         const result = await response.json();
 
         if (result.success) {
+            // 更新已加入編號集合
+            addedSongCodes = new Set(result.data.map(song => song.code.toString()));
             renderSonglist(result.data);
         } else {
             DOM.songlistContainer.innerHTML = '<p class="error-text">歌單資料讀取失敗</p>';
@@ -224,21 +232,27 @@ function createSongCard(song, type) {
     const div = document.createElement('div');
     div.className = 'song-card';
     
+    // 修正：只有在「搜尋結果模式 (add)」下才檢查是否已加入，「我的歌單模式 (delete)」需維持顯示刪除按鈕
+    const isAdded = (type === 'add') && addedSongCodes.has(song.code.toString());
+    
     div.innerHTML = `
         <div class="song-info">
-            <div class="song-name">${song.name}</div>
+            <div class="song-name">${song.name} ${isAdded ? '<span class="material-icons" style="font-size:1.25rem; color:#2e7d32; vertical-align:middle;">check_circle</span>' : ''}</div>
             <div class="song-meta">${song.singer} ( ${song.lang} )</div>
             <div class="song-code">編號：${song.code}</div>
         </div>
-        <button class="btn-action ${type === 'add' ? 'btn-add' : 'btn-delete'}" title="${type === 'add' ? '加入歌單' : '刪除歌曲'}">
-            <span class="material-icons">${type === 'add' ? 'add' : 'delete'}</span>
+        <button class="btn-action ${isAdded ? 'btn-added' : (type === 'add' ? 'btn-add' : 'btn-delete')}" 
+                ${isAdded ? 'disabled' : ''} 
+                title="${isAdded ? '已在歌單中' : (type === 'add' ? '加入歌單' : '刪除歌曲')}">
+            <span class="material-icons">${isAdded ? 'check_circle' : (type === 'add' ? 'add' : 'delete')}</span>
         </button>
     `;
 
     const actionBtn = div.querySelector('.btn-action');
     actionBtn.onclick = () => {
+        if (isAdded) return;
         if (type === 'add') {
-            confirmAdd(song);
+            confirmAdd(song, actionBtn);
         } else {
             confirmDelete(song);
         }
@@ -247,13 +261,20 @@ function createSongCard(song, type) {
     return div;
 }
 
-function confirmAdd(song) {
+function confirmAdd(song, btn) {
     showModal(
         '加入歌單',
         `確定要將《${song.name}》加入您的金嗓歌單嗎？`,
         'add_circle',
         async () => {
             closeModal();
+            
+            // 方案 C：進入處理中狀態 (沙漏翻轉)
+            btn.disabled = true;
+            btn.classList.remove('btn-add');
+            btn.classList.add('btn-loading');
+            btn.querySelector('span').innerText = 'hourglass_empty';
+            
             showSnackbar(`正在加入《${song.name}》...`);
             
             const params = new URLSearchParams({
@@ -264,11 +285,33 @@ function confirmAdd(song) {
                 lang: song.lang
             });
 
-            const res = await fetch(`${GAS_URL}?${params.toString()}`);
-            const data = await res.json();
-            if (data.success) {
-                showSnackbar('新增成功！');
-                fetchSonglist(); // 刷新歌單
+            try {
+                const res = await fetch(`${GAS_URL}?${params.toString()}`);
+                const data = await res.json();
+                if (data.success) {
+                    // 方案二：轉為已加入狀態 (綠色勾選)
+                    btn.classList.remove('btn-loading');
+                    btn.classList.add('btn-added');
+                    btn.querySelector('span').innerText = 'check_circle';
+                    btn.title = '已在歌單中';
+                    
+                    addedSongCodes.add(song.code.toString());
+                    showSnackbar('新增成功！');
+                    fetchSonglist(); // 刷新背景歌單
+                } else {
+                    // 失敗還原
+                    btn.disabled = false;
+                    btn.classList.add('btn-add');
+                    btn.classList.remove('btn-loading');
+                    btn.querySelector('span').innerText = 'add';
+                    showSnackbar('新增失敗：' + data.error);
+                }
+            } catch (err) {
+                btn.disabled = false;
+                btn.classList.add('btn-add');
+                btn.classList.remove('btn-loading');
+                btn.querySelector('span').innerText = 'add';
+                showSnackbar('連線超時，請稍後再試');
             }
         }
     );

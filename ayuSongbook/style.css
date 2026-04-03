@@ -52,6 +52,7 @@ body {
 .gradient-text {
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 900;
 }
@@ -223,8 +224,9 @@ input#search-input::placeholder { color: #aaa; }
     transition: transform 0.2s, opacity 0.2s, background 0.2s;
 }
 
-.btn:active { transform: scale(0.96); }
+.btn:active, .btn-action:active, .btn-text:active { transform: scale(0.96); outline: none; }
 .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.btn:focus, .btn-action:focus, .btn-text:focus { outline: none; border: none; }
 
 .btn-primary {
     background: linear-gradient(135deg, var(--primary), var(--primary-container));
@@ -247,6 +249,8 @@ input#search-input::placeholder { color: #aaa; }
 
 .btn-text {
     background: none;
+    border: none;
+    outline: none;
     color: var(--secondary);
     font-size: 1.125rem;
     font-weight: 700;
@@ -333,6 +337,33 @@ input#search-input::placeholder { color: #aaa; }
 
 .btn-add { background: var(--tertiary); color: var(--on-tertiary); }
 .btn-delete { background: #fee; color: #d33; }
+
+/* 方案二：已加入狀態 (綠色勾選) */
+.btn-added {
+    background: #e8f5e9 !important;
+    color: #2e7d32 !important;
+    cursor: default;
+    box-shadow: none !important;
+}
+
+/* 方案 C：處理中狀態 (動態沙漏) */
+.btn-loading {
+    background: var(--surface-container-high) !important;
+    color: var(--secondary) !important;
+    cursor: wait;
+    box-shadow: none !important;
+}
+
+.btn-loading span {
+    animation: flip-hourglass 1.2s infinite ease-in-out;
+}
+
+@keyframes flip-hourglass {
+    0% { transform: rotate(0deg); }
+    40% { transform: rotate(180deg); }
+    60% { transform: rotate(180deg); }
+    100% { transform: rotate(360deg); }
+}
 
 /* --- 歌單分群 --- */
 .song-group {
