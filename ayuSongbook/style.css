@@ -195,9 +195,19 @@ input#search-input {
     border: none;
     font-size: 1.25rem;
     font-weight: 700;
-    padding: 0.75rem 0;
+    padding: 0.75rem 0.75rem 0.75rem 0; /* 增加右側間距避免壓到 X 按鈕 */
     color: var(--on-surface);
     outline: none;
+    width: 0; /* 強制 flex 縮放 */
+}
+
+/* 隱藏 iOS / Chrome 原生的搜尋框內部按鈕 */
+input::-webkit-search-cancel-button,
+input::-webkit-search-decoration,
+input::-webkit-search-results-button,
+input::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 input#search-input::placeholder { color: #aaa; }
