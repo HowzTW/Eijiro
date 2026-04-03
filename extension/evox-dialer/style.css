@@ -1,42 +1,45 @@
 /* EVOX Quick Dial Button */
 
 .evox-dial-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-left: 8px;
-  padding: 3px 10px;
-  background: #00b050;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  margin-left: 8px !important;
+  padding: 3px 10px !important;
+  background: #00b050 !important;
   color: #fff !important;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 600;
+  border-radius: 4px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
   text-decoration: none !important;
-  cursor: pointer;
-  border: none;
-  vertical-align: middle;
-  line-height: 1.5;
-  transition: background 0.15s ease, transform 0.1s ease;
-  white-space: nowrap;
+  cursor: pointer !important;
+  border: none !important;
+  vertical-align: middle !important;
+  line-height: 1.5 !important;
+  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease !important;
+  white-space: nowrap !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important;
 }
 
 .evox-dial-btn:hover {
-  background: #009140;
-  transform: scale(1.05);
+  background: #009140 !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.4) !important;
 }
 
 .evox-dial-btn:active {
-  background: #007a36;
-  transform: scale(0.97);
+  background: #007a36 !important;
+  transform: scale(0.97) !important;
 }
 
 .evox-icon {
-  font-size: 13px;
-  line-height: 1;
+  font-size: 16px !important;
+  line-height: 1 !important;
 }
 
 .evox-label {
-  letter-spacing: 0.02em;
+  letter-spacing: 0.02em !important;
 }
 
 /* 撥號中狀態 */

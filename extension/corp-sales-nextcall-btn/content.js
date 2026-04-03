@@ -10,8 +10,16 @@
  */
 
 (function () {
+  // 注入 Material Icons 樣式
+  if (!document.querySelector('link[href*="Material+Icons"]')) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://fonts.googleapis.com/icon?family=Material+Icons';
+    document.head.appendChild(link);
+  }
+
   const BUTTON_LABEL = '預約時間';
-  const BUTTON_HTML = `<span class="oa-label">${BUTTON_LABEL}</span>`;
+  const BUTTON_HTML = `<span class="material-icons oa-icon">event</span><span class="oa-label">${BUTTON_LABEL}</span>`;
   const STYLE_ID = 'oa-nextcall-styles';
 
   /**
@@ -26,6 +34,7 @@
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
+        gap: 4px !important;
         padding: 3px 10px !important;
         background-color: #e67e22 !important; /* 強制橘色 */
         color: #ffffff !important;           /* 強制白色文字 */
@@ -37,12 +46,19 @@
         border: none !important;
         vertical-align: middle !important;
         line-height: 1.5 !important;
-        transition: background 0.15s ease !important;
+        transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease !important;
         white-space: nowrap !important;
-        margin: 2px 0;
+        margin: 2px 0 !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important;
       }
       .oa-nextcall-btn:hover {
         background-color: #d35400 !important;
+        transform: scale(1.05) !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.4) !important;
+      }
+      .oa-icon {
+        font-size: 16px !important;
+        line-height: 1 !important;
       }
       .oa-label {
         letter-spacing: 0.02em !important;

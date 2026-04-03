@@ -1,5 +1,10 @@
-// EVOX Quick Dial - content script
-// 偵測 td.phone_number，在電話號碼旁插入撥號按鈕
+// 注入 Material Icons 樣式
+if (!document.querySelector('link[href*="Material+Icons"]')) {
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = 'https://fonts.googleapis.com/icon?family=Material+Icons';
+  document.head.appendChild(link);
+}
 
 function cleanNumber(raw) {
   // 移除所有非數字字元（空格、dash、括號等）
@@ -17,7 +22,7 @@ function createDialButton(number) {
   const btn = document.createElement('a');
   btn.className = 'evox-dial-btn';
   btn.title = `用 EVOX 撥打 ${number}`;
-  btn.innerHTML = `<span class="evox-icon">📞</span><span class="evox-label">撥打</span>`;
+  btn.innerHTML = `<span class="material-icons evox-icon">call</span><span class="evox-label">撥打</span>`;
   btn.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();

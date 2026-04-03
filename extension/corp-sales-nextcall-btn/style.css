@@ -3,32 +3,33 @@
 .oa-nextcall-btn {
   display: inline-flex !important;
   align-items: center !important;
-  gap: 6px !important;
-  padding: 4px 12px !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  padding: 3px 10px !important;
   background-color: #e67e22 !important; /* 強制橘色 */
   color: #ffffff !important;           /* 強制白色文字 */
   border-radius: 4px !important;
-  font-size: 13px !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
   text-decoration: none !important;
   cursor: pointer !important;
   border: none !important;
   vertical-align: middle !important;
   line-height: 1.5 !important;
-  transition: all 0.15s ease !important;
+  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease !important;
   white-space: nowrap !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
   margin: 2px 0 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important;
 }
 
 .oa-nextcall-btn:hover {
   background-color: #d35400 !important;
   transform: scale(1.05) !important;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.25) !important;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.4) !important;
 }
 
 .oa-icon {
-  font-size: 15px !important;
+  font-size: 16px !important;
   line-height: 1 !important;
 }
 
