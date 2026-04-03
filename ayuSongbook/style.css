@@ -125,7 +125,7 @@ body {
 
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    to { opacity: 1; transform: none; }
 }
 
 /* --- Header --- */
@@ -267,10 +267,15 @@ input#search-input::placeholder { color: #aaa; }
 }
 
 .section-title {
+    position: sticky;
+    top: 72px; /* 置頂於 Header 下方 */
+    background: var(--surface); /* 遮擋背景 */
+    z-index: 900;
     font-size: 1.75rem;
     font-weight: 800;
     color: var(--primary);
-    margin: 1.5rem 0 0.75rem;
+    margin: 0;
+    padding: 1.5rem 0 0.75rem;
 }
 
 .results-list, .songlist-items {
@@ -300,25 +305,38 @@ input#search-input::placeholder { color: #aaa; }
 }
 
 .song-name {
-    font-size: 1.5rem;
+    font-size: 1.75rem; /* 放大到與標題一致 */
     font-weight: 900;
     color: var(--primary);
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
 }
 
 .song-meta {
-    font-size: 1.125rem;
     color: #555;
     font-weight: 600;
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+}
+
+.song-singer {
+    font-size: 1.4rem; /* 比歌名小一點，但比以前大 */
+    display: block; /* 建議換行顯示，更有編輯感 */
+    margin-bottom: 0.25rem;
+}
+
+.song-lang {
+    font-size: 1.125rem; /* 維持原大小 */
+    opacity: 0.7;
 }
 
 .song-code {
     display: inline-block;
     background: var(--surface-container);
     color: var(--secondary);
-    padding: 0.125rem 0.5rem;
-    border-radius: 4px;
-    font-weight: 700;
+    padding: 0.25rem 0.75rem;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 1.75rem; /* 放大到與歌名一致 */
     margin-top: 0.5rem;
 }
 

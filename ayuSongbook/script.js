@@ -12,6 +12,7 @@ let addedSongCodes = new Set();
 const DOM = {
     splash: document.getElementById('splash'),
     splashDate: document.getElementById('splash-last-updated'),
+    header: document.getElementById('header'),
     main: document.getElementById('main-app'),
     footerDate: document.getElementById('footer-last-updated'),
     
@@ -56,6 +57,7 @@ function dismissSplash() {
     DOM.splash.style.opacity = '0';
     setTimeout(() => {
         DOM.splash.classList.add('hidden');
+        DOM.header.classList.remove('hidden');
         DOM.main.classList.remove('hidden');
         fetchSonglist(); // 進入主畫面後讀取歌單
     }, 800);
@@ -238,7 +240,10 @@ function createSongCard(song, type) {
     div.innerHTML = `
         <div class="song-info">
             <div class="song-name">${song.name} ${isAdded ? '<span class="material-icons" style="font-size:1.25rem; color:#2e7d32; vertical-align:middle;">check_circle</span>' : ''}</div>
-            <div class="song-meta">${song.singer} ( ${song.lang} )</div>
+            <div class="song-meta">
+                <span class="song-singer">${song.singer}</span>
+                <span class="song-lang">( ${song.lang} )</span>
+            </div>
             <div class="song-code">編號：${song.code}</div>
         </div>
         <button class="btn-action ${isAdded ? 'btn-added' : (type === 'add' ? 'btn-add' : 'btn-delete')}" 
