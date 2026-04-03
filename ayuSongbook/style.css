@@ -267,18 +267,54 @@ input#search-input::placeholder { color: #aaa; }
 }
 
 .section-title {
-    position: sticky;
-    top: 72px; /* 置頂於 Header 下方 */
-    background: var(--surface); /* 遮擋背景 */
-    z-index: 900;
     font-size: 1.75rem;
     font-weight: 800;
     color: var(--primary);
-    margin: 0;
-    padding: 1.5rem 0 0.75rem;
+    margin: 1.5rem 0 0.75rem;
 }
 
-.results-list, .songlist-items {
+/* 分頁導覽列 (Sticky Tabs) */
+.tab-bar-container {
+    position: sticky;
+    top: 72px; /* 剛好在 Header 下方 */
+    background: rgba(249, 249, 247, 0.9);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 900;
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* 隱藏 FF 捲軸 */
+}
+
+.tab-bar-container::-webkit-scrollbar {
+    display: none; /* 隱藏 Chrome/Safari 捲軸 */
+}
+
+.tab-btn {
+    padding: 0.6rem 1.25rem;
+    border-radius: 2rem;
+    background: #e3f2fd; /* 淺藍預設 */
+    color: var(--primary);
+    font-size: 1.125rem;
+    font-weight: 800;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.tab-btn.active {
+    background: #ffebee; /* 淺紅啟用 */
+    color: #d32f2f;
+    box-shadow: 0 4px 10px rgba(211, 47, 47, 0.2);
+    transform: scale(1.05);
+}
+
+.results-list, .songlist-container {
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -389,14 +425,16 @@ input#search-input::placeholder { color: #aaa; }
 }
 
 .group-header {
-    background: var(--surface-container-high);
-    padding: 0.5rem 1.25rem;
-    border-radius: 2rem;
-    display: inline-block;
-    font-weight: 800;
-    font-size: 1.125rem;
-    margin-bottom: 1rem;
-    color: var(--primary);
+    background: none;
+    padding: 0.5rem 0;
+    border-radius: 0;
+    display: block;
+    font-weight: 900;
+    font-size: 1.5rem; /* 稍微放大標題 */
+    margin-bottom: 1.25rem;
+    color: var(--secondary);
+    border-left: 6px solid var(--tertiary); /* 加入裝飾色條 */
+    padding-left: 1rem;
 }
 
 /* --- 自定義彈窗 --- */

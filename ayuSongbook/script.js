@@ -16,6 +16,7 @@ const DOM = {
     main: document.getElementById('main-app'),
     footerDate: document.getElementById('footer-last-updated'),
     
+    tabsContainer: document.getElementById('songlist-tabs'),
     searchInput: document.getElementById('search-input'),
     searchClearBtn: document.getElementById('search-clear-btn'),
     searchSubmitBtn: document.getElementById('search-submit-btn'),
@@ -178,6 +179,13 @@ async function fetchSonglist() {
             // 更新已加入編號集合
             addedSongCodes = new Set(result.data.map(song => song.code.toString()));
             renderSonglist(result.data);
+            
+            // 如果有資料，顯示標籤列
+            if (result.data.length > 0) {
+                DOM.tabsContainer.classList.remove('hidden-collapsed');
+            } else {
+                DOM.tabsContainer.classList.add('hidden-collapsed');
+            }
         } else {
             DOM.songlistContainer.innerHTML = '<p class="error-text">歌單資料讀取失敗</p>';
         }
@@ -189,6 +197,7 @@ async function fetchSonglist() {
 function renderSonglist(songs) {
     if (!songs || songs.length === 0) {
         DOM.songlistContainer.innerHTML = '<p class="empty-tip">目前歌單沒有資料，快搜尋歌曲加入吧！</p>';
+        DOM.tabsContainer.innerHTML = '';
         return;
     }
 
@@ -200,28 +209,98 @@ function renderSonglist(songs) {
         grouped[len].push(song);
     });
 
-    // 取得字數排序後的 Key
     const sortedKeys = Object.keys(grouped).sort((a, b) => a - b);
     
     DOM.songlistContainer.innerHTML = '';
+    DOM.tabsContainer.innerHTML = '';
+
     sortedKeys.forEach(len => {
+        const groupId = `group-${len}`;
         const groupEl = document.createElement('div');
+        groupEl.id = groupId;
         groupEl.className = 'song-group';
-        groupEl.innerHTML = `<div class="group-header">${len} 字部</div>`;
         
+        // 生成標籤按鈕
+        const tabBtn = document.createElement('button');
+        tabBtn.className = 'tab-btn';
+        tabBtn.innerText = `${len} 字部`;
+        tabBtn.setAttribute('data-target', groupId);
+        tabBtn.onclick = () => scrollToGroup(groupId, tabBtn);
+        DOM.tabsContainer.appendChild(tabBtn);
+
+        // 生成群組內容
+        groupEl.innerHTML = `<div class="group-header">${len} 字部</div>`;
         const itemsEl = document.createElement('div');
         itemsEl.className = 'songlist-items';
         
-        // 群組內按歌名排序
         const sortedSongs = grouped[len].sort((a, b) => a.name.localeCompare(b.name, 'zh-Hant'));
-        
         sortedSongs.forEach(song => {
-            const card = createSongCard(song, 'delete');
-            itemsEl.appendChild(card);
+            itemsEl.appendChild(createSongCard(song, 'delete'));
         });
         
         groupEl.appendChild(itemsEl);
         DOM.songlistContainer.appendChild(groupEl);
+    });
+
+    setupScrollSync();
+}
+
+/**
+ * 跳轉至歌曲分群
+ */
+function scrollToGroup(groupId, tabBtn) {
+    const targetEl = document.getElementById(groupId);
+    if (!targetEl) return;
+
+    // 取得 Header 與 Tab Bar 的總高度 (約 72 + 65 = 137px)
+    const offset = 140; 
+    const elementPosition = targetEl.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+    window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+    });
+
+    // 立即置中圖示標籤
+    tabBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+}
+
+/**
+ * 實作捲動同步監聽 (Scroll Sync)
+ */
+function setupScrollSync() {
+    const groups = document.querySelectorAll('.song-group');
+    if (!groups.length) return;
+
+    const observerOptions = {
+        root: null,
+        rootMargin: '-145px 0px -70% 0px', // 向上偏移 Header + Tab Bar 的空間
+        threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.id;
+                updateActiveTab(id);
+            }
+        });
+    }, observerOptions);
+
+    groups.forEach(group => observer.observe(group));
+}
+
+function updateActiveTab(groupId) {
+    const tabs = DOM.tabsContainer.querySelectorAll('.tab-btn');
+    tabs.forEach(tab => {
+        if (tab.getAttribute('data-target') === groupId) {
+            tab.classList.add('active');
+            // 將標題標籤自動捲動至中央
+            tab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        } else {
+            tab.classList.remove('active');
+        }
     });
 }
 
