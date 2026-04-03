@@ -18,9 +18,67 @@
  */
 
 (function () {
+  const STYLE_ID = 'oa-copy-style';
+
+  // ── 注入 Material Icons ──────────────────────────────────────────────────
+  if (!document.querySelector('link[href*="Material+Icons"]')) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://fonts.googleapis.com/icon?family=Material+Icons';
+    document.head.appendChild(link);
+  }
+
+  // ── 注入樣式 ─────────────────────────────────────────────────────────────
+  function injectStyles() {
+    if (document.getElementById(STYLE_ID)) return;
+    const style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = `
+      .oa-copy-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 4px !important;
+        margin: 0 8px !important;
+        padding: 3px 10px !important;
+        background-color: #e67e22 !important; /* 強制橘色 */
+        color: #ffffff !important;           /* 強制白色文字 */
+        border-radius: 4px !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        text-decoration: none !important;
+        cursor: pointer !important;
+        border: none !important;
+        vertical-align: middle !important;
+        line-height: 1.5 !important;
+        transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease !important;
+        white-space: nowrap !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important;
+      }
+      .oa-copy-btn:hover {
+        background-color: #d35400 !important;
+        transform: scale(1.05) !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.4) !important;
+      }
+      .oa-copy-btn:active {
+        transform: scale(0.97) !important;
+      }
+      .oa-copy-icon {
+        font-size: 16px !important;
+        line-height: 1 !important;
+      }
+      .oa-copy-btn.is-success {
+        background-color: #27ae60 !important; /* 成功時暫時變綠色 */
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   function injectCopyButton() {
     // 避免重複插入
     if (document.getElementById('oa-copy-btn')) return;
+
+    injectStyles();
 
     // 在 .content 區塊中找文字為「遠端課程」的 <a> 標籤
     const contentDiv = document.querySelector('.content');
@@ -63,28 +121,17 @@
     if (!classroomName) return;
 
     // 建立複製按鈕
-    const btn = document.createElement('button');
+    const btn = document.createElement('a');
     btn.id = 'oa-copy-btn';
-    btn.textContent = '複製';
+    btn.className = 'oa-copy-btn';
+    btn.innerHTML = `<span class="material-icons oa-copy-icon">content_copy</span><span class="oa-copy-label">複製</span>`;
     btn.title = `複製：${classroomName}`;
-    btn.style.cssText = `
-      margin: 0 8px;
-      padding: 2px 10px;
-      font-size: 12px;
-      cursor: pointer;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      vertical-align: middle;
-      line-height: 1.5;
-    `;
 
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
       try {
         await navigator.clipboard.writeText(classroomName);
       } catch (_) {
-        // fallback for older browsers
         const ta = document.createElement('textarea');
         ta.value = classroomName;
         ta.style.cssText = 'position:fixed;opacity:0';
@@ -93,11 +140,21 @@
         document.execCommand('copy');
         document.body.removeChild(ta);
       }
-      btn.textContent = '✓ 已複製！';
-      btn.style.backgroundColor = '#2196F3';
+
+      // 成功回饋
+      const labelSpan = btn.querySelector('.oa-copy-label');
+      const iconSpan = btn.querySelector('.oa-copy-icon');
+      const originalText = labelSpan.textContent;
+      const originalIcon = iconSpan.textContent;
+
+      btn.classList.add('is-success');
+      labelSpan.textContent = '已複製！';
+      iconSpan.textContent = 'check';
+
       setTimeout(() => {
-        btn.textContent = '複製';
-        btn.style.backgroundColor = '#4CAF50';
+        btn.classList.remove('is-success');
+        labelSpan.textContent = originalText;
+        iconSpan.textContent = originalIcon;
       }, 2000);
     });
 

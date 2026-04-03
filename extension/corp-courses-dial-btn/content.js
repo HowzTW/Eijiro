@@ -14,26 +14,59 @@
   const PROCESSED_ATTR = 'data-evox-done';
   const PHONE_COL_INDEX = 4; // 「聯絡人\n電話\nEmail」欄（0-based）
 
+  // ── 注入 Material Icons ──────────────────────────────────────────────────
+  if (!document.querySelector('link[href*="Material+Icons"]')) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://fonts.googleapis.com/icon?family=Material+Icons';
+    document.head.appendChild(link);
+  }
+
   // ── 注入樣式 ─────────────────────────────────────────────────────────────
   if (!document.getElementById('evox-style')) {
     const style = document.createElement('style');
     style.id = 'evox-style';
     style.textContent = `
       .evox-btn {
-        display: inline-block;
-        margin-top: 4px;
-        padding: 2px 14px;
-        background: #27ae60;
-        color: #fff;
-        font-size: 12px;
-        font-weight: bold;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        line-height: 1.8;
-        vertical-align: middle;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 4px !important;
+        margin-top: 4px !important;
+        padding: 3px 10px !important;
+        background: #00b050 !important;
+        color: #fff !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        border: none !important;
+        border-radius: 4px !important;
+        cursor: pointer !important;
+        line-height: 1.5 !important;
+        vertical-align: middle !important;
+        text-decoration: none !important;
+        white-space: nowrap !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important;
+        transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease !important;
       }
-      .evox-btn:hover { background: #1e8449; }
+      .evox-btn:hover {
+        background: #009140 !important;
+        transform: scale(1.05) !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.4) !important;
+      }
+      .evox-btn:active {
+        transform: scale(0.97) !important;
+      }
+      .evox-icon {
+        font-size: 16px !important;
+        line-height: 1 !important;
+      }
+      .evox-btn.is-dialing {
+        background: #9aa1a9 !important;
+        cursor: not-allowed !important;
+        opacity: 0.85 !important;
+        transform: none !important;
+        box-shadow: none !important;
+      }
     `;
     document.head.appendChild(style);
   }
@@ -69,16 +102,32 @@
         // 避免重複加按鈕
         if (cell.querySelector(`[data-phone="${phoneClean}"]`)) return;
 
-        // 建立按鈕，插在電話號碼後（第二個 <br> 前）
-        const btn = document.createElement('button');
+        // 建立按鈕
+        const btn = document.createElement('a');
         btn.className = 'evox-btn';
-        btn.textContent = '撥打';
+        btn.innerHTML = `<span class="material-icons evox-icon">call</span><span class="evox-label">撥打</span>`;
         btn.setAttribute('data-phone', phoneClean);
         btn.setAttribute('title', `撥打 ${phoneRaw}`);
+        btn.href = `evox://${phoneClean}`;
+
         btn.addEventListener('click', e => {
-          e.preventDefault();
-          e.stopPropagation();
-          window.open(`evox://${phoneClean}`);
+          // 禁止重複點擊
+          if (btn.classList.contains('is-dialing')) {
+            e.preventDefault();
+            return;
+          }
+
+          // 進入撥號中狀態
+          btn.classList.add('is-dialing');
+          const labelSpan = btn.querySelector('.evox-label');
+          const originalText = labelSpan.textContent;
+          labelSpan.textContent = '撥號中';
+
+          // 3 秒後恢復
+          setTimeout(() => {
+            btn.classList.remove('is-dialing');
+            labelSpan.textContent = originalText;
+          }, 3000);
         });
 
         // 重建 cell 內容：姓名<br>電話<br>[按鈕]<br>email...
