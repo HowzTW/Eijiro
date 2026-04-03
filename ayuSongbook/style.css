@@ -83,11 +83,10 @@ body {
 }
 
 .splash-logo {
-    width: 180px;
-    height: 180px;
-    border-radius: 2rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    width: 350px; /* 放大至 350px 讓視覺更宏偉 */
+    height: 350px;
+    margin-bottom: 2.5rem;
+    object-fit: contain;
 }
 
 .splash-title-cn {
@@ -156,7 +155,7 @@ body {
 .header-logo {
     width: 40px;
     height: 40px;
-    border-radius: 8px;
+    object-fit: contain;
 }
 
 .header-title {
