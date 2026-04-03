@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>阿玉金嗓歌單 - Ayu Songbook</title>
+    <!-- Google Fonts: Manrope & Noto Sans TC -->
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 歡迎畫面 (Splash Screen) -->
+    <div id="splash" class="splash-screen">
+        <div class="splash-content">
+            <img src="icon.png" alt="Logo" class="splash-logo pulse">
+            <h1 class="splash-title-cn gradient-text">阿玉金嗓歌單</h1>
+            <h2 class="splash-title-en gradient-text">Ayu Songbook</h2>
+        </div>
+        <div class="splash-footer">最後更新時間：<span id="splash-last-updated">xxxx-xx-xx xx:xx:xx</span></div>
+    </div>
+
+    <!-- 主內容區 (Main Screen) - 初始隱藏 -->
+    <div id="main-app" class="main-container hidden">
+        
+        <!-- 固定置頂 Header -->
+        <header class="header">
+            <div class="header-content">
+                <img src="icon.png" alt="Logo" class="header-logo">
+                <h1 class="header-title">阿玉金嗓歌單</h1>
+            </div>
+        </header>
+
+        <main class="content">
+            <!-- 搜尋區塊 -->
+            <section class="search-section card">
+                <div class="search-bar">
+                    <span class="material-icons search-icon-prefix">search</span>
+                    <input type="text" id="search-input" placeholder="輸入歌名、歌手或關鍵字" aria-label="搜尋歌曲">
+                    <button id="search-clear-btn" class="inline-clear-btn hidden" title="清空輸入">
+                        <span class="material-icons">cancel</span>
+                    </button>
+                </div>
+                <button id="search-submit-btn" class="btn btn-primary btn-large" disabled>
+                    <span class="material-icons">manage_search</span> 執行搜尋
+                </button>
+            </section>
+
+            <!-- 搜尋結果區塊 -->
+            <section id="search-results-section" class="results-section hidden-collapsed">
+                <div class="results-header">
+                    <h3 class="section-title">搜尋結果</h3>
+                    <button id="close-results-btn" class="btn-text" title="收合結果">
+                        <span class="material-icons">expand_less</span> 收合
+                    </button>
+                </div>
+                <div id="search-results-list" class="results-list">
+                    <!-- 動態插入搜尋結果 -->
+                    <div class="loading-spinner hidden">讀取中...</div>
+                </div>
+            </section>
+
+            <!-- 我的歌單區塊 -->
+            <section class="songlist-section">
+                <h3 class="section-title">我的歌單</h3>
+                <div id="my-songlist" class="songlist-container">
+                    <!-- 動態插入歌單分群 -->
+                    <div class="loading-spinner">載入歌單中...</div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 頁尾 -->
+        <footer class="footer">
+            <p>最後更新日期：<span id="footer-last-updated">xxxx-xx-xx xx:xx:xx</span></p>
+        </footer>
+    </div>
+
+    <!-- 自定義大型彈窗 (Custom Modal) -->
+    <div id="custom-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-icon-container">
+                <span id="modal-icon" class="material-icons">help_outline</span>
+            </div>
+            <h4 id="modal-title">標題</h4>
+            <p id="modal-message">確認訊息內容</p>
+            <div class="modal-actions">
+                <button id="modal-cancel-btn" class="btn btn-outline">取消</button>
+                <button id="modal-confirm-btn" class="btn btn-primary">確定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全域吐司提示 (Snackbar) -->
+    <div id="snackbar" class="snackbar hidden"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
