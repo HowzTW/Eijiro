@@ -232,6 +232,7 @@ input#search-input::placeholder { color: #aaa; }
     background: linear-gradient(135deg, var(--primary), var(--primary-container));
     color: white;
     box-shadow: 0 4px 15px rgba(0, 37, 77, 0.3);
+    font-size: 1.25rem; /* 對齊按鈕字體大小 */
 }
 
 .btn-large {
