@@ -26,6 +26,7 @@ const DOM = {
     closeResultsBtn: document.getElementById('close-results-btn'),
     
     songlistContainer: document.getElementById('my-songlist'),
+    reloadBtn: document.getElementById('reload-btn'),
     
     modal: document.getElementById('custom-modal'),
     modalTitle: document.getElementById('modal-title'),
@@ -87,6 +88,13 @@ function formatDateTime(date) {
  * ------------------------------------------------------------------
  */
 function setupEventListeners() {
+    // 重新整理按鈕
+    if (DOM.reloadBtn) {
+        DOM.reloadBtn.addEventListener('click', () => {
+            window.location.reload();
+        });
+    }
+
     // 搜尋框輸入監聽
     DOM.searchInput.addEventListener('input', () => {
         const val = DOM.searchInput.value;

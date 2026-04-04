@@ -162,6 +162,36 @@ body {
     font-size: 1.5rem;
     font-weight: 800;
     color: var(--primary);
+    flex: 1; /* 讓標題撐開，並把按鈕推到右邊 */
+}
+
+/* 圓形圖示按鈕 */
+.icon-btn-circle {
+    background: none;
+    border: none;
+    color: var(--primary);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-left: auto;
+}
+
+.icon-btn-circle:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.icon-btn-circle:active {
+    background: rgba(0, 0, 0, 0.1);
+    transform: scale(0.92);
+}
+
+.icon-btn-circle .material-icons {
+    font-size: 24px;
 }
 
 /* --- 內容區域 --- */
