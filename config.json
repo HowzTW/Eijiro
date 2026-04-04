@@ -1,5 +1,6 @@
 {
     "displayOrder": [
+        "ayuSongbook",
         "watchDrama",
         "dailyQuotation",
         "dailyQuotationNew",
@@ -144,6 +145,13 @@
             "title": "每日箴言 (新版)",
             "description": "引導式每日金句產生器，支援高畫質圖片下載與 AI 提示詞助手。",
             "stats": "Wizard App"
+        },
+        "ayuSongbook": {
+            "href": "ayuSongbook/index.html",
+            "icon": "library_music",
+            "title": "阿玉金嗓歌單",
+            "description": "專為長輩設計的數位歌單系統，具備高易讀性、動態分群導覽與快速搜尋功能。",
+            "stats": "Active Project"
         }
     }
 }
