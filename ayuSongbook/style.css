@@ -83,27 +83,30 @@ body {
 }
 
 .splash-logo {
-    width: 350px; /* 放大至 350px 讓視覺更宏偉 */
-    height: 350px;
+    /* 使用 clamp() 實現響應式縮放：最小 200px，理想 75vw，最高 350px */
+    width: clamp(200px, 75vw, 350px);
+    height: auto;
+    aspect-ratio: 1 / 1; 
     margin-bottom: 2.5rem;
     object-fit: contain;
 }
 
 .splash-title-cn {
-    font-size: 3rem;
+    font-size: clamp(2.25rem, 10vw, 4rem);
     margin-bottom: 0.5rem;
     letter-spacing: 0.1rem;
 }
 
 .splash-title-en {
-    font-size: 1.5rem;
+    font-size: clamp(1.1rem, 5vw, 1.75rem);
     opacity: 0.8;
 }
 
 .splash-footer {
     position: absolute;
-    bottom: 3rem;
-    font-size: 0.875rem;
+    bottom: 5vh;
+    font-size: clamp(0.75rem, 2.5vw, 0.875rem);
+    letter-spacing: 0.05em;
     color: #888;
 }
 

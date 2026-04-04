@@ -331,7 +331,7 @@ function createSongCard(song, type) {
                 <span class="song-singer">${song.singer}</span>
                 <span class="song-lang">( ${song.lang} )</span>
             </div>
-            <div class="song-code">編號：${song.code}</div>
+            <div class="song-code"># ${song.code}</div>
         </div>
         <button class="btn-action ${isAdded ? 'btn-added' : (type === 'add' ? 'btn-add' : 'btn-delete')}" 
                 ${isAdded ? 'disabled' : ''} 
