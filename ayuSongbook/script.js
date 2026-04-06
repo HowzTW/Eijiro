@@ -321,12 +321,21 @@ function createSongCard(song, type) {
     const div = document.createElement('div');
     div.className = 'song-card';
     
-    // 修正：只有在「搜尋結果模式 (add)」下才檢查是否已加入，「我的歌單模式 (delete)」需維持顯示刪除按鈕
+    // 歌單模式才具備收合功能
+    const isCollapsible = (type === 'delete');
+    if (isCollapsible) {
+        div.classList.add('collapsible', 'is-collapsed');
+    }
+
     const isAdded = (type === 'add') && addedSongCodes.has(song.code.toString());
     
     div.innerHTML = `
         <div class="song-info">
-            <div class="song-name">${song.name} ${isAdded ? '<span class="material-icons" style="font-size:1.25rem; color:#2e7d32; vertical-align:middle;">check_circle</span>' : ''}</div>
+            <div class="song-name">
+                <span class="name-text">${song.name}</span>
+                ${isAdded ? '<span class="material-icons" style="font-size:1.25rem; color:#2e7d32; vertical-align:middle; margin-left:4px;">check_circle</span>' : ''}
+                ${isCollapsible ? '<span class="material-icons expand-indicator">expand_more</span>' : ''}
+            </div>
             <div class="song-meta">
                 <span class="song-singer">${song.singer}</span>
                 <span class="song-lang">( ${song.lang} )</span>
@@ -340,8 +349,16 @@ function createSongCard(song, type) {
         </button>
     `;
 
+    // 點擊卡片切換收合狀態 (僅限歌單模式)
+    if (isCollapsible) {
+        div.onclick = () => {
+            div.classList.toggle('is-collapsed');
+        };
+    }
+
     const actionBtn = div.querySelector('.btn-action');
-    actionBtn.onclick = () => {
+    actionBtn.onclick = (e) => {
+        e.stopPropagation(); // 防止觸發卡片的收合點擊事件
         if (isAdded) return;
         if (type === 'add') {
             confirmAdd(song, actionBtn);

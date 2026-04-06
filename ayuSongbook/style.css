@@ -389,6 +389,49 @@ input#search-input::placeholder { color: #aaa; }
     gap: 1.25rem;
     position: relative;
     border-left: 8px solid var(--surface-container-high); /* 代替邊框 */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 可收合卡片基礎樣式 */
+.song-card.collapsible {
+    cursor: pointer;
+}
+
+.song-card.collapsible:hover {
+    background: #fffdf9;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* 收合狀態 */
+.song-card.is-collapsed {
+    padding: 1.1rem 1.5rem; /* 縮減垂直高度 */
+}
+
+.song-card.is-collapsed .song-name {
+    margin-bottom: 0;
+}
+
+.song-card.is-collapsed .song-meta,
+.song-card.is-collapsed .song-code,
+.song-card.is-collapsed .btn-action {
+    display: none; /* 收合時隱藏細節 */
+}
+
+/* 展開/收合指標 - 固定在右上角 */
+.expand-indicator {
+    position: absolute;
+    right: 1.25rem;
+    top: 1.25rem;
+    font-size: 1.5rem;
+    color: var(--secondary);
+    opacity: 0.5;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none; /* 讓點擊穿透回卡片主體 */
+}
+
+.song-card:not(.is-collapsed) .expand-indicator {
+    transform: rotate(180deg);
 }
 
 .song-card:nth-child(even) {
