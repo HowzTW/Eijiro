@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "OA 銷售未接聽按鈕",
+  "version": "1.0",
+  "description": "在銷售頁面加上「未接聽」快捷按鈕",
+  "content_scripts": [
+    {
+      "matches": ["https://corp.orangeapple.co/marketing/sales*"],
+      "css": ["style.css"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
