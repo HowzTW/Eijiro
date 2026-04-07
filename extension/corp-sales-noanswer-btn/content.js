@@ -13,17 +13,16 @@
     document.head.appendChild(link);
   }
 
-  const BUTTON_LABEL = '未接聽';
-  const BUTTON_HTML = `<span class="material-icons oa-icon">phone_missed</span><span class="oa-label">${BUTTON_LABEL}</span>`;
-  
   /**
-   * 自動化流程：點擊連結 -> 等待彈窗 -> 勾選 -> 送出 -> 關閉
+   * 自動化流程：點擊連結 -> 等待彈窗 -> 勾選 -> 填寫內容 -> 送出 -> 關閉
+   * @param {HTMLElement} link - 原始觸發彈窗的 <a> 標籤
+   * @param {string} commentValue - 自動填入的備註內容
    */
-  async function performNoAnswerAutomation(link) {
+  async function performLogAutomation(link, commentValue = '') {
     // 1. 點擊原始的 <a> 標籤觸發 Turbo 彈窗
     link.click();
 
-    console.log('[OA NoAnswer] 觸發彈窗，等待表單加載...');
+    console.log(`[OA LogAutomation] 觸發彈窗 (內容: "${commentValue}")，等待表單加載...`);
 
     // 2. 監聽 DOM，等待 #remote_modal 內的表單出現
     const observer = new MutationObserver((mutations, obs) => {
@@ -32,7 +31,7 @@
       
       if (form) {
         obs.disconnect(); // 找到後立即停止監聽
-        console.log('[OA NoAnswer] 找到表單，開始填寫...');
+        console.log('[OA LogAutomation] 找到表單，開始填寫...');
         
         try {
           // A. 勾選 [是否接聽] 為 否
@@ -43,27 +42,27 @@
           const pitchedFalse = form.querySelector('input[type="radio"][value="false"][name*="[is_pitched]"]');
           if (pitchedFalse) pitchedFalse.checked = true;
 
-          // C. 內容保持空白 (根據 User 要求)
+          // C. 填寫內容 (根據傳入參數)
           const contentArea = form.querySelector('textarea[name*="[content]"]');
-          if (contentArea) contentArea.value = '';
+          if (contentArea) contentArea.value = commentValue;
 
           // D. 點擊送出按鈕
           const submitBtn = form.querySelector('input[type="submit"]');
           if (submitBtn) {
-            console.log('[OA NoAnswer] 正在提交表單...');
+            console.log('[OA LogAutomation] 正在提交表單...');
             submitBtn.click();
             
             // E. 等待一下後嘗試關閉彈窗 (雖然 Turbo 通常會處理，但雙重保險)
             setTimeout(() => {
               const closeBtn = document.querySelector('button[data-action*="remote-modal#closeModal"]');
               if (closeBtn) {
-                console.log('[OA NoAnswer] 關閉彈窗');
+                console.log('[OA LogAutomation] 關閉彈窗');
                 closeBtn.click();
               }
             }, 800);
           }
         } catch (err) {
-          console.error('[OA NoAnswer] 自動填寫失敗:', err);
+          console.error('[OA LogAutomation] 自動填寫失敗:', err);
         }
       }
     });
@@ -72,6 +71,42 @@
       childList: true,
       subtree: true
     });
+  }
+
+  /**
+   * 建立快捷按鈕
+   * @param {string} label - 按鈕文字
+   * @param {string} icon - Material Icon 名稱
+   * @param {string} commentValue - 自動填寫內容
+   * @param {HTMLElement} link - 原始連結
+   */
+  function createQuickButton(label, icon, commentValue, link) {
+    const btn = document.createElement('button');
+    btn.className = 'oa-noanswer-btn';
+    btn.innerHTML = `<span class="material-icons oa-icon">${icon}</span><span class="oa-label">${label}</span>`;
+    btn.type = 'button';
+    
+    // 點擊事件
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // 防呆機制：禁用按鈕 3 秒
+      btn.disabled = true;
+      const originalHTML = btn.innerHTML;
+      btn.innerHTML = `<span class="material-icons oa-icon">sync</span><span class="oa-label">處理中...</span>`;
+
+      performLogAutomation(link, commentValue);
+
+      setTimeout(() => {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalHTML;
+        }
+      }, 3000);
+    });
+
+    return btn;
   }
 
   /**
@@ -88,36 +123,14 @@
       const link = frame.querySelector('a.show-comment[data-turbo-frame="remote_modal"]');
 
       if (link) {
-        // 建立新按鈕
-        const noAnswerBtn = document.createElement('button');
-        noAnswerBtn.className = 'oa-noanswer-btn';
-        noAnswerBtn.innerHTML = BUTTON_HTML;
-        noAnswerBtn.type = 'button';
+        // 建立並注入按鈕
+        const noAnswerBtn = createQuickButton('未接聽', 'phone_missed', '', link);
+        const transferBtn = createQuickButton('直轉', 'forward', '直轉', link);
         
-        // 點擊事件
-        noAnswerBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-
-          // 防呆機制：禁用按鈕 3 秒
-          noAnswerBtn.disabled = true;
-          const originalHTML = noAnswerBtn.innerHTML;
-          noAnswerBtn.innerHTML = `<span class="material-icons oa-icon">sync</span><span class="oa-label">處理中...</span>`;
-
-          performNoAnswerAutomation(link);
-
-          setTimeout(() => {
-            if (noAnswerBtn) {
-              noAnswerBtn.disabled = false;
-              noAnswerBtn.innerHTML = originalHTML;
-            }
-          }, 3000);
-        });
-
         // 插入在 <turbo-frame> 內部最底端
-        // 這樣當 Turbo 更新框架內容時，舊按鈕會自動被移除，防止重複增生
         frame.appendChild(document.createElement('br'));
         frame.appendChild(noAnswerBtn);
+        frame.appendChild(transferBtn);
 
         // 標記為已處理
         frame.dataset.oaNoAnswerProcessed = 'true';
@@ -141,5 +154,5 @@
     subtree: true
   });
 
-  console.log('[OA NoAnswer Extension] 載入成功');
+  console.log('[OA NoAnswer Extension] 載入成功 (含直轉按鈕)');
 })();
