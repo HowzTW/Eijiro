@@ -48,6 +48,13 @@ function createDialButton(number) {
       searchInput.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
+    // 新增：複製到剪貼簿 (clipboard)
+    navigator.clipboard.writeText(number).then(() => {
+      console.log(`已將電話號碼 ${number} 複製到剪貼簿`);
+    }).catch(err => {
+      console.error('無法複製到剪貼簿', err);
+    });
+
     // 3 秒後恢復原狀
     setTimeout(() => {
       btn.classList.remove('is-dialing');

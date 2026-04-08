@@ -120,10 +120,26 @@
           // 進入撥號中狀態
           btn.classList.add('is-dialing');
           const labelSpan = btn.querySelector('.evox-label');
+          if (!labelSpan) return;
           const originalText = labelSpan.textContent;
           labelSpan.textContent = '撥號中';
 
-          // 3 秒後恢復
+          // 1. 同步填寫主搜尋欄 (id="q") 並觸發搜尋
+          const searchInput = document.getElementById('q');
+          if (searchInput) {
+            searchInput.value = ''; // 先清除
+            searchInput.value = phoneClean; // 填入
+            searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+
+          // 2. 複製到剪貼簿 (Clipboard)
+          navigator.clipboard.writeText(phoneClean).then(() => {
+            console.log(`[EVOX] 已將號碼 ${phoneClean} 複製到剪貼簿`);
+          }).catch(err => {
+            console.error('[EVOX] 無法複製到剪貼簿', err);
+          });
+
+          // 3. 3 秒後恢復
           setTimeout(() => {
             btn.classList.remove('is-dialing');
             labelSpan.textContent = originalText;
