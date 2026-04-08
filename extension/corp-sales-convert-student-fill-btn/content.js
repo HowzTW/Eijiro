@@ -25,7 +25,10 @@
     const quickFillBtn = document.createElement('button');
     quickFillBtn.id = 'oa-quick-fill-btn';
     quickFillBtn.type = 'button';
-    quickFillBtn.className = 'btn btn-secondary'; // 使用 Bootstrap 次要按鈕樣式
+    quickFillBtn.className = 'btn'; // 保留 Bootstrap 基本按鈕大小，自訂顏色
+    quickFillBtn.style.backgroundColor = '#f97316'; // 橘色背景
+    quickFillBtn.style.color = '#ffffff'; // 白色字體
+    quickFillBtn.style.borderColor = '#ea580c'; // 微深的橘色邊框
     quickFillBtn.style.marginRight = '8px'; // 與右邊的送出按鈕保持一小段距離
     quickFillBtn.textContent = '快速填寫';
 
@@ -39,26 +42,91 @@
         const lines = text.split('\n');
         
         const keptLines = [];
-        const removedLines = [];
+        const processedLog = []; // 紀錄成功的處理
+        const errorLog = [];     // 紀錄失敗或找不到目標的處理
 
         // 判斷每一行是否以 "dt_admission_" 開頭
         lines.forEach(line => {
           if (line.trim().startsWith('dt_admission_')) {
-            removedLines.push(line);
+            // 利用第一個冒號來切割 (避免 value 內也有冒號的情況)
+            const delimiterIndex = line.indexOf(':');
+            
+            if (delimiterIndex !== -1) {
+              const elementId = line.substring(0, delimiterIndex).trim();
+              const valueToFill = line.substring(delimiterIndex + 1).trim();
+
+               // 使用 getElementById 在畫面上尋找對應的元件
+              const targetElement = document.getElementById(elementId);
+              
+              if (targetElement) {
+                try {
+                  const tagName = targetElement.tagName.toUpperCase();
+                  
+                  if (tagName === 'INPUT' || tagName === 'TEXTAREA') {
+                    // 輸入框類型處理
+                    targetElement.value = valueToFill;
+                    // 派發相關事件讓框架(如 Stimulus/Vue)觸發綁定更新
+                    targetElement.dispatchEvent(new Event('input', { bubbles: true }));
+                    targetElement.dispatchEvent(new Event('change', { bubbles: true }));
+                    
+                    processedLog.push(`✓ [已填寫] ${elementId} -> ${valueToFill}`);
+                  } 
+                  else if (tagName === 'SELECT') {
+                    // 下拉選單處理
+                    let optionFound = false;
+                    for (let i = 0; i < targetElement.options.length; i++) {
+                      // 檢查選項的文字是否等於我們要填入的值
+                      if (targetElement.options[i].text.trim() === valueToFill) {
+                        targetElement.selectedIndex = i;
+                        targetElement.dispatchEvent(new Event('change', { bubbles: true }));
+                        optionFound = true;
+                        processedLog.push(`✓ [已選擇] ${elementId} -> ${valueToFill}`);
+                        break;
+                      }
+                    }
+                    if (!optionFound) {
+                      errorLog.push(`✗ [找不到選項] ${elementId} 內找不到名為「${valueToFill}」的選項`);
+                    }
+                  } 
+                  else {
+                    errorLog.push(`✗ [未知的元件類型] 找到 ${elementId}，但它的類型標籤是 ${tagName} 無法填值`);
+                  }
+                } catch (err) {
+                  errorLog.push(`✗ [填寫時發生預期外錯誤] ${elementId}: ${err.message}`);
+                }
+              } else {
+                errorLog.push(`✗ [找不到元件] 網頁上沒有 ID 為 "${elementId}" 的輸入框或選單`);
+              }
+            } else {
+              errorLog.push(`✗ [格式錯誤] 此行缺少冒號分隔字元：${line}`);
+            }
           } else {
+            // 不符合處理格式的行，原封不動地保留在 textarea 中
             keptLines.push(line);
           }
         });
 
-        // 將保留的行重新填回 textarea
+        // 將保留下來的行，重新組合後填回原來的 textarea
         currentTextarea.value = keptLines.join('\n');
+        // 主動派發 input 事件，確保網頁框架能發現 textarea 被變更了
+        currentTextarea.dispatchEvent(new Event('input', { bubbles: true }));
 
-        // 將被移除的行顯示在 alert 中
-        if (removedLines.length > 0) {
-          alert("已移除以下內容：\n" + removedLines.join('\n'));
-        } else {
-          alert("沒有找到以 'dt_admission_' 開頭的行。");
+        // 最後將成功與錯誤的資訊統整後再顯示 alert
+        let alertMessage = "";
+        
+        if (processedLog.length > 0) {
+          alertMessage += "✅ 【成功處理欄位】\n" + processedLog.join('\n') + "\n\n";
         }
+        
+        if (errorLog.length > 0) {
+          alertMessage += "⚠️ 【處理異常 / 找不到元件】\n" + errorLog.join('\n') + "\n\n";
+        }
+        
+        if (alertMessage === "") {
+          alertMessage = "沒有找到以 'dt_admission_' 開頭的行。";
+        }
+        
+        alert(alertMessage.trim());
       }
     });
 
