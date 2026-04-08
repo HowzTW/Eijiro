@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "OA 雙師班快速填寫按鈕",
+  "version": "1.0",
+  "description": "在轉為雙師班學生的對話框中加入快速填寫按鈕",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://corp.orangeapple.co/marketing/sales*"
+      ],
+      "js": [
+        "content.js"
+      ]
+    }
+  ]
+}
