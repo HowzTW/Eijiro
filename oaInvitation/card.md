@@ -284,7 +284,18 @@
         ---
         家長Email：《家長Email》。
         家長電話：《家長電話》。
+        dt_admission_student_attributes_name: 《學員姓名》
+        dt_admission_student_attributes_grade: 《學員年級》
+        dt_admission_total_times: 1
+        dt_admission_contact_name: 《聯絡人稱謂》
+        dt_admission_contact_email: 《家長Email》
+        dt_admission_plan: 自訂價
         ```
+        - 定義「聯絡人稱謂」如下：
+            - **單一學員**：
+            - 格式`《學員姓名》《家長稱謂》`。例如：王小明爸爸。
+            - **多位學員**：
+            - 格式`《學員a姓名》、《學員b姓名》 《家長稱謂》`。例如：王小明、王小華 媽媽。
         - 以上格式中的 《 及 》 符號請省略，直接替換為 《某某欄位》 的欄位值。  
         - 以上格式中的 《所有備註欄位的集合》 請替換為所有備註欄位的集合。只需要顯示備註欄位值，不需要加註設備備註、網路備註、總體備註等標題。
         - 以上格式中的每一行的每一個《某某欄位》的值若都是空的，則不顯示該行。

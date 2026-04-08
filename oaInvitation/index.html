@@ -1371,6 +1371,38 @@
                 if (testSentParts.length > 0) combinedTestSentText = testSentParts.map(t => `${t.prefix} ${t.test}`).join('。') + "。";
             }
 
+            // --- Extract Shared Title and Names ---
+            const parentTitleGlobal = document.querySelector('[name="parentTitle"]')?.value || "";
+            let actualParentTitleGlobal = parentTitleGlobal;
+            if (parentTitleGlobal === '其他') {
+                actualParentTitleGlobal = document.getElementById('parentTitleOther')?.value.trim() || "";
+            }
+
+            let validStudentNamesForContact = [];
+            let validStudentGradesForContact = [];
+            for (let i = 1; i <= studentCount; i++) {
+                const sNameInput = document.querySelector(`[name="studentName_${i}"]`);
+                const sName = sNameInput ? sNameInput.value.trim() : "";
+                if (sName) {
+                    validStudentNamesForContact.push(sName);
+                    const sGradeSelect = document.querySelector(`[name="studentGrade_${i}"]`);
+                    let sGrade = sGradeSelect ? sGradeSelect.value : "";
+                    if (sGrade === '其他') sGrade = document.getElementById(`studentGradeOther_${i}`)?.value.trim() || "";
+                    validStudentGradesForContact.push(sGrade === "請選擇年級" ? "" : sGrade);
+                }
+            }
+            
+            let combinedContactName = "";
+            if (actualParentTitleGlobal && validStudentNamesForContact.length > 0) {
+                if (validStudentNamesForContact.length === 1) {
+                    combinedContactName = `${validStudentNamesForContact[0]}${actualParentTitleGlobal}`;
+                } else {
+                    combinedContactName = `${validStudentNamesForContact.join('、')} ${actualParentTitleGlobal}`;
+                }
+            }
+            const combinedNamesStr = validStudentNamesForContact.join('、');
+            const combinedGradesStr = validStudentGradesForContact.filter(g => g).join('、');
+
             // --- Block 1: Combined ---
             if (studentCount >= 0) {
                 const motivation = getValue('[name="leaveMotivation"]', 'leaveMotivationOther');
@@ -1413,6 +1445,14 @@
                 let contactInfo = [];
                 if (parentEmail) contactInfo.push(`家長Email：${parentEmail}。`);
                 if (parentPhone) contactInfo.push(`家長電話：${parentPhone}。`);
+
+                if (combinedNamesStr) contactInfo.push(`dt_admission_student_attributes_name: ${combinedNamesStr}`);
+                if (combinedGradesStr) contactInfo.push(`dt_admission_student_attributes_grade: ${combinedGradesStr}`);
+                contactInfo.push(`dt_admission_total_times: 1`);
+                if (combinedContactName) contactInfo.push(`dt_admission_contact_name: ${combinedContactName}`);
+                if (parentEmail) contactInfo.push(`dt_admission_contact_email: ${parentEmail}`);
+                contactInfo.push(`dt_admission_plan: 自訂價`);
+
                 if (contactInfo.length > 0) body += "\n\n---\n" + contactInfo.join('\n');
 
                 createBlock("聯絡紀錄", body.trim(), "redDotText_combined");
@@ -1474,6 +1514,16 @@
                 let contactInfo = [];
                 if (parentEmailGlobal) contactInfo.push(`家長Email：${parentEmailGlobal}。`);
                 if (parentPhoneGlobal) contactInfo.push(`家長電話：${parentPhoneGlobal}。`);
+
+                if (c.sName) contactInfo.push(`dt_admission_student_attributes_name: ${c.sName}`);
+                if (c.sGrade && c.sGrade !== "請選擇年級") contactInfo.push(`dt_admission_student_attributes_grade: ${c.sGrade}`);
+                contactInfo.push(`dt_admission_total_times: 1`);
+                
+                if (combinedContactName) contactInfo.push(`dt_admission_contact_name: ${combinedContactName}`);
+                
+                if (parentEmailGlobal) contactInfo.push(`dt_admission_contact_email: ${parentEmailGlobal}`);
+                contactInfo.push(`dt_admission_plan: 自訂價`);
+
                 if (contactInfo.length > 0) body += "\n\n---\n" + contactInfo.join('\n');
 
                 createBlock(`${c.sGrade}${c.sName} ${c.cType}`, body.trim(), `redDotText_${idx}`);
