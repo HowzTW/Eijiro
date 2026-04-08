@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "OA Sales Email Copy Button",
+  "version": "1.1",
+  "description": "在行銷銷售頁面注入藍色 Email 複製按鈕",
+  "permissions": [
+    "clipboardWrite"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "http://corp.orangeapple.co/marketing/sales*",
+        "https://corp.orangeapple.co/marketing/sales*"
+      ],
+      "css": [
+        "style.css"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

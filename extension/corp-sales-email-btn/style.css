@@ -1,0 +1,49 @@
+/* OrangeApple Email Copy Button Style - 藍色修正版 v4 (對齊「撥打」按鈕) */
+
+.oa-email-copy-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  padding: 3px 10px !important;       /* 對齊撥打按鈕 */
+  background-color: #3498db !important; /* 藍色 */
+  color: #ffffff !important;           /* 白色文字 */
+  border-radius: 4px !important;
+  font-size: 12px !important;          /* 對齊撥打按鈕 */
+  font-weight: 600 !important;         /* 對齊撥打按鈕 */
+  text-decoration: none !important;
+  cursor: pointer !important;
+  border: none !important;
+  vertical-align: middle !important;
+  line-height: 1.5 !important;         /* 對齊撥打按鈕 */
+  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease !important;
+  white-space: nowrap !important;
+  
+  /* 內部間距 */
+  margin: 4px 0 !important;
+  
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important;
+}
+
+.oa-email-copy-btn:hover {
+  background-color: #2980b9 !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.4) !important;
+}
+
+.oa-email-copy-btn:active {
+  transform: scale(0.97) !important;
+}
+
+.oa-email-copy-btn.is-success {
+  background-color: #2ecc71 !important;
+}
+
+.oa-copy-icon {
+  font-size: 16px !important;           /* 對齊撥打按鈕圖示大小 */
+  line-height: 1 !important;
+}
+
+.oa-copy-label {
+  letter-spacing: 0.01em !important;
+}
