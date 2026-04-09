@@ -54,27 +54,45 @@
     "trialCourses": [
         {
             "name": "麥思數學",
-            "abbr": "麥思"
+            "abbr": "麥思",
+            "full": "線上體驗課_麥思數學",
+            "prefix": "線上麥思數學體驗課＿",
+            "price": "12000"
         },
         {
             "name": "頑皮艾伯特基礎程式",
-            "abbr": "艾伯特"
+            "abbr": "艾伯特",
+            "full": "線上體驗課_頑皮艾伯特",
+            "prefix": "線上體驗課- 頑皮艾伯特",
+            "price": "28800"
         },
         {
             "name": "麥塊程式",
-            "abbr": "MC"
+            "abbr": "MC",
+            "full": "線上體驗課_Minecraft 麥塊教育版",
+            "prefix": "線上麥塊教育版體驗_",
+            "price": "28500"
         },
         {
             "name": "Roblox AI遊戲設計",
-            "abbr": "RX"
+            "abbr": "RX",
+            "full": "線上體驗課_Roblox",
+            "prefix": "線上Roblox體驗_",
+            "price": "26800"
         },
         {
             "name": "Scratch程式開發",
-            "abbr": "SC"
+            "abbr": "SC",
+            "full": "線上體驗課_Scratch",
+            "prefix": "遠距教學_",
+            "price": "28000"
         },
         {
             "name": "Python程式開發",
-            "abbr": "PY"
+            "abbr": "PY",
+            "full": "線上體驗課_Python",
+            "prefix": "遠距教學_",
+            "price": "32000"
         }
     ],
     "timeSlots": [

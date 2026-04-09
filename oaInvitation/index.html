@@ -1446,13 +1446,6 @@
                 if (parentEmail) contactInfo.push(`家長Email：${parentEmail}。`);
                 if (parentPhone) contactInfo.push(`家長電話：${parentPhone}。`);
 
-                if (combinedNamesStr) contactInfo.push(`dt_admission_student_attributes_name: ${combinedNamesStr}`);
-                if (combinedGradesStr) contactInfo.push(`dt_admission_student_attributes_grade: ${combinedGradesStr}`);
-                contactInfo.push(`dt_admission_total_times: 1`);
-                if (combinedContactName) contactInfo.push(`dt_admission_contact_name: ${combinedContactName}`);
-                if (parentEmail) contactInfo.push(`dt_admission_contact_email: ${parentEmail}`);
-                contactInfo.push(`dt_admission_plan: 自訂價`);
-
                 if (contactInfo.length > 0) body += "\n\n---\n" + contactInfo.join('\n');
 
                 createBlock("聯絡紀錄", body.trim(), "redDotText_combined");
@@ -1517,11 +1510,17 @@
 
                 if (c.sName) contactInfo.push(`dt_admission_student_attributes_name: ${c.sName}`);
                 if (c.sGrade && c.sGrade !== "請選擇年級") contactInfo.push(`dt_admission_student_attributes_grade: ${c.sGrade}`);
+                contactInfo.push(`dt_admission_stage_id-selectized:`);
+                
+                const courseObj = configData.trialCourses.find(tc => tc.name === c.cType);
+                if (courseObj && courseObj.full) contactInfo.push(`dt_admission_course_id: ${courseObj.full}`);
+                
                 contactInfo.push(`dt_admission_total_times: 1`);
                 
                 if (combinedContactName) contactInfo.push(`dt_admission_contact_name: ${combinedContactName}`);
                 
                 if (parentEmailGlobal) contactInfo.push(`dt_admission_contact_email: ${parentEmailGlobal}`);
+                if (courseObj && courseObj.price) contactInfo.push(`dt_admission_price: ${courseObj.price}`);
                 contactInfo.push(`dt_admission_plan: 自訂價`);
 
                 if (contactInfo.length > 0) body += "\n\n---\n" + contactInfo.join('\n');

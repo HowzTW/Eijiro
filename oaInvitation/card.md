@@ -286,11 +286,18 @@
         家長電話：《家長電話》。
         dt_admission_student_attributes_name: 《學員姓名》
         dt_admission_student_attributes_grade: 《學員年級》
+        dt_admission_stage_id-selectized:
+        dt_admission_course_id: 《體驗課程全名》
         dt_admission_total_times: 1
         dt_admission_contact_name: 《聯絡人稱謂》
         dt_admission_contact_email: 《家長Email》
+        dt_admission_price: 《體驗課程定價》
         dt_admission_plan: 自訂價
         ```
+        - 定義「體驗課程全名」如下：
+            在config.json中，體驗課程中對應的full。
+        - 定義「體驗課程定價」如下：
+            在config.json中，體驗課程中對應的price。
         - 定義「聯絡人稱謂」如下：
             - **單一學員**：
             - 格式`《學員姓名》《家長稱謂》`。例如：王小明爸爸。
