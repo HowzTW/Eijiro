@@ -17,6 +17,15 @@
 </head>
 
 <body>
+    <!-- AI Loading Overlay -->
+    <div id="ai_loading" class="ai-loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>AI 正在為您繪製專屬背景...</h3>
+            <p>這大約需要 10-20 秒，請稍候</p>
+        </div>
+    </div>
+
     <div class="app-container">
         <header>
             <div class="header-top">
@@ -28,7 +37,7 @@
                         class="material-symbols-rounded">refresh</span></button>
             </div>
             <div class="progress-bar">
-                <div class="step-indicator" id="step_indicator">步驟 1 / 5</div>
+                <div class="step-indicator" id="step_indicator">步驟 1 / 3</div>
                 <div class="progress-line">
                     <div id="progress_fill" class="progress-fill"></div>
                 </div>
@@ -70,58 +79,20 @@
                 <div class="actions">
                     <button class="btn btn-secondary" onclick="prevStep()"><span
                             class="material-symbols-rounded">arrow_back</span> 上一步</button>
-                    <button class="btn btn-primary" onclick="nextStep()">下一步 <span
-                            class="material-symbols-rounded">arrow_forward</span></button>
+                    <button class="btn btn-primary btn-auto-gen" onclick="autoGenerateAIImage()">
+                        <span class="material-symbols-rounded">auto_awesome</span> 自動生成小卡
+                    </button>
                 </div>
             </section>
 
-            <!-- Step 3: AI Prompt -->
-            <section id="step_3" class="step-section">
+            <!-- Step 3 & 4: Hidden (Internal Logic) -->
+            <section id="step_3" class="step-section" style="display:none !important;"></section>
+            <section id="step_4" class="step-section" style="display:none !important;"></section>
 
-                <h2>第 3 步：生成 AI 提示詞</h2>
-                <div class="input-group">
-                    <label for="prompt_input">複製提示詞至 ChatGPT 產生圖片：</label>
-                    <textarea id="prompt_input" rows="8"></textarea>
-                </div>
-                <div class="actions" style="margin-bottom: 20px;">
-                    <a id="chatgpt_link" class="btn btn-accent" href="#" target="_blank"
-                        onclick="copyAndPrepareChatGPT(event)" style="width: 100%;">
-                        <span class="material-symbols-rounded">forum</span> 送給 ChatGPT
-                    </a>
-                </div>
-                <div class="actions">
-                    <button class="btn btn-secondary" onclick="prevStep()"><span
-                            class="material-symbols-rounded">arrow_back</span> 上一步</button>
-                    <button class="btn btn-primary" onclick="nextStep()">下一步 <span
-                            class="material-symbols-rounded">arrow_forward</span></button>
-                </div>
-            </section>
-
-            <!-- Step 4: Upload Image -->
-            <section id="step_4" class="step-section">
-
-                <h2>第 4 步：上傳背景圖片</h2>
-                <div class="upload-container" id="drop_zone" onclick="triggerFileInput()">
-                    <span class="material-symbols-rounded">cloud_upload</span>
-                    <p>點擊或拖放圖片至此</p>
-                    <input type="file" id="file_input" accept="image/*" style="display: none;"
-                        onchange="handleFileUpload(event)">
-                </div>
-                <div id="upload_preview" class="preview-box">
-                    <img id="preview_img" src="" alt="Preview" style="display: none;">
-                </div>
-                <div class="actions">
-                    <button class="btn btn-secondary" onclick="prevStep()"><span
-                            class="material-symbols-rounded">arrow_back</span> 上一步</button>
-                    <button class="btn btn-primary" id="btn_step4_next" onclick="nextStep()" disabled>下一步 <span
-                            class="material-symbols-rounded">arrow_forward</span></button>
-                </div>
-            </section>
-
-            <!-- Step 5: Final Preview & Download -->
+            <!-- Step 5: Final Preview & Download (Now conceptual Step 3) -->
             <section id="step_5" class="step-section">
 
-                <h2>第 5 步：預覽與下載</h2>
+                <h2>第 3 步：預覽與下載</h2>
                 <div class="card-scroll-wrapper">
                     <div class="card-viewer">
                         <!-- The Master Card (Fixed 1500x2000, scaled for viewing) -->
@@ -147,6 +118,9 @@
                 <div class="actions">
                     <button class="btn btn-secondary" onclick="prevStep()"><span
                             class="material-symbols-rounded">arrow_back</span> 上一步</button>
+                    <button class="btn btn-accent" onclick="autoGenerateAIImage(true)">
+                        <span class="material-symbols-rounded">cached</span> 換一張圖
+                    </button>
                     <button class="btn btn-success" onclick="downloadPoster()">
                         <span class="material-symbols-rounded">download</span> 下載
                     </button>
