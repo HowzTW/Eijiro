@@ -1,0 +1,76 @@
+.next-list-fab {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #6f42c1; /* Purple */
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.next-list-fab:hover {
+  background-color: #5a32a3;
+  transform: scale(1.05);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4), 0 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+.next-list-fab:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.next-list-fab svg {
+  width: 28px;
+  height: 28px;
+  fill: currentColor;
+}
+
+/* 方案三：浮動標籤樣式 */
+.next-list-indicator {
+  position: absolute;
+  background-color: #6f42c1;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  pointer-events: none;
+  z-index: 10000;
+  box-shadow: 0 4px 12px rgba(111, 66, 193, 0.4);
+  white-space: nowrap;
+  animation: tooltip-bounce 0.5s ease-out;
+}
+
+/* 小箭頭 */
+.next-list-indicator::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  margin-top: -6px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent #6f42c1 transparent transparent;
+}
+
+@keyframes tooltip-bounce {
+  0% { transform: translateX(-20px); opacity: 0; }
+  60% { transform: translateX(5px); opacity: 1; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+/* 目標元件邊框加強 */
+.next-list-target-highlight {
+  outline: 2px solid #6f42c1 !important;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
