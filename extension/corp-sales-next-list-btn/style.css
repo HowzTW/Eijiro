@@ -36,7 +36,7 @@
 
 /* 方案三：浮動標籤樣式 */
 .next-list-indicator {
-  position: absolute;
+  position: fixed;
   background-color: #6f42c1;
   color: white;
   padding: 6px 12px;

@@ -32,7 +32,12 @@
     const recordList = frames.map(frame => {
       const small = frame.querySelector('small');
       if (!small) return null;
-      
+
+      // 排除隱藏元素（折疊列、display:none 等）
+      // 隱藏元素的 getBoundingClientRect 會回傳 width:0, height:0
+      const rect = small.getBoundingClientRect();
+      if (rect.width === 0 && rect.height === 0) return null;
+
       const timeStr = small.textContent.trim(); // 格式: 2026-04-15 10:29:15
       const recordDate = new Date(timeStr.replace(/-/g, '/')); // 部分瀏覽器對 - 相容性較差
       
@@ -93,18 +98,17 @@
     indicator.textContent = message;
     document.body.appendChild(indicator);
 
-    // 計算定位 (在 highlightElement 右側)
+    // 計算定位 (position: fixed → 直接使用 viewport 座標，不需加 scrollY)
     const updatePosition = () => {
       const rect = highlightElement.getBoundingClientRect();
-      indicator.style.top = `${window.scrollY + rect.top + (rect.height / 2) - 15}px`;
-      indicator.style.left = `${window.scrollX + rect.right + 15}px`;
+      // Guard：元素若為隱藏（display:none）則 width/height 為 0，跳過定位
+      if (rect.width === 0 && rect.height === 0) return;
+      indicator.style.top  = `${rect.top + rect.height / 2 - 15}px`;
+      indicator.style.left = `${rect.right + 15}px`;
     };
 
-    updatePosition();
-    
-    // 處理捲動中定位可能跑掉的問題
-    const scrollHandler = () => updatePosition();
-    window.addEventListener('scroll', scrollHandler);
+    // 等 smooth scroll 完成後再定位（600ms 緩衝確保遠距離捲動也能完成）
+    setTimeout(updatePosition, 600);
 
     // 3 秒後自動消失
     setTimeout(() => {
@@ -113,7 +117,6 @@
       setTimeout(() => {
         indicator.remove();
         highlightElement.classList.remove('next-list-target-highlight');
-        window.removeEventListener('scroll', scrollHandler);
       }, 500);
     }, 3000);
   }
