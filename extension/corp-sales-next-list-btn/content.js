@@ -51,9 +51,9 @@
     });
 
     if (sameDayPotentials.length > 0) {
-      // 找出距離當下時間最近的一筆 (即最晚的時間)
+      // 找出距離當下時間最遠的一筆 (即最早的時間)
       const target = sameDayPotentials.reduce((prev, curr) => {
-        return (curr.date > prev.date) ? curr : prev;
+        return (curr.date < prev.date) ? curr : prev;
       });
       scrollToElement(target.element, target.highlightElement, '下一筆在此');
       return;
