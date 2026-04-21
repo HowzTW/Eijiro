@@ -74,3 +74,16 @@
   outline-offset: 2px;
   border-radius: 4px;
 }
+
+/* 跳過用 Checkbox */
+.next-list-checkbox {
+  margin-right: 5px;
+  cursor: pointer;
+  accent-color: #6f42c1;
+  width: 13px;
+  height: 13px;
+  vertical-align: middle;
+  flex-shrink: 0;
+  position: relative;
+  top: -1px;
+}

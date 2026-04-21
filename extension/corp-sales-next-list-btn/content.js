@@ -18,6 +18,25 @@
     document.body.appendChild(btn);
   }
 
+  // 注入 checkbox 到所有符合條件的 <small> 元件
+  function injectCheckboxes() {
+    const frames = document.querySelectorAll('turbo-frame[id^="potential_student_"][id$="_log"]');
+    frames.forEach(frame => {
+      const small = frame.querySelector('small');
+      // 若找不到 small，或已經注入過，則跳過
+      if (!small || small.querySelector('.next-list-checkbox')) return;
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'next-list-checkbox';
+      checkbox.title = '勾選後此筆將被跳過';
+      // 防止點擊 checkbox 觸發列表的其他點擊事件
+      checkbox.addEventListener('click', e => e.stopPropagation());
+
+      small.insertBefore(checkbox, small.firstChild);
+    });
+  }
+
   function findNextAndScroll() {
     const frames = Array.from(document.querySelectorAll('turbo-frame[id^="potential_student_"][id$="_log"]'));
     if (frames.length === 0) {
@@ -33,11 +52,16 @@
       const small = frame.querySelector('small');
       if (!small) return null;
 
+      // 跳過已勾選的項目
+      const checkbox = small.querySelector('.next-list-checkbox');
+      if (checkbox && checkbox.checked) return null;
+
       // 排除隱藏元素（折疊列、display:none 等）
       // 隱藏元素的 getBoundingClientRect 會回傳 width:0, height:0
       const rect = small.getBoundingClientRect();
       if (rect.width === 0 && rect.height === 0) return null;
 
+      // 取得純文字時間字串（排除 checkbox 本身，input 無 textContent 故不影響）
       const timeStr = small.textContent.trim(); // 格式: 2026-04-15 10:29:15
       const recordDate = new Date(timeStr.replace(/-/g, '/')); // 部分瀏覽器對 - 相容性較差
       
@@ -123,7 +147,17 @@
 
   // 自動執行注入
   injectFAB();
+  injectCheckboxes();
+
+  // 監聽 DOM 動態變化（turbo-frame 非同步載入內容時），自動補充注入 checkbox
+  const observer = new MutationObserver(() => {
+    injectCheckboxes();
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
 
   // 處理 Turbolinks/Turbo 頁面切換 (如果有的話)
-  document.addEventListener('turbo:load', injectFAB);
+  document.addEventListener('turbo:load', () => {
+    injectFAB();
+    injectCheckboxes();
+  });
 })();
