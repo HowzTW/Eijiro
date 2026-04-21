@@ -106,43 +106,134 @@
     return `${y}-${m}-${d}`;
   }
 
-  function scrollToElement(scrollTarget, highlightElement, message) {
-    scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    
-    // 移除舊的標籤（如果存在）
+  // 模組層級：追蹤動畫與清理想時器
+  let _trackingAnimFrame = null;
+  let _scrollEndCleanup = null;
+  let _delayedShowTimer = null;   // 新增：追蹤「等待 400ms」的計時器
+  let _cleanupTimer = null;       // 新增：追蹤「3 秒後移除」的計時器
+
+  function clearAllActiveEffects() {
+    // 1. 取消所有動畫幀
+    if (_trackingAnimFrame) {
+      cancelAnimationFrame(_trackingAnimFrame);
+      _trackingAnimFrame = null;
+    }
+    // 2. 取消所有計時器
+    if (_delayedShowTimer) {
+      clearTimeout(_delayedShowTimer);
+      _delayedShowTimer = null;
+    }
+    if (_cleanupTimer) {
+      clearTimeout(_cleanupTimer);
+      _cleanupTimer = null;
+    }
+    // 3. 移除現有的監聽器
+    if (_scrollEndCleanup) {
+      _scrollEndCleanup();
+      _scrollEndCleanup = null;
+    }
+    // 4. 清除頁面上所有高亮與標籤
+    document.querySelectorAll('.next-list-target-highlight').forEach(el => {
+      el.classList.remove('next-list-target-highlight');
+    });
     const oldIndicator = document.querySelector('.next-list-indicator');
     if (oldIndicator) oldIndicator.remove();
+  }
 
-    // 增加高亮樣式 (套用在 small 元件上)
+  function scrollToElement(scrollTarget, highlightElement, message) {
+    // 進入新任務前，先徹底清空舊狀態
+    clearAllActiveEffects();
+
+    // 先捲動到目標
+    scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    // 增加高亮樣式
     highlightElement.classList.add('next-list-target-highlight');
 
-    // 建立浮動標籤
-    const indicator = document.createElement('div');
-    indicator.className = 'next-list-indicator';
-    indicator.textContent = message;
-    document.body.appendChild(indicator);
+    let hasShown = false;
 
-    // 計算定位 (position: fixed → 直接使用 viewport 座標，不需加 scrollY)
-    const updatePosition = () => {
-      const rect = highlightElement.getBoundingClientRect();
-      // Guard：元素若為隱藏（display:none）則 width/height 為 0，跳過定位
-      if (rect.width === 0 && rect.height === 0) return;
-      indicator.style.top  = `${rect.top + rect.height / 2 - 15}px`;
-      indicator.style.left = `${rect.right + 15}px`;
+    // 最終顯示標籤的函式（立即執行，不帶延遲）
+    const showIndicatorImmediately = () => {
+      if (hasShown) return;
+      hasShown = true;
+
+      // 清理所有監聽與保底計時
+      if (_scrollEndCleanup) {
+        _scrollEndCleanup();
+        _scrollEndCleanup = null;
+      }
+
+      // 建立浮動標籤
+      const indicator = document.createElement('div');
+      indicator.className = 'next-list-indicator';
+      indicator.textContent = message;
+      document.body.appendChild(indicator);
+
+      // 用 rAF 迴圈持續更新位置
+      const trackPosition = () => {
+        const rect = highlightElement.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+          indicator.style.top  = `${rect.top + rect.height / 2 - 15}px`;
+          indicator.style.left = `${rect.right + 15}px`;
+        }
+        _trackingAnimFrame = requestAnimationFrame(trackPosition);
+      };
+      _trackingAnimFrame = requestAnimationFrame(trackPosition);
+
+      // 3 秒後自動消失
+      _cleanupTimer = setTimeout(() => {
+        indicator.style.opacity = '0';
+        indicator.style.transition = 'opacity 0.5s';
+        _cleanupTimer = setTimeout(() => {
+          cancelAnimationFrame(_trackingAnimFrame);
+          _trackingAnimFrame = null;
+          indicator.remove();
+          highlightElement.classList.remove('next-list-target-highlight');
+          _cleanupTimer = null;
+        }, 500);
+      }, 3000);
     };
 
-    // 等 smooth scroll 完成後再定位（600ms 緩衝確保遠距離捲動也能完成）
-    setTimeout(updatePosition, 600);
+    // 觸發「偵測到停止後的 400ms 延遲」
+    const triggerDelayedShow = () => {
+      if (_scrollEndCleanup) _scrollEndCleanup();
+      // 確保取消掉之前的延遲計時，避免多重顯示
+      if (_delayedShowTimer) clearTimeout(_delayedShowTimer);
+      _delayedShowTimer = setTimeout(showIndicatorImmediately, 400);
+    };
 
-    // 3 秒後自動消失
+    // ── 偵測捲動 ──────────────────────────────────────────────
+    let isScrolling = false;
+    let debounceTimer = null;
+
+    const onScrollStartDetected = () => {
+      isScrolling = true;
+    };
+    const onScrollEnd = () => triggerDelayedShow();
+    const onScrollMove = () => {
+      isScrolling = true;
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(onScrollEnd, 150); // 150ms 沒動視為停止
+    };
+
+    window.addEventListener('scroll', onScrollStartDetected, { once: true });
+    window.addEventListener('scrollend', onScrollEnd, { once: true });
+    window.addEventListener('scroll', onScrollMove);
+
+    _scrollEndCleanup = () => {
+      window.removeEventListener('scroll', onScrollStartDetected);
+      window.removeEventListener('scrollend', onScrollEnd);
+      window.removeEventListener('scroll', onScrollMove);
+      clearTimeout(debounceTimer);
+    };
+
+    // 保底觸發邏輯：
     setTimeout(() => {
-      indicator.style.opacity = '0';
-      indicator.style.transition = 'opacity 0.5s';
-      setTimeout(() => {
-        indicator.remove();
-        highlightElement.classList.remove('next-list-target-highlight');
-      }, 500);
-    }, 3000);
+      // 如果 150ms 內完全沒觸發捲動事件，表示元素已在視野中，直接啟動延遲顯示
+      if (!isScrolling) {
+        triggerDelayedShow();
+      }
+    }, 150);
   }
 
   // 自動執行注入
