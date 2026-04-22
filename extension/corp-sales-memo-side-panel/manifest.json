@@ -2,21 +2,13 @@
   "manifest_version": 3,
   "name": "OA 體驗課程預約紀錄",
   "version": "1.0",
-  "description": "體驗課程預約記錄側邊欄，支援場次ID自動查詢",
-  "permissions": ["sidePanel"],
+  "description": "點擊工具列圖示開啟體驗課程預約紀錄頁面，支援場次ID自動查詢",
+  "permissions": ["tabs"],
   "host_permissions": ["https://corp.orangeapple.co/*"],
   "background": {
     "service_worker": "background.js"
   },
   "action": {
     "default_title": "OA 體驗課程預約紀錄"
-  },
-  "content_scripts": [
-    {
-      "matches": ["https://corp.orangeapple.co/sales/audition_status*"],
-      "css": ["style.css"],
-      "js": ["content.js"],
-      "run_at": "document_idle"
-    }
-  ]
+  }
 }

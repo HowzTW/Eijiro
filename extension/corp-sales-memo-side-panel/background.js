@@ -1,10 +1,9 @@
-// 代理 fetch 請求 & content script 開啟 side panel
+chrome.action.onClicked.addListener(() => {
+    chrome.tabs.create({ url: chrome.runtime.getURL('sidepanel.html') });
+});
+
+// 代理 fetch 請求：extension 分頁無法直接跨域，由 background 以 cookie 發送
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.type === 'openPanel') {
-        chrome.sidePanel.setOptions({ tabId: sender.tab.id, path: 'sidepanel.html', enabled: true });
-        chrome.sidePanel.open({ tabId: sender.tab.id });
-        return;
-    }
     if (message.type === 'fetchUrl') {
         fetch(message.url, { credentials: 'include' })
             .then(res => {
