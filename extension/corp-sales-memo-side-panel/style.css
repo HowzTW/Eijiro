@@ -1,0 +1,38 @@
+/* OA 體驗課程預約紀錄按鈕 - 咖啡色版本 */
+
+.oa-record-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  padding: 3px 10px !important;
+  background-color: #795548 !important;
+  color: #ffffff !important;
+  border-radius: 4px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  border: none !important;
+  vertical-align: middle !important;
+  line-height: 1.5 !important;
+  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease !important;
+  white-space: nowrap !important;
+  margin: 2px 0 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important;
+}
+
+.oa-record-btn:hover {
+  background-color: #5d4037 !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.4) !important;
+}
+
+.oa-record-btn .oa-icon {
+  font-size: 16px !important;
+  line-height: 1 !important;
+}
+
+.oa-record-btn .oa-label {
+  letter-spacing: 0.02em !important;
+}

@@ -1,10 +1,10 @@
-// 點擊 toolbar 按鈕時開啟 side panel
-chrome.action.onClicked.addListener((tab) => {
-    chrome.sidePanel.open({ tabId: tab.id });
-});
-
-// 代理 fetch 請求：side panel 無法直接跨域，由 background 以 cookie 發送
+// 代理 fetch 請求 & content script 開啟 side panel
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === 'openPanel') {
+        chrome.sidePanel.setOptions({ tabId: sender.tab.id, path: 'sidepanel.html', enabled: true });
+        chrome.sidePanel.open({ tabId: sender.tab.id });
+        return;
+    }
     if (message.type === 'fetchUrl') {
         fetch(message.url, { credentials: 'include' })
             .then(res => {

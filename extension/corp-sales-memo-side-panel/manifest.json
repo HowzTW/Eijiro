@@ -8,10 +8,15 @@
   "background": {
     "service_worker": "background.js"
   },
-  "side_panel": {
-    "default_path": "sidepanel.html"
-  },
   "action": {
     "default_title": "OA 體驗課程預約紀錄"
-  }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://corp.orangeapple.co/marketing/sales*"],
+      "css": ["style.css"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
 }
