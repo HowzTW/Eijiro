@@ -1,65 +1,27 @@
-function injectMaterialIcons() {
-    if (!document.querySelector('link[href*="Material+Icons"]')) {
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = 'https://fonts.googleapis.com/icon?family=Material+Icons';
-        document.head.appendChild(link);
-    }
-}
+(function () {
+    function injectFAB() {
+        if (document.querySelector('.oa-memo-fab')) return;
 
-function addRecordButton(td) {
-    if (td.querySelector('.oa-record-btn')) return;
-    const btn = document.createElement('button');
-    btn.className = 'oa-record-btn';
-    btn.type = 'button';
-    btn.innerHTML = '<span class="material-icons oa-icon">edit_note</span><span class="oa-label">記錄</span>';
-    btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        try {
-            chrome.runtime.sendMessage({ type: 'openPanel' });
-        } catch {
-            // extension 已重新載入，忽略
-        }
+        const btn = document.createElement('button');
+        btn.className = 'oa-memo-fab';
+        btn.title = '開啟體驗課程預約紀錄';
+        btn.innerHTML = `
+            <svg viewBox="0 0 24 24">
+                <path d="M3 10h11v2H3zm0-2h11V6H3zm0 8h7v-2H3zm15.01-3.13l.71-.71a.996.996 0 0 1 1.41 0l.71.71c.39.39.39 1.02 0 1.41l-.71.71-2.12-2.12zm-.71.71l-5.3 5.3V21h2.12l5.3-5.3-2.12-2.12z"/>
+            </svg>
+        `;
 
-        const row = btn.closest('tr');
-        if (!row) return;
-
-        let targetScrollTop = 0;
-        for (let el = row; el; el = el.offsetParent) targetScrollTop += el.offsetTop;
-        const initialWidth = window.innerWidth;
-        let done = false;
-
-        const scheduleScroll = () => {
-            if (done) return;
-            done = true;
-            resizeObserver.disconnect();
-            window.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
-        };
-
-        const resizeObserver = new ResizeObserver(() => {
-            if (window.innerWidth !== initialWidth) scheduleScroll();
+        btn.addEventListener('click', () => {
+            try {
+                chrome.runtime.sendMessage({ type: 'openPanel' });
+            } catch {
+                // extension 已重新載入，忽略
+            }
         });
-        resizeObserver.observe(document.documentElement);
 
-        // 保底：若 side panel 已開啟（寬度不變），800ms 後仍執行捲動
-        setTimeout(scheduleScroll, 800);
-    });
-    const dropdown = td.querySelector(':scope > div.dropdown');
-    if (dropdown) dropdown.after(btn);
-}
+        document.body.appendChild(btn);
+    }
 
-function processRows() {
-    document.querySelectorAll('td > div.dropdown').forEach(dropdown => {
-        addRecordButton(dropdown.parentElement);
-    });
-}
-
-injectMaterialIcons();
-processRows();
-
-const observer = new MutationObserver(processRows);
-observer.observe(document.body, { childList: true, subtree: true });
-
-document.addEventListener('turbo:load', processRows);
-document.addEventListener('turbo:frame-render', processRows);
+    injectFAB();
+    document.addEventListener('turbo:load', injectFAB);
+})();
