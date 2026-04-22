@@ -286,7 +286,7 @@
         家長電話：《家長電話》。
         dt_admission_student_attributes_name: 《學員姓名》
         dt_admission_student_attributes_grade: 《學員年級》
-        dt_admission_stage_id-selectized:
+        dt_admission_stage_id-selectized: 《體驗課場次ID》
         dt_admission_course_id: 《體驗課程全名》
         dt_admission_total_times: 1
         dt_admission_contact_name: 《聯絡人稱謂》
@@ -298,6 +298,15 @@
             在config.json中，體驗課程中對應的full。
         - 定義「體驗課程定價」如下：
             在config.json中，體驗課程中對應的price。
+        - 定義「體驗課場次ID」如下：
+            要取得體驗課場次ID的話，需要三個參數：《預約日期》、《預約時段》、《體驗課程對應prefix》。 例如：《2026-05-17》《10:00》《線上Roblox體驗_》 
+            根據《預約日期》，例如 2026=05-17，
+            連結到網頁 https://corp.orangeapple.co/sales/audition_status?date=《預約日期》，例如： https://corp.orangeapple.co/sales/audition_status?date=2026-05-17。
+            在該網頁頁面裡的表格中，找出「日期欄」等於《預約日期》、「時間欄」等於《預約時段》、「班級名稱」以《體驗課程對應prefix》開頭的列。
+            取得該列班級連結的 href，擷取末段數字即為體驗課場次 ID。
+            例如：《2026-05-17》《10:00》《線上Roblox體驗_》，
+            然後要找到 線上Roblox體驗_A教室(5) : https://corp.orangeapple.co/courses/dt/7168 ，
+            則得到體驗課場次ID就是 7168 。
         - 定義「聯絡人稱謂」如下：
             - **單一學員**：
             - 格式`《學員姓名》《家長稱謂》`。例如：王小明爸爸。
