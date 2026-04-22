@@ -10,7 +10,8 @@
       ],
       "js": [
         "content.js"
-      ]
+      ],
+      "world": "MAIN"
     }
   ]
 }
