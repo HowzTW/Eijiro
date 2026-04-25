@@ -46,7 +46,11 @@
 
     const now = new Date();
     const todayStr = getTaipeiDateString(now); // YYYY-MM-DD
-    const fourHoursInMs = 4 * 60 * 60 * 1000;
+
+    // 截斷到分鐘（秒與毫秒歸零），讓比較不受秒數影響
+    const nowTruncated = new Date(now);
+    nowTruncated.setSeconds(0, 0);
+    const threeH59mInMs = (3 * 60 + 59) * 60 * 1000;
 
     const recordList = frames.map(frame => {
       const small = frame.querySelector('small');
@@ -74,9 +78,12 @@
       };
     }).filter(item => item !== null && !isNaN(item.date.getTime()));
 
-    // 邏輯 2: 同日且距離現在超過4小時
+    // 邏輯 2: 同日且（截斷到分鐘後）距現在 ≥ 3小時59分
     const sameDayPotentials = recordList.filter(item => {
-      return item.dateStr === todayStr && (now - item.date) >= fourHoursInMs;
+      if (item.dateStr !== todayStr) return false;
+      const recordTruncated = new Date(item.date);
+      recordTruncated.setSeconds(0, 0);
+      return (nowTruncated - recordTruncated) >= threeH59mInMs;
     });
 
     if (sameDayPotentials.length > 0) {
