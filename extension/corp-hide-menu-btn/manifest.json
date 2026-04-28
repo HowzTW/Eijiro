@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "corp-hide-menu-btn",
+  "version": "1.0",
+  "description": "在 OrangeApple 後台注入浮動按鈕，可切換收合/展開左側導覽選單",
+  "content_scripts": [
+    {
+      "matches": ["https://corp.orangeapple.co/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
