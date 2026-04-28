@@ -53,7 +53,16 @@
         margin-left: 0 !important;
         padding-top: 52px !important;
       }
-      /* 搜尋框移入浮動容器後的樣式 */
+      /* form 移入浮動容器後：只讓 #q 顯示，hidden input 本就隱藏 */
+      #${CONTAINER_ID} #search_students {
+        display: flex !important;
+        align-items: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border: none !important;
+      }
+      /* 搜尋框樣式 */
       #${CONTAINER_ID} #q {
         height: 36px !important;
         width: 200px !important;
@@ -70,24 +79,46 @@
         border-color: #e67e22 !important;
         box-shadow: 0 0 0 2px rgba(230,126,34,0.25) !important;
       }
+      /* 搜尋結果下拉：複製原始 .desktop 的 hover 顯示/隱藏規則 */
+      #${CONTAINER_ID} #search_students #search_results { display: none !important; }
+      #${CONTAINER_ID} #search_students:hover #search_results,
+      #${CONTAINER_ID} #search_students:focus-within #search_results { display: block !important; }
+      /* 定位到浮動列下方 */
+      #${CONTAINER_ID} #search_results {
+        position: fixed !important;
+        top: 52px !important;
+        left: 8px !important;
+        z-index: 9998 !important;
+        min-width: 260px !important;
+        max-height: 60vh !important;
+        overflow-y: auto !important;
+        background: #fff !important;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 6px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+      }
     `;
     document.head.appendChild(style);
   }
 
   // ── 狀態輔助 ──────────────────────────────────────────────────────────────
-  let qParent = null;
-  let qNextSibling = null;
+  let formParent = null;
+  let formNextSibling = null;
 
   const isCollapsed = () => sessionStorage.getItem(STORAGE_KEY) === '1';
 
-  // ── 收合 ──────────────────────────────────────────────────────────────────
+  function getSearchForm() {
+    return document.getElementById('search_students');
+  }
+
+  // ── 收合：移動整個 form，保留 Stimulus binding ────────────────────────────
   function collapse(btn) {
-    const q = document.getElementById('q');
+    const form = getSearchForm();
     const container = document.getElementById(CONTAINER_ID);
-    if (q && container && !container.contains(q)) {
-      qParent = q.parentElement;
-      qNextSibling = q.nextSibling;
-      container.appendChild(q);
+    if (form && container && !container.contains(form)) {
+      formParent = form.parentElement;
+      formNextSibling = form.nextSibling;
+      container.appendChild(form);
     }
     document.body.classList.add('oa-menu-collapsed');
     sessionStorage.setItem(STORAGE_KEY, '1');
@@ -95,13 +126,13 @@
     if (icon) icon.textContent = 'menu';
   }
 
-  // ── 展開 ──────────────────────────────────────────────────────────────────
+  // ── 展開：將 form 歸位 ────────────────────────────────────────────────────
   function expand(btn) {
-    const q = document.getElementById('q');
-    if (q && qParent) {
-      qParent.insertBefore(q, qNextSibling || null);
-      qParent = null;
-      qNextSibling = null;
+    const form = getSearchForm();
+    if (form && formParent) {
+      formParent.insertBefore(form, formNextSibling || null);
+      formParent = null;
+      formNextSibling = null;
     }
     document.body.classList.remove('oa-menu-collapsed');
     sessionStorage.removeItem(STORAGE_KEY);
@@ -132,25 +163,24 @@
     // 若 sessionStorage 記錄為收合狀態，恢復收合（Turbo 導航後重建）
     if (isCollapsed()) {
       const btn = document.getElementById(BTN_ID);
-      const q = document.getElementById('q');
-      if (btn && q && !container.contains(q)) {
+      const form = getSearchForm();
+      if (btn && form && !container.contains(form)) {
         collapse(btn);
       } else {
-        // sidebar class 可能因 Turbo 而消失，補上
         document.body.classList.add('oa-menu-collapsed');
       }
     }
   }
 
-  // ── Turbo 導航前：將 #q 移回 nav，確保 Turbo permanent 機制正常保存 ───────
+  // ── Turbo 導航前：將 form 移回 nav，確保 Turbo permanent 機制正常保存 ──────
   document.addEventListener('turbo:before-render', () => {
     if (!isCollapsed()) return;
-    const q = document.getElementById('q');
+    const form = getSearchForm();
     const container = document.getElementById(CONTAINER_ID);
-    if (q && container && container.contains(q) && qParent) {
-      qParent.insertBefore(q, qNextSibling || null);
-      qParent = null;
-      qNextSibling = null;
+    if (form && container && container.contains(form) && formParent) {
+      formParent.insertBefore(form, formNextSibling || null);
+      formParent = null;
+      formNextSibling = null;
     }
   });
 
