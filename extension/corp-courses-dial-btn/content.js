@@ -12,7 +12,7 @@
 
 (function () {
   const PROCESSED_ATTR = 'data-evox-done';
-  const PHONE_COL_INDEX = 4; // 「聯絡人\n電話\nEmail」欄（0-based）
+  const PHONE_COL_INDEX = 3; // 「聯絡人\n電話\nEmail」欄（0-based）
 
   // ── 注入 Material Icons ──────────────────────────────────────────────────
   if (!document.querySelector('link[href*="Material+Icons"]')) {
