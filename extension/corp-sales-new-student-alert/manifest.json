@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Corp Sales New Student Alert",
+  "version": "1.0",
+  "description": "偵測新潛在學生名單加入時，發出聲音與通知。",
+  "permissions": ["notifications"],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://corp.orangeapple.co/marketing/sales*"
+      ],
+      "css": [
+        "style.css"
+      ],
+      "js": [
+        "content.js"
+      ]
+    }
+  ]
+}

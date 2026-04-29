@@ -1,0 +1,43 @@
+.oa-dial-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  padding: 3px 10px !important;
+  background: #00b050 !important;
+  color: #fff !important;
+  border-radius: 4px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  border: none !important;
+  vertical-align: middle !important;
+  line-height: 1.5 !important;
+  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease !important;
+  white-space: nowrap !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important;
+}
+
+.oa-dial-btn:hover {
+  background: #009140 !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.4) !important;
+}
+
+.oa-dial-btn:active {
+  background: #007a36 !important;
+  transform: scale(0.97) !important;
+}
+
+.oa-dial-btn.is-dialing {
+  background: #9aa1a9 !important;
+  cursor: not-allowed !important;
+  opacity: 0.85 !important;
+  transform: none !important;
+}
+
+.oa-dial-btn.is-dialing:hover {
+  background: #9aa1a9 !important;
+  transform: none !important;
+}
