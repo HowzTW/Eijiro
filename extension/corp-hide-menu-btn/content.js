@@ -1,13 +1,14 @@
 (function () {
   const CONTAINER_ID = 'oa-hide-menu-container';
-  const BTN_ID = 'oa-hide-menu-btn';
-  const STYLE_ID = 'oa-hide-menu-style';
+  const BTN_ID      = 'oa-hide-menu-btn';
+  const CLOCK_ID    = 'oa-hide-menu-clock';
+  const STYLE_ID    = 'oa-hide-menu-style';
   const STORAGE_KEY = 'oa-menu-collapsed';
 
   // ── Material Icons ────────────────────────────────────────────────────────
   if (!document.querySelector('link[href*="Material+Icons"]')) {
     const link = document.createElement('link');
-    link.rel = 'stylesheet';
+    link.rel  = 'stylesheet';
     link.href = 'https://fonts.googleapis.com/icon?family=Material+Icons';
     document.head.appendChild(link);
   }
@@ -44,6 +45,25 @@
       #${BTN_ID}:hover { background: #d35400; transform: scale(1.05); }
       #${BTN_ID}:active { transform: scale(0.97); }
       #${BTN_ID} .material-icons { font-size: 20px; line-height: 1; }
+      /* 時鐘 */
+      #${CLOCK_ID} {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 36px;
+        padding: 0 5px;
+        background: #e67e22;
+        color: #fff;
+        font-size: 20px;
+        font-family: ui-monospace, 'Courier New', monospace;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        border-radius: 6px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        user-select: none;
+        flex-shrink: 0;
+        line-height: 1;
+      }
       /* 收合時主內容區填滿寬度 */
       body.oa-menu-collapsed .sidebar { display: none !important; }
       body.oa-menu-collapsed .sidebar + * {
@@ -53,7 +73,7 @@
         margin-left: 0 !important;
         padding-top: 52px !important;
       }
-      /* form 移入浮動容器後：只讓 #q 顯示，hidden input 本就隱藏 */
+      /* form 移入浮動容器後 */
       #${CONTAINER_ID} #search_students {
         display: flex !important;
         align-items: center !important;
@@ -101,8 +121,51 @@
     document.head.appendChild(style);
   }
 
+  // ── Server 時間校準 ───────────────────────────────────────────────────────
+  let serverOffset = 0; // ms，server 時間 - 本機時間
+
+  async function calibrateServerTime() {
+    try {
+      const t0  = Date.now();
+      const res = await fetch('/', { method: 'HEAD', cache: 'no-store' });
+      const t1  = Date.now();
+      const serverDateStr = res.headers.get('Date');
+      if (!serverDateStr) return;
+      const serverMs = new Date(serverDateStr).getTime();
+      // 用 RTT 中點補償網路延遲
+      serverOffset = serverMs - Math.round((t0 + t1) / 2);
+    } catch (e) {
+      console.warn('[oa-clock] 校準失敗，使用本機時間', e);
+    }
+  }
+
+  function getServerNow() {
+    return new Date(Date.now() + serverOffset);
+  }
+
+  function formatTime(date) {
+    const hh = String(date.getHours()).padStart(2, '0');
+    const mi = String(date.getMinutes()).padStart(2, '0');
+    const ss = String(date.getSeconds()).padStart(2, '0');
+    return `${hh}:${mi}:${ss}`;
+  }
+
+  // 首次校準，之後每 5 分鐘重新校準
+  calibrateServerTime();
+  setInterval(calibrateServerTime, 5 * 60 * 1000);
+
+  // 每秒更新時鐘
+  let clockInterval = null;
+  function startClock() {
+    if (clockInterval) return;
+    clockInterval = setInterval(() => {
+      const el = document.getElementById(CLOCK_ID);
+      if (el) el.textContent = formatTime(getServerNow());
+    }, 1000);
+  }
+
   // ── 狀態輔助 ──────────────────────────────────────────────────────────────
-  let formParent = null;
+  let formParent      = null;
   let formNextSibling = null;
 
   const isCollapsed = () => sessionStorage.getItem(STORAGE_KEY) === '1';
@@ -111,14 +174,16 @@
     return document.getElementById('search_students');
   }
 
-  // ── 收合：移動整個 form，保留 Stimulus binding ────────────────────────────
+  // ── 收合：將 form 插到時鐘左側，保留 Stimulus binding ────────────────────
   function collapse(btn) {
-    const form = getSearchForm();
+    const form      = getSearchForm();
     const container = document.getElementById(CONTAINER_ID);
+    const clock     = document.getElementById(CLOCK_ID);
     if (form && container && !container.contains(form)) {
-      formParent = form.parentElement;
+      formParent      = form.parentElement;
       formNextSibling = form.nextSibling;
-      container.appendChild(form);
+      // 插在時鐘左側，維持 [btn][form][clock] 順序
+      container.insertBefore(form, clock || null);
     }
     document.body.classList.add('oa-menu-collapsed');
     sessionStorage.setItem(STORAGE_KEY, '1');
@@ -131,7 +196,7 @@
     const form = getSearchForm();
     if (form && formParent) {
       formParent.insertBefore(form, formNextSibling || null);
-      formParent = null;
+      formParent      = null;
       formNextSibling = null;
     }
     document.body.classList.remove('oa-menu-collapsed');
@@ -140,7 +205,7 @@
     if (icon) icon.textContent = 'menu_open';
   }
 
-  // ── 注入浮動容器與按鈕 ────────────────────────────────────────────────────
+  // ── 注入浮動容器、按鈕、時鐘 ─────────────────────────────────────────────
   function inject() {
     let container = document.getElementById(CONTAINER_ID);
 
@@ -148,21 +213,29 @@
       container = document.createElement('div');
       container.id = CONTAINER_ID;
 
+      // 切換按鈕
       const btn = document.createElement('button');
-      btn.id = BTN_ID;
+      btn.id    = BTN_ID;
       btn.title = '收合/展開側邊欄';
       btn.innerHTML = `<span class="material-icons">${isCollapsed() ? 'menu' : 'menu_open'}</span>`;
       btn.addEventListener('click', () => {
         isCollapsed() ? expand(btn) : collapse(btn);
       });
-
       container.appendChild(btn);
+
+      // 時鐘（永遠在容器最右側）
+      const clock = document.createElement('div');
+      clock.id          = CLOCK_ID;
+      clock.textContent = formatTime(getServerNow());
+      container.appendChild(clock);
+
       document.body.appendChild(container);
+      startClock();
     }
 
-    // 若 sessionStorage 記錄為收合狀態，恢復收合（Turbo 導航後重建）
+    // 恢復收合狀態（Turbo 導航後重建）
     if (isCollapsed()) {
-      const btn = document.getElementById(BTN_ID);
+      const btn  = document.getElementById(BTN_ID);
       const form = getSearchForm();
       if (btn && form && !container.contains(form)) {
         collapse(btn);
@@ -172,14 +245,14 @@
     }
   }
 
-  // ── Turbo 導航前：將 form 移回 nav，確保 Turbo permanent 機制正常保存 ──────
+  // ── Turbo 導航前：將 form 移回 nav，確保 permanent 機制正常 ───────────────
   document.addEventListener('turbo:before-render', () => {
     if (!isCollapsed()) return;
-    const form = getSearchForm();
+    const form      = getSearchForm();
     const container = document.getElementById(CONTAINER_ID);
     if (form && container && container.contains(form) && formParent) {
       formParent.insertBefore(form, formNextSibling || null);
-      formParent = null;
+      formParent      = null;
       formNextSibling = null;
     }
   });
@@ -189,7 +262,7 @@
   document.addEventListener('turbo:load', inject);
   document.addEventListener('turbo:render', inject);
 
-  // ── MutationObserver 自癒（防止容器被移除）─────────────────────────────────
+  // ── MutationObserver 自癒 ─────────────────────────────────────────────────
   new MutationObserver(() => {
     if (!document.getElementById(CONTAINER_ID)) inject();
   }).observe(document.body, { childList: true, subtree: false });
