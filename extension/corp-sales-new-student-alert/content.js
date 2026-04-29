@@ -89,7 +89,7 @@
     const header = document.createElement('div');
     header.style.cssText = 'display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;';
     header.innerHTML = `
-      <strong style="color:#e05c00; font-size:15px;">🔔 新潛在學生名單</strong>
+      <strong style="color:#e05c00; font-size:15px;">🔔 發現 Corp 新名單</strong>
       <span class="oa-toast-close" style="cursor:pointer; color:#999; font-size:18px; line-height:1;">✕</span>
     `;
     toast.appendChild(header);
