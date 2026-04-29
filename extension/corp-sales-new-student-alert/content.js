@@ -7,23 +7,29 @@
   }
 
   const myTabId = Math.random();
+  const audioCtx = new AudioContext();
+  ['click', 'keydown', 'touchstart'].forEach(evt =>
+    document.addEventListener(evt, () => {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }, { capture: true, passive: true })
+  );
   const channel = new BroadcastChannel('oa_sales_new_student');
   let observer = null;
   let initialized = false;
   let pendingAlert = null;
 
   function beep() {
-    const ctx = new AudioContext();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+    if (audioCtx.state !== 'running') return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(audioCtx.destination);
     osc.type = 'sine';
     osc.frequency.value = 880;
-    gain.gain.setValueAtTime(0.3, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.8);
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 0.8);
   }
 
   function cleanNumber(raw) {
@@ -99,7 +105,11 @@
       const btn = document.createElement('a');
       btn.className = 'oa-dial-btn';
       btn.title = `用 EVOX 撥打 ${phone}`;
+      btn.tabIndex = 0;
       btn.innerHTML = '<span class="material-icons evox-icon">call</span><span class="evox-label">撥打</span>';
+      btn.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') { e.preventDefault(); btn.click(); }
+      });
       btn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -133,6 +143,9 @@
 
     document.body.appendChild(toast);
     toast.querySelector('.oa-toast-close').addEventListener('click', () => toast.remove());
+
+    const firstBtn = toast.querySelector('.oa-dial-btn');
+    if (firstBtn) firstBtn.focus();
     setTimeout(() => { if (toast.parentNode) toast.remove(); }, 60000);
   }
 
