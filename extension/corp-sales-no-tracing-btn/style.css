@@ -28,6 +28,16 @@
   box-shadow: 0 2px 5px rgba(0,0,0,0.4) !important;
 }
 
+.oa-notracing-sep {
+  display: inline-block !important;
+  color: #4a4a4a !important;
+  font-size: 18px !important;
+  margin: 0 2px !important;
+  vertical-align: middle !important;
+  user-select: none !important;
+  line-height: 1 !important;
+}
+
 .oa-notracing-btn:disabled {
   background-color: #95a5a6 !important;
   cursor: not-allowed !important;

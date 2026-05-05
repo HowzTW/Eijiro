@@ -5,13 +5,19 @@
  */
 
 (function () {
-  const BUTTONS = [
-    { label: '10次未接',   reason: '10次不同時段未接/轉語音' },
-    { label: '不需要',     reason: '聊完後主動告知不需要' },
-    { label: '3次自介掛',  reason: '累積3次，一聽是橘子蘋果就掛掉' },
-    { label: '年紀不符',   reason: '年紀不符(小~大班、大學)' },
+  const NOT_TRACK_BUTTONS = [
+    { label: '10次未接',    reason: '10次不同時段未接/轉語音' },
+    { label: '不需要',      reason: '聊完後主動告知不需要' },
+    { label: '3次自介掛',   reason: '累積3次，一聽是橘子蘋果就掛掉' },
+    { label: '年紀不符',    reason: '年紀不符(小~大班、大學)' },
     { label: '有平板沒電腦', reason: '有平板，但沒筆電' },
     { label: '沒平板沒電腦', reason: '沒有平板，也沒有筆電' },
+  ];
+
+  const INVALID_BUTTONS = [
+    { label: '沒有小孩', reason: '沒有小孩' },
+    { label: '電話錯誤', reason: '電話錯誤(空號、缺碼、暫停使用)' },
+    { label: '沒留電話', reason: '對方說沒留過電話' },
   ];
 
   /**
@@ -46,25 +52,26 @@
   }
 
   /**
-   * 執行不追蹤流程：
-   * 1. 點擊「設為 不追蹤」連結
+   * 執行狀態變更流程（不追蹤 / 無效）：
+   * 1. 點擊對應連結
    * 2. 等待 modal 出現
    * 3. 選擇原因
-   * 4. 點擊送出
+   * 4. 點擊送出並關閉 modal
+   * @param {string} studentId
+   * @param {string} kind - 'not-track' | 'invalid'
+   * @param {string} reason - 下拉選單的 option value
    */
-  async function performNoTracing(studentId, reason) {
-    // 從 turbo-frame 出發，在同一 <tr> 內找 dropdown-menu 裡的不追蹤連結
-    // （避免全局搜尋因 href 格式或 DOM 狀態造成找不到的問題）
+  async function performStatusChange(studentId, kind, reason) {
     const frame = document.querySelector(`turbo-frame#potential_student_${studentId}_log`);
     const row = frame?.closest('tr');
-    const link = row?.querySelector('a[href*="/change_status?kind=not-track"]');
+    const link = row?.querySelector(`a[href*="/change_status?kind=${kind}"]`);
     if (!link) {
-      console.error(`[OA NoTracing] 找不到學生 ${studentId} 的不追蹤連結`);
+      console.error(`[OA NoTracing] 找不到學生 ${studentId} 的 ${kind} 連結`);
       return;
     }
 
     link.click();
-    console.log(`[OA NoTracing] 已觸發不追蹤 modal（學生 ${studentId}）`);
+    console.log(`[OA NoTracing] 已觸發 ${kind} modal（學生 ${studentId}）`);
 
     let sel;
     try {
@@ -74,7 +81,6 @@
       return;
     }
 
-    // 設定原因
     sel.value = reason;
     sel.dispatchEvent(new Event('change', { bubbles: true }));
     console.log(`[OA NoTracing] 已選擇原因：${reason}`);
@@ -117,8 +123,12 @@
 
   /**
    * 建立單一快捷按鈕
+   * @param {string} label
+   * @param {string} kind - 'not-track' | 'invalid'
+   * @param {string} reason
+   * @param {string} studentId
    */
-  function createTracingButton(label, reason, studentId) {
+  function createStatusButton(label, kind, reason, studentId) {
     const btn = document.createElement('button');
     btn.className = 'oa-notracing-btn';
     btn.textContent = label;
@@ -132,7 +142,7 @@
       const originalText = btn.textContent;
       btn.textContent = '處理中…';
 
-      performNoTracing(studentId, reason).finally(() => {
+      performStatusChange(studentId, kind, reason).finally(() => {
         setTimeout(() => {
           btn.disabled = false;
           btn.textContent = originalText;
@@ -141,6 +151,13 @@
     });
 
     return btn;
+  }
+
+  function createSeparator() {
+    const sep = document.createElement('span');
+    sep.className = 'material-icons oa-notracing-sep';
+    sep.textContent = 'drag_indicator';
+    return sep;
   }
 
   /**
@@ -173,13 +190,27 @@
         targetTd.appendChild(document.createElement('br'));
       }
 
-      BUTTONS.forEach(({ label, reason }) => {
-        targetTd.appendChild(createTracingButton(label, reason, studentId));
+      NOT_TRACK_BUTTONS.forEach(({ label, reason }) => {
+        targetTd.appendChild(createStatusButton(label, 'not-track', reason, studentId));
+      });
+
+      targetTd.appendChild(createSeparator());
+
+      INVALID_BUTTONS.forEach(({ label, reason }) => {
+        targetTd.appendChild(createStatusButton(label, 'invalid', reason, studentId));
       });
 
       targetTd.dataset.oaNoTracingProcessed = 'true';
       frame.dataset.oaNoTracingProcessed = 'true';
     });
+  }
+
+  // 注入 Material Icons 字型
+  if (!document.querySelector('link[href*="Material+Icons"]')) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://fonts.googleapis.com/icon?family=Material+Icons';
+    document.head.appendChild(link);
   }
 
   // 初始注入
