@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "OA 聯絡記錄快速填入按鈕",
+  "version": "1.0",
+  "description": "在聯絡記錄 modal 的文字框旁注入快速填入按鈕",
+  "content_scripts": [
+    {
+      "matches": ["https://corp.orangeapple.co/marketing/sales*"],
+      "css": ["style.css"],
+      "js": ["config.js", "content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

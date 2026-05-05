@@ -1,0 +1,11 @@
+/**
+ * 聯絡記錄快速填入按鈕參數檔案
+ *
+ * 格式：{ label: '按鈕顯示文字', text: '要 append 到 textarea 的文字' }
+ */
+const OA_MEMO_BUTTONS = [
+  { label: '爸爸', text: '爸爸' },
+  { label: '媽媽', text: '媽媽' },
+  { label: '在忙預約', text: '現在在忙不方便通話。請  再回撥。' },
+  { label: '沒留資料', text: '表示沒有留資料，不需要。' },
+];
