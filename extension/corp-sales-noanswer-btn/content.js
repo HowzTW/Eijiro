@@ -127,7 +127,7 @@
         const noAnswerBtn = createQuickButton('未接聽', 'phone_missed', '', link);
         const transferBtn = createQuickButton('直轉', 'forward', '直轉', link);
         const introHangBtn = createQuickButton('自介掛', 'record_voice_over', '自介掛', link);
-        const hangupBtn = createQuickButton('接掛', 'call_end', '掛掛', link);
+        const hangupBtn = createQuickButton('接掛', 'call_end', '接掛', link);
         const aiVoiceBtn = createQuickButton('AI語音', 'smart_toy', '轉AI語音，自介後仍不接聽。', link);
         
         // 插入在 <turbo-frame> 內部最底端
