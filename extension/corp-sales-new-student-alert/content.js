@@ -153,8 +153,10 @@
     beep();
     showToast(rows);
     if (Notification.permission === 'granted') {
+      const now = new Date();
+      const ts = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
       const notif = new Notification('發現 Corp 新名單！', {
-        body: `有 ${rows.length} 筆新名單加入。`,
+        body: `有 ${rows.length} 筆新名單加入。\n(${ts})`,
         icon: 'https://corp.orangeapple.co/favicon.ico'
       });
       notif.onclick = () => window.focus();
