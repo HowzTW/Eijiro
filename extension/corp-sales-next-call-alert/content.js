@@ -1,20 +1,60 @@
 (function () {
-  const ALERT_MIN = 2;
-  const ALERT_MAX = 4;
+  const ALERT_MAX = 4; // 最多提前 4 分鐘提醒，已過時的名單也算
+  const alerted = new Set(); // 記錄已提醒過的預約，頁面關閉或重整後自動清除
+
+  // AudioContext 需要使用者互動後才能播音
+  const audioCtx = new AudioContext();
+  ['click', 'keydown', 'touchstart'].forEach(evt =>
+    document.addEventListener(evt, () => {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }, { capture: true, passive: true })
+  );
+
+  function beep() {
+    if (audioCtx.state !== 'running') return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = 'sine';
+    osc.frequency.value = 660;
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 0.8);
+  }
+
+  function showNotification(items) {
+    if (Notification.permission !== 'granted') return;
+    const body = items.map(({ timeText, phone }) => `${timeText.substring(11, 16)} ${phone}`).join('\n');
+    const notif = new Notification('📞 預約撥打提醒', {
+      body,
+      icon: 'https://corp.orangeapple.co/favicon.ico'
+    });
+    notif.onclick = () => window.focus();
+  }
+
+  function requestNotificationPermission() {
+    if (Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }
 
   chrome.runtime.onMessage.addListener((msg) => {
     if (msg.type === 'check_appointments' && msg.html) {
+      console.log('[NextCall] content.js received html, length:', msg.html.length);
       processAppointments(msg.html);
     }
   });
 
-  async function processAppointments(html) {
+  function processAppointments(html) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
     const rows = doc.querySelectorAll('#next_call tr.border-black');
+    console.log('[NextCall] rows found:', rows.length);
 
     const now = Date.now();
-    const upcoming = [];
+    const newItems = [];
 
     rows.forEach(tr => {
       const tds = tr.querySelectorAll('td');
@@ -31,34 +71,22 @@
 
       const apptTime = new Date(timeText.replace(' ', 'T')).getTime();
       const diffMin = (apptTime - now) / 60000;
+      console.log(`[NextCall] ${phone} @ ${timeText} → diff: ${diffMin.toFixed(2)} min`);
 
-      if (diffMin >= ALERT_MIN && diffMin <= ALERT_MAX) {
-        upcoming.push({ timeText, phone });
-      }
+      if (diffMin > ALERT_MAX) return; // 超過 4 分鐘後才到的預約，暫不提醒
+
+      const key = `${timeText}|${phone}`;
+      if (alerted.has(key)) return;
+
+      alerted.add(key);
+      newItems.push({ timeText, phone });
     });
 
-    if (upcoming.length === 0) return;
-
-    // 過濾已提醒過的
-    const storage = await chrome.storage.session.get('alerted');
-    const alerted = storage.alerted || {};
-
-    const newItems = upcoming.filter(({ timeText, phone }) => !alerted[`${timeText}|${phone}`]);
+    console.log('[NextCall] newItems to alert:', newItems.length);
     if (newItems.length === 0) return;
 
-    // 標記已提醒
-    newItems.forEach(({ timeText, phone }) => {
-      alerted[`${timeText}|${phone}`] = Date.now();
-    });
-
-    // 清理 2 小時前的舊記錄
-    const twoHoursAgo = Date.now() - 2 * 60 * 60 * 1000;
-    Object.keys(alerted).forEach(key => {
-      if (alerted[key] < twoHoursAgo) delete alerted[key];
-    });
-
-    await chrome.storage.session.set({ alerted });
-
+    beep();
+    showNotification(newItems);
     showModal(newItems);
   }
 
@@ -109,4 +137,6 @@
     // 60 秒後自動關閉
     setTimeout(() => { if (modal.parentNode) modal.remove(); }, 60000);
   }
+
+  requestNotificationPermission();
 })();
