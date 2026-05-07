@@ -1,0 +1,77 @@
+.oa-next-call-modal {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 999999;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  padding: 16px;
+  min-width: 260px;
+  max-width: 320px;
+  font-family: sans-serif;
+  font-size: 14px;
+}
+
+.oa-next-call-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.oa-next-call-header strong {
+  color: #e05c00;
+  font-size: 15px;
+}
+
+.oa-next-call-close {
+  cursor: pointer;
+  color: #999;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.oa-next-call-close:hover {
+  color: #333;
+}
+
+.oa-next-call-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-top: 1px solid #f0f0f0;
+}
+
+.oa-next-call-time {
+  font-weight: 700;
+  color: #e05c00;
+  font-size: 15px;
+  min-width: 42px;
+}
+
+.oa-next-call-phone {
+  color: #333;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+
+.oa-next-call-btn {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 8px 0;
+  background: #e05c00;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+
+.oa-next-call-btn:hover {
+  background: #c44f00;
+}
