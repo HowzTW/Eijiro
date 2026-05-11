@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Corp Sales Next List Button",
+  "name": "OA Corp Sales：快速尋找下一筆可撥打名單按鈕",
   "version": "1.0",
-  "description": "Find the next potential student to call based on time rules.",
+  "description": "在銷售頁面依時間規則快速定位下一筆可撥打的潛在學生名單",
   "permissions": [
     "activeTab"
   ],
@@ -18,5 +18,10 @@
         "content.js"
       ]
     }
-  ]
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
 }

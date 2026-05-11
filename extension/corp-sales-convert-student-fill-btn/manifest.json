@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "OA 雙師班快速填寫按鈕",
+  "name": "OA Corp Sales：雙師班聯絡紀錄轉換按鈕",
   "version": "1.0",
-  "description": "在轉為雙師班學生的對話框中加入快速填寫按鈕",
+  "description": "在轉為雙師班學生的 modal 中，將備註文字框內容填寫至對應表格欄位的快速填寫按鈕",
   "content_scripts": [
     {
       "matches": [
@@ -13,5 +13,10 @@
       ],
       "world": "MAIN"
     }
-  ]
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
 }

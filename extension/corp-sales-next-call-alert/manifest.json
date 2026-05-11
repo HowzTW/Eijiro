@@ -1,18 +1,36 @@
 {
   "manifest_version": 3,
-  "name": "Corp Sales Next Call Alert",
+  "name": "OA Corp Sales：預約撥打提醒",
   "version": "1.0",
-  "description": "預約撥打提醒：於預約時間前 2~4 分鐘彈出通知。",
-  "permissions": ["alarms", "storage", "tabs", "scripting"],
-  "host_permissions": ["https://corp.orangeapple.co/*"],
+  "description": "於預約撥打時間前 2～4 分鐘，自動彈出桌面提醒通知",
+  "permissions": [
+    "alarms",
+    "storage",
+    "tabs",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://corp.orangeapple.co/*"
+  ],
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["https://corp.orangeapple.co/marketing/sales*"],
-      "css": ["style.css"],
-      "js": ["content.js"]
+      "matches": [
+        "https://corp.orangeapple.co/marketing/sales*"
+      ],
+      "css": [
+        "style.css"
+      ],
+      "js": [
+        "content.js"
+      ]
     }
-  ]
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
 }

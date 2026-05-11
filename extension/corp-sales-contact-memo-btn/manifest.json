@@ -1,11 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "OA Corp Sales：發現新名單通知",
+  "name": "OA Corp Sales：聯絡記錄常用詞𢑥填寫按鈕",
   "version": "1.0",
-  "description": "偵測銷售頁面出現新潛在學生名單時，自動發出聲音與桌面通知",
-  "permissions": [
-    "notifications"
-  ],
+  "description": "在聯絡記錄 modal 的文字框旁注入常用詞快速填寫按鈕",
   "content_scripts": [
     {
       "matches": [
@@ -15,8 +12,10 @@
         "style.css"
       ],
       "js": [
+        "config.js",
         "content.js"
-      ]
+      ],
+      "run_at": "document_idle"
     }
   ],
   "icons": {

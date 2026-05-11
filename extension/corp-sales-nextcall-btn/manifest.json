@@ -1,14 +1,25 @@
 {
   "manifest_version": 3,
-  "name": "OrangeApple 銷售預約時間提醒",
+  "name": "OA Corp Sales：預約撥打時間設定按鈕",
   "version": "1.0",
-  "description": "當銷售頁面的下一次撥打時間為空時，顯示 [預約時間] 提示文字",
+  "description": "當銷售頁面的下一次撥打時間為空時，顯示提示並提供快速設定預約時間的按鈕",
   "content_scripts": [
     {
-      "matches": ["https://corp.orangeapple.co/marketing/sales*"],
-      "css": ["style.css"],
-      "js": ["content.js"],
+      "matches": [
+        "https://corp.orangeapple.co/marketing/sales*"
+      ],
+      "css": [
+        "style.css"
+      ],
+      "js": [
+        "content.js"
+      ],
       "run_at": "document_idle"
     }
-  ]
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
 }

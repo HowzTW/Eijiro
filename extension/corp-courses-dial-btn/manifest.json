@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "corp-courses-dial-btn",
+  "name": "OA Corp Course：Evox 撥打按鈕",
   "version": "1.0",
-  "description": "在 OrangeApple 學生表格的電話號碼下方加入 EvoX 撥打按鈕",
+  "description": "在課程頁面學生表格的電話號碼下方，注入 Evox 一鍵撥打按鈕",
   "icons": {
     "16": "icon16.png",
     "48": "icon48.png",
@@ -10,8 +10,12 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://corp.orangeapple.co/courses/dt/*"],
-      "js": ["content.js"],
+      "matches": [
+        "https://corp.orangeapple.co/courses/dt/*"
+      ],
+      "js": [
+        "content.js"
+      ],
       "run_at": "document_idle"
     }
   ]

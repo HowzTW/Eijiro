@@ -1,14 +1,25 @@
 {
   "manifest_version": 3,
-  "name": "OA 銷售不追蹤按鈕",
+  "name": "OA Corp Sales：不追蹤/無效名單按鈕",
   "version": "1.0",
-  "description": "在銷售頁面加上「不追蹤」快捷按鈕",
+  "description": "在銷售頁面注入快捷按鈕，一鍵將名單標記為不追蹤或無效名單",
   "content_scripts": [
     {
-      "matches": ["https://corp.orangeapple.co/marketing/sales*"],
-      "css": ["style.css"],
-      "js": ["content.js"],
+      "matches": [
+        "https://corp.orangeapple.co/marketing/sales*"
+      ],
+      "css": [
+        "style.css"
+      ],
+      "js": [
+        "content.js"
+      ],
       "run_at": "document_idle"
     }
-  ]
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
 }
