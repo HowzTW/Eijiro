@@ -20,17 +20,36 @@
     { label: '沒留電話', reason: '對方說沒留過電話' },
   ];
 
+  const ROW_COLORS = {
+    'not-track': { normal: '#DCDCDC', repeat: '#ADACAC' },
+    'invalid':   { normal: '#C1F2F2', repeat: '#44DADA' },
+  };
+
+  function applyRowColors(currentTr, nextTr, kind) {
+    const colors = ROW_COLORS[kind];
+    if (!colors) return;
+    [currentTr, nextTr].forEach(tr => {
+      if (!tr) return;
+      const color = tr.classList.contains('has_repeat') ? colors.repeat : colors.normal;
+      tr.querySelectorAll('td').forEach(td => {
+        td.style.setProperty('background-color', color, 'important');
+      });
+    });
+  }
+
   /**
    * 直接 POST 送出狀態變更，不開 modal。
    * 避免原本透過 MutationObserver 等待 modal 的競爭條件問題。
    *
    * @param {string} studentId
-   * @param {string} kind   - 'not-track' | 'invalid'
-   * @param {string} reason - 原因文字（對應 select option value）
+   * @param {string} kind       - 'not-track' | 'invalid'
+   * @param {string} reason     - 原因文字（對應 select option value）
    * @param {HTMLElement} btn
    * @param {string} originalText
+   * @param {HTMLElement} currentTr
+   * @param {HTMLElement} nextTr
    */
-  async function submitStatusDirect(studentId, kind, reason, btn, originalText) {
+  async function submitStatusDirect(studentId, kind, reason, btn, originalText, currentTr, nextTr) {
     const token = document.querySelector('meta[name="csrf-token"]')?.content;
     if (!token) {
       console.error('[OA NoTracing] 找不到 CSRF token，送出失敗');
@@ -58,6 +77,7 @@
 
       if (resp.ok) {
         console.log(`[OA NoTracing] 送出成功 (student: ${studentId}, kind: ${kind}, reason: "${reason}")`);
+        applyRowColors(currentTr, nextTr, kind);
       } else {
         console.error(`[OA NoTracing] 送出失敗，HTTP ${resp.status}`);
       }
@@ -85,8 +105,10 @@
    * @param {string} kind - 'not-track' | 'invalid'
    * @param {string} reason
    * @param {string} studentId
+   * @param {HTMLElement} currentTr
+   * @param {HTMLElement} nextTr
    */
-  function createStatusButton(label, kind, reason, studentId) {
+  function createStatusButton(label, kind, reason, studentId, currentTr, nextTr) {
     const btn = document.createElement('button');
     btn.className = 'oa-notracing-btn';
     btn.textContent = label;
@@ -100,7 +122,7 @@
       const originalText = btn.textContent;
       btn.textContent = '處理中…';
 
-      submitStatusDirect(studentId, kind, reason, btn, originalText);
+      submitStatusDirect(studentId, kind, reason, btn, originalText, currentTr, nextTr);
     });
 
     return btn;
@@ -144,13 +166,13 @@
       }
 
       NOT_TRACK_BUTTONS.forEach(({ label, reason }) => {
-        targetTd.appendChild(createStatusButton(label, 'not-track', reason, studentId));
+        targetTd.appendChild(createStatusButton(label, 'not-track', reason, studentId, currentTr, nextTr));
       });
 
       targetTd.appendChild(createSeparator());
 
       INVALID_BUTTONS.forEach(({ label, reason }) => {
-        targetTd.appendChild(createStatusButton(label, 'invalid', reason, studentId));
+        targetTd.appendChild(createStatusButton(label, 'invalid', reason, studentId, currentTr, nextTr));
       });
 
       targetTd.dataset.oaNoTracingProcessed = 'true';
