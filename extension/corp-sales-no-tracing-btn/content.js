@@ -34,8 +34,10 @@
     const token = document.querySelector('meta[name="csrf-token"]')?.content;
     if (!token) {
       console.error('[OA NoTracing] 找不到 CSRF token，送出失敗');
-      btn.disabled = false;
-      btn.textContent = originalText;
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }, 3000);
       return;
     }
 
@@ -63,8 +65,10 @@
       console.error('[OA NoTracing] 網路錯誤:', err);
     }
 
-    btn.disabled = false;
-    btn.textContent = originalText;
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }, 3000);
   }
 
   /**

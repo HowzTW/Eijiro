@@ -26,8 +26,10 @@
     const token = document.querySelector('meta[name="csrf-token"]')?.content;
     if (!token) {
       console.error('[OA NoAnswer] 找不到 CSRF token，送出失敗');
-      btn.disabled = false;
-      btn.innerHTML = originalHTML;
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+      }, 3000);
       return;
     }
 
@@ -48,25 +50,32 @@
 
       if (resp.ok) {
         console.log(`[OA NoAnswer] 送出成功 (student: ${studentId}, content: "${commentValue}")`);
-        const frame = document.querySelector(`turbo-frame#potential_student_${studentId}_log`);
-        if (frame) {
-          // 等 frame 載入完畢後才移除旗標並重新注入按鈕，
-          // 避免 reload 期間 mainObserver 提早觸發造成重複注入
-          frame.addEventListener('turbo:frame-load', () => {
-            delete frame.dataset.oaNoAnswerProcessed;
-            injectNoAnswerButtons();
-          }, { once: true });
-          frame.reload();
-        }
+        // 延遲 3 秒再 reload，讓按鈕維持 disabled 狀態提供視覺回饋
+        setTimeout(() => {
+          const frame = document.querySelector(`turbo-frame#potential_student_${studentId}_log`);
+          if (frame) {
+            // 等 frame 載入完畢後才移除旗標並重新注入按鈕，
+            // 避免 reload 期間 mainObserver 提早觸發造成重複注入
+            frame.addEventListener('turbo:frame-load', () => {
+              delete frame.dataset.oaNoAnswerProcessed;
+              injectNoAnswerButtons();
+            }, { once: true });
+            frame.reload();
+          }
+        }, 3000);
       } else {
         console.error(`[OA NoAnswer] 送出失敗，HTTP ${resp.status}`);
-        btn.disabled = false;
-        btn.innerHTML = originalHTML;
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerHTML = originalHTML;
+        }, 3000);
       }
     } catch (err) {
       console.error('[OA NoAnswer] 網路錯誤:', err);
-      btn.disabled = false;
-      btn.innerHTML = originalHTML;
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+      }, 3000);
     }
   }
 
