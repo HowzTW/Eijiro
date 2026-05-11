@@ -13,54 +13,24 @@
     document.head.appendChild(link);
   }
 
-  /**
-   * 在 content script 的 DOM context 中直接套用 Turbo Stream，
-   * 不呼叫任何頁面 JS（避開 CSP inline-script 限制）。
-   * 支援 replace / update / append / prepend / remove 五種 action。
-   */
-  function applyTurboStream(html) {
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    doc.querySelectorAll('turbo-stream').forEach(stream => {
-      const action   = stream.getAttribute('action');
-      const targetId = stream.getAttribute('target');
-      const template = stream.querySelector('template');
-      if (!targetId) return;
-
-      const targetEl = document.getElementById(targetId);
-      if (!targetEl) return;
-
-      if (action === 'replace') {
-        targetEl.replaceWith(template.content.cloneNode(true));
-      } else if (action === 'update') {
-        targetEl.innerHTML = '';
-        targetEl.appendChild(template.content.cloneNode(true));
-      } else if (action === 'append') {
-        targetEl.appendChild(template.content.cloneNode(true));
-      } else if (action === 'prepend') {
-        targetEl.prepend(template.content.cloneNode(true));
-      } else if (action === 'remove') {
-        targetEl.remove();
-      }
-    });
-  }
+  // 記錄最近送出的學生；value: { expiry: timestamp, icon: string }
+  const recentlySubmitted = new Map();
 
   /**
    * 直接 POST 送出聯絡紀錄，不開 modal。
    * 避免原本透過 MutationObserver 等待 #remote_modal 的競爭條件問題。
    *
+   * 送出後，ActionCable 廣播會讓頁面 Turbo 立即替換 turbo-frame（含按鈕），
+   * 因此改以 recentlySubmitted Map 記錄已送出的學生，
+   * 讓 injectNoAnswerButtons 重新注入時直接建立 disabled 狀態的按鈕。
+   *
    * @param {string} studentId   - 從 turbo-frame id 取出的潛在學生 ID
    * @param {string} commentValue - 備註內容
-   * @param {HTMLElement} btn    - 觸發的按鈕（用於還原狀態）
-   * @param {string} originalHTML - 按鈕原始 innerHTML
    */
-  async function submitLogDirect(studentId, commentValue, btn, originalHTML) {
+  async function submitLogDirect(studentId, commentValue) {
     const token = document.querySelector('meta[name="csrf-token"]')?.content;
     if (!token) {
       console.error('[OA NoAnswer] 找不到 CSRF token，送出失敗');
-      setTimeout(() => {
-        btn.disabled = false;
-        btn.innerHTML = originalHTML;
-      }, 3000);
       return;
     }
 
@@ -81,57 +51,50 @@
 
       if (resp.ok) {
         console.log(`[OA NoAnswer] 送出成功 (student: ${studentId}, content: "${commentValue}")`);
-        const contentType = resp.headers.get('content-type') || '';
-        const streamHtml = await resp.text();
-        // 延遲 3 秒後讓 Turbo 處理 stream 回應更新 frame，
-        // 讓按鈕在這段時間維持 disabled 提供視覺回饋。
-        // Turbo 替換 frame 元素後 mainObserver 會自動重新注入按鈕。
-        setTimeout(() => {
-          if (contentType.includes('turbo-stream')) {
-            applyTurboStream(streamHtml);
-          } else {
-            btn.disabled = false;
-            btn.innerHTML = originalHTML;
-          }
-        }, 3000);
+        await resp.text();
       } else {
         console.error(`[OA NoAnswer] 送出失敗，HTTP ${resp.status}`);
-        setTimeout(() => {
-          btn.disabled = false;
-          btn.innerHTML = originalHTML;
-        }, 3000);
+        recentlySubmitted.delete(studentId);
       }
     } catch (err) {
       console.error('[OA NoAnswer] 網路錯誤:', err);
-      setTimeout(() => {
-        btn.disabled = false;
-        btn.innerHTML = originalHTML;
-      }, 3000);
+      recentlySubmitted.delete(studentId);
     }
   }
 
   /**
    * 建立快捷按鈕
-   * @param {string} label       - 按鈕文字
-   * @param {string} icon        - Material Icon 名稱
+   * @param {string} label        - 按鈕文字
+   * @param {string} icon         - Material Icon 名稱
    * @param {string} commentValue - 自動填寫的備註內容
-   * @param {string} studentId   - 潛在學生 ID
+   * @param {string} studentId    - 潛在學生 ID
+   * @param {boolean} startDisabled - 是否建立時就 disabled（學生剛送出過）
    */
-  function createQuickButton(label, icon, commentValue, studentId) {
+  function createQuickButton(label, icon, commentValue, studentId, startDisabled) {
     const btn = document.createElement('button');
     btn.className = 'oa-noanswer-btn';
     btn.innerHTML = `<span class="material-icons oa-icon">${icon}</span><span class="oa-label">${label}</span>`;
     btn.type = 'button';
+
+    btn._originalLabel = label;
+
+    if (startDisabled) {
+      btn.disabled = true;
+      btn.querySelector('.oa-label').textContent = '處理中...';
+    }
 
     btn.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
 
       btn.disabled = true;
-      const originalHTML = btn.innerHTML;
-      btn.innerHTML = `<span class="material-icons oa-icon">sync</span><span class="oa-label">處理中...</span>`;
+      btn.querySelector('.oa-label').textContent = '處理中...';
 
-      submitLogDirect(studentId, commentValue, btn, originalHTML);
+      // 記錄此學生已送出，並記下是哪個 icon，3 秒內重新注入時只 disable 同一顆按鈕
+      recentlySubmitted.set(studentId, { expiry: Date.now() + 3000, icon });
+      setTimeout(() => recentlySubmitted.delete(studentId), 3000);
+
+      submitLogDirect(studentId, commentValue);
     });
 
     return btn;
@@ -154,11 +117,28 @@
       if (!match) return;
       const studentId = match[1];
 
-      const noAnswerBtn = createQuickButton('未接聽', 'phone_missed',  '',                          studentId);
-      const transferBtn = createQuickButton('直轉',   'forward',        '直轉',                      studentId);
-      const introHangBtn = createQuickButton('自介掛', 'record_voice_over', '自介掛',                studentId);
-      const aiVoiceBtn  = createQuickButton('AI語音', 'smart_toy',      '轉AI語音，自介後仍不接聽。', studentId);
-      const hangupBtn   = createQuickButton('接掛',   'call_end',       '接掛',                      studentId);
+      // 若此學生剛送出過（3 秒內），找到對應 icon 的按鈕直接以 disabled 狀態顯示
+      const record = recentlySubmitted.get(studentId);
+      const coolingIcon = (record && Date.now() < record.expiry) ? record.icon : null;
+
+      const noAnswerBtn  = createQuickButton('未接聽', 'phone_missed',       '',                          studentId, coolingIcon === 'phone_missed');
+      const transferBtn  = createQuickButton('直轉',   'forward',             '直轉',                      studentId, coolingIcon === 'forward');
+      const introHangBtn = createQuickButton('自介掛', 'record_voice_over',   '自介掛',                    studentId, coolingIcon === 'record_voice_over');
+      const aiVoiceBtn   = createQuickButton('AI語音', 'smart_toy',           '轉AI語音，自介後仍不接聽。', studentId, coolingIcon === 'smart_toy');
+      const hangupBtn    = createQuickButton('接掛',   'call_end',            '接掛',                      studentId, coolingIcon === 'call_end');
+
+      // 若有剩餘冷卻時間，設定 timer 在到期後恢復被 disabled 的那顆按鈕
+      if (coolingIcon) {
+        const remaining = record.expiry - Date.now();
+        const disabledBtn = [noAnswerBtn, transferBtn, introHangBtn, aiVoiceBtn, hangupBtn]
+          .find(b => b.querySelector('.oa-icon')?.textContent === coolingIcon);
+        if (disabledBtn) {
+          setTimeout(() => {
+            disabledBtn.disabled = false;
+            disabledBtn.querySelector('.oa-label').textContent = disabledBtn._originalLabel;
+          }, remaining);
+        }
+      }
 
       frame.appendChild(document.createElement('br'));
       frame.appendChild(noAnswerBtn);
