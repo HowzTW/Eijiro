@@ -1,6 +1,6 @@
 /**
  * OA 銷售未接聽快捷按鈕
- * 
+ *
  * 適用 URL: https://corp.orangeapple.co/marketing/sales*
  */
 
@@ -14,96 +14,84 @@
   }
 
   /**
-   * 自動化流程：點擊連結 -> 等待彈窗 -> 勾選 -> 填寫內容 -> 送出 -> 關閉
-   * @param {HTMLElement} link - 原始觸發彈窗的 <a> 標籤
-   * @param {string} commentValue - 自動填入的備註內容
+   * 直接 POST 送出聯絡紀錄，不開 modal。
+   * 避免原本透過 MutationObserver 等待 #remote_modal 的競爭條件問題。
+   *
+   * @param {string} studentId   - 從 turbo-frame id 取出的潛在學生 ID
+   * @param {string} commentValue - 備註內容
+   * @param {HTMLElement} btn    - 觸發的按鈕（用於還原狀態）
+   * @param {string} originalHTML - 按鈕原始 innerHTML
    */
-  async function performLogAutomation(link, commentValue = '') {
-    // 1. 點擊原始的 <a> 標籤觸發 Turbo 彈窗
-    link.click();
+  async function submitLogDirect(studentId, commentValue, btn, originalHTML) {
+    const token = document.querySelector('meta[name="csrf-token"]')?.content;
+    if (!token) {
+      console.error('[OA NoAnswer] 找不到 CSRF token，送出失敗');
+      btn.disabled = false;
+      btn.innerHTML = originalHTML;
+      return;
+    }
 
-    console.log(`[OA LogAutomation] 觸發彈窗 (內容: "${commentValue}")，等待表單加載...`);
+    const body = new URLSearchParams({
+      'authenticity_token':                  token,
+      'potential_student_log[is_answered]':  'false',
+      'potential_student_log[is_pitched]':   'false',
+      'potential_student_log[content]':      commentValue,
+      'commit':                              '確認送出'
+    });
 
-    // 2. 監聽 DOM，等待 #remote_modal 內的表單出現
-    const observer = new MutationObserver((mutations, obs) => {
-      const modal = document.querySelector('#remote_modal');
-      const form = modal?.querySelector('form[action*="/logs"]');
-      
-      if (form) {
-        obs.disconnect(); // 找到後立即停止監聽
-        console.log('[OA LogAutomation] 找到表單，開始填寫...');
-        
-        try {
-          // A. 勾選 [是否接聽] 為 否
-          const answeredFalse = form.querySelector('input[type="radio"][value="false"][name*="[is_answered]"]');
-          if (answeredFalse) answeredFalse.checked = true;
+    try {
+      const resp = await fetch(`/potential_students/${studentId}/logs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString()
+      });
 
-          // B. 勾選 [是否溝通] 為 否
-          const pitchedFalse = form.querySelector('input[type="radio"][value="false"][name*="[is_pitched]"]');
-          if (pitchedFalse) pitchedFalse.checked = true;
-
-          // C. 填寫內容 (根據傳入參數)
-          const contentArea = form.querySelector('textarea[name*="[content]"]');
-          if (contentArea) contentArea.value = commentValue;
-
-          // D. 點擊送出按鈕
-          const submitBtn = form.querySelector('input[type="submit"]');
-          if (submitBtn) {
-            console.log('[OA LogAutomation] 正在提交表單...');
-            submitBtn.click();
-            
-            // E. 等待一下後嘗試關閉彈窗 (雖然 Turbo 通常會處理，但雙重保險)
-            setTimeout(() => {
-              const closeBtn = document.querySelector('button[data-action*="remote-modal#closeModal"]');
-              if (closeBtn) {
-                console.log('[OA LogAutomation] 關閉彈窗');
-                closeBtn.click();
-              }
-            }, 800);
-          }
-        } catch (err) {
-          console.error('[OA LogAutomation] 自動填寫失敗:', err);
+      if (resp.ok) {
+        console.log(`[OA NoAnswer] 送出成功 (student: ${studentId}, content: "${commentValue}")`);
+        const frame = document.querySelector(`turbo-frame#potential_student_${studentId}_log`);
+        if (frame) {
+          // 等 frame 載入完畢後才移除旗標並重新注入按鈕，
+          // 避免 reload 期間 mainObserver 提早觸發造成重複注入
+          frame.addEventListener('turbo:frame-load', () => {
+            delete frame.dataset.oaNoAnswerProcessed;
+            injectNoAnswerButtons();
+          }, { once: true });
+          frame.reload();
         }
+      } else {
+        console.error(`[OA NoAnswer] 送出失敗，HTTP ${resp.status}`);
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
       }
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
+    } catch (err) {
+      console.error('[OA NoAnswer] 網路錯誤:', err);
+      btn.disabled = false;
+      btn.innerHTML = originalHTML;
+    }
   }
 
   /**
    * 建立快捷按鈕
-   * @param {string} label - 按鈕文字
-   * @param {string} icon - Material Icon 名稱
-   * @param {string} commentValue - 自動填寫內容
-   * @param {HTMLElement} link - 原始連結
+   * @param {string} label       - 按鈕文字
+   * @param {string} icon        - Material Icon 名稱
+   * @param {string} commentValue - 自動填寫的備註內容
+   * @param {string} studentId   - 潛在學生 ID
    */
-  function createQuickButton(label, icon, commentValue, link) {
+  function createQuickButton(label, icon, commentValue, studentId) {
     const btn = document.createElement('button');
     btn.className = 'oa-noanswer-btn';
     btn.innerHTML = `<span class="material-icons oa-icon">${icon}</span><span class="oa-label">${label}</span>`;
     btn.type = 'button';
-    
-    // 點擊事件
+
     btn.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
 
-      // 防呆機制：禁用按鈕 3 秒
       btn.disabled = true;
       const originalHTML = btn.innerHTML;
       btn.innerHTML = `<span class="material-icons oa-icon">sync</span><span class="oa-label">處理中...</span>`;
 
-      performLogAutomation(link, commentValue);
-
-      setTimeout(() => {
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = originalHTML;
-        }
-      }, 3000);
+      submitLogDirect(studentId, commentValue, btn, originalHTML);
     });
 
     return btn;
@@ -113,34 +101,33 @@
    * 搜尋並注入按鈕
    */
   function injectNoAnswerButtons() {
-    // 尋找具有特定格式的 Turbo Frame (學生聯絡紀錄列)
     const logFrames = document.querySelectorAll('turbo-frame[id^="potential_student_"][id$="_log"]');
 
     logFrames.forEach(frame => {
-      // 使用 data 屬性標記，防止重複注入導致無窮迴圈
       if (frame.dataset.oaNoAnswerProcessed === 'true') return;
 
       const link = frame.querySelector('a.show-comment[data-turbo-frame="remote_modal"]');
+      if (!link) return;
 
-      if (link) {
-        // 建立並注入按鈕
-        const noAnswerBtn = createQuickButton('未接聽', 'phone_missed', '', link);
-        const transferBtn = createQuickButton('直轉', 'forward', '直轉', link);
-        const introHangBtn = createQuickButton('自介掛', 'record_voice_over', '自介掛', link);
-        const hangupBtn = createQuickButton('接掛', 'call_end', '接掛', link);
-        const aiVoiceBtn = createQuickButton('AI語音', 'smart_toy', '轉AI語音，自介後仍不接聽。', link);
-        
-        // 插入在 <turbo-frame> 內部最底端
-        frame.appendChild(document.createElement('br'));
-        frame.appendChild(noAnswerBtn);
-        frame.appendChild(transferBtn);
-        frame.appendChild(introHangBtn);
-        frame.appendChild(aiVoiceBtn);
-        frame.appendChild(hangupBtn);
+      // 從 turbo-frame id 取出 student ID（格式：potential_student_{id}_log）
+      const match = frame.id.match(/^potential_student_(\d+)_log$/);
+      if (!match) return;
+      const studentId = match[1];
 
-        // 標記為已處理
-        frame.dataset.oaNoAnswerProcessed = 'true';
-      }
+      const noAnswerBtn = createQuickButton('未接聽', 'phone_missed',  '',                          studentId);
+      const transferBtn = createQuickButton('直轉',   'forward',        '直轉',                      studentId);
+      const introHangBtn = createQuickButton('自介掛', 'record_voice_over', '自介掛',                studentId);
+      const aiVoiceBtn  = createQuickButton('AI語音', 'smart_toy',      '轉AI語音，自介後仍不接聽。', studentId);
+      const hangupBtn   = createQuickButton('接掛',   'call_end',       '接掛',                      studentId);
+
+      frame.appendChild(document.createElement('br'));
+      frame.appendChild(noAnswerBtn);
+      frame.appendChild(transferBtn);
+      frame.appendChild(introHangBtn);
+      frame.appendChild(aiVoiceBtn);
+      frame.appendChild(hangupBtn);
+
+      frame.dataset.oaNoAnswerProcessed = 'true';
     });
   }
 
@@ -160,5 +147,5 @@
     subtree: true
   });
 
-  console.log('[OA NoAnswer Extension] 載入成功 (含直轉按鈕)');
+  console.log('[OA NoAnswer Extension] 載入成功');
 })();
