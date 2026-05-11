@@ -14,6 +14,37 @@
   }
 
   /**
+   * 在 content script 的 DOM context 中直接套用 Turbo Stream，
+   * 不呼叫任何頁面 JS（避開 CSP inline-script 限制）。
+   * 支援 replace / update / append / prepend / remove 五種 action。
+   */
+  function applyTurboStream(html) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    doc.querySelectorAll('turbo-stream').forEach(stream => {
+      const action   = stream.getAttribute('action');
+      const targetId = stream.getAttribute('target');
+      const template = stream.querySelector('template');
+      if (!targetId) return;
+
+      const targetEl = document.getElementById(targetId);
+      if (!targetEl) return;
+
+      if (action === 'replace') {
+        targetEl.replaceWith(template.content.cloneNode(true));
+      } else if (action === 'update') {
+        targetEl.innerHTML = '';
+        targetEl.appendChild(template.content.cloneNode(true));
+      } else if (action === 'append') {
+        targetEl.appendChild(template.content.cloneNode(true));
+      } else if (action === 'prepend') {
+        targetEl.prepend(template.content.cloneNode(true));
+      } else if (action === 'remove') {
+        targetEl.remove();
+      }
+    });
+  }
+
+  /**
    * 直接 POST 送出聯絡紀錄，不開 modal。
    * 避免原本透過 MutationObserver 等待 #remote_modal 的競爭條件問題。
    *
@@ -50,17 +81,17 @@
 
       if (resp.ok) {
         console.log(`[OA NoAnswer] 送出成功 (student: ${studentId}, content: "${commentValue}")`);
-        // 延遲 3 秒再 reload，讓按鈕維持 disabled 狀態提供視覺回饋
+        const contentType = resp.headers.get('content-type') || '';
+        const streamHtml = await resp.text();
+        // 延遲 3 秒後讓 Turbo 處理 stream 回應更新 frame，
+        // 讓按鈕在這段時間維持 disabled 提供視覺回饋。
+        // Turbo 替換 frame 元素後 mainObserver 會自動重新注入按鈕。
         setTimeout(() => {
-          const frame = document.querySelector(`turbo-frame#potential_student_${studentId}_log`);
-          if (frame) {
-            // 等 frame 載入完畢後才移除旗標並重新注入按鈕，
-            // 避免 reload 期間 mainObserver 提早觸發造成重複注入
-            frame.addEventListener('turbo:frame-load', () => {
-              delete frame.dataset.oaNoAnswerProcessed;
-              injectNoAnswerButtons();
-            }, { once: true });
-            frame.reload();
+          if (contentType.includes('turbo-stream')) {
+            applyTurboStream(streamHtml);
+          } else {
+            btn.disabled = false;
+            btn.innerHTML = originalHTML;
           }
         }, 3000);
       } else {
