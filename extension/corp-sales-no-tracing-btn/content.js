@@ -21,96 +21,50 @@
   ];
 
   /**
-   * 等待 modal 出現並包含目標 select，最多等 5 秒
+   * 直接 POST 送出狀態變更，不開 modal。
+   * 避免原本透過 MutationObserver 等待 modal 的競爭條件問題。
+   *
+   * @param {string} studentId
+   * @param {string} kind   - 'not-track' | 'invalid'
+   * @param {string} reason - 原因文字（對應 select option value）
+   * @param {HTMLElement} btn
+   * @param {string} originalText
    */
-  function waitForModal() {
-    return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        observer.disconnect();
-        reject(new Error('等待 modal 超時'));
-      }, 5000);
+  async function submitStatusDirect(studentId, kind, reason, btn, originalText) {
+    const token = document.querySelector('meta[name="csrf-token"]')?.content;
+    if (!token) {
+      console.error('[OA NoTracing] 找不到 CSRF token，送出失敗');
+      btn.disabled = false;
+      btn.textContent = originalText;
+      return;
+    }
 
-      const observer = new MutationObserver(() => {
-        const sel = document.querySelector('select[name="potential_student_log[content]"]');
-        if (sel) {
-          observer.disconnect();
-          clearTimeout(timeout);
-          resolve(sel);
-        }
+    const body = new URLSearchParams({
+      'potential_student_log[content]': reason,
+      'commit': '送出'
+    });
+
+    try {
+      const resp = await fetch(`/potential_students/${studentId}/set_status?kind=${kind}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRF-Token': token
+        },
+        body: body.toString()
       });
 
-      observer.observe(document.body, { childList: true, subtree: true });
-
-      // 若 modal 已存在則立即 resolve
-      const existing = document.querySelector('select[name="potential_student_log[content]"]');
-      if (existing) {
-        observer.disconnect();
-        clearTimeout(timeout);
-        resolve(existing);
+      if (resp.ok) {
+        console.log(`[OA NoTracing] 送出成功 (student: ${studentId}, kind: ${kind}, reason: "${reason}")`);
+      } else {
+        console.error(`[OA NoTracing] 送出失敗，HTTP ${resp.status}`);
       }
-    });
-  }
-
-  /**
-   * 執行狀態變更流程（不追蹤 / 無效）：
-   * 1. 點擊對應連結
-   * 2. 等待 modal 出現
-   * 3. 選擇原因
-   * 4. 點擊送出並關閉 modal
-   * @param {string} studentId
-   * @param {string} kind - 'not-track' | 'invalid'
-   * @param {string} reason - 下拉選單的 option value
-   */
-  async function performStatusChange(studentId, kind, reason) {
-    const frame = document.querySelector(`turbo-frame#potential_student_${studentId}_log`);
-    const row = frame?.closest('tr');
-    const link = row?.querySelector(`a[href*="/change_status?kind=${kind}"]`);
-    if (!link) {
-      console.error(`[OA NoTracing] 找不到學生 ${studentId} 的 ${kind} 連結`);
-      return;
-    }
-
-    link.click();
-    console.log(`[OA NoTracing] 已觸發 ${kind} modal（學生 ${studentId}）`);
-
-    let sel;
-    try {
-      sel = await waitForModal();
     } catch (err) {
-      console.error('[OA NoTracing] modal 未出現：', err.message);
-      return;
+      console.error('[OA NoTracing] 網路錯誤:', err);
     }
 
-    sel.value = reason;
-    sel.dispatchEvent(new Event('change', { bubbles: true }));
-    console.log(`[OA NoTracing] 已選擇原因：${reason}`);
-
-    // 找送出按鈕（input[type=submit] 或 button[type=submit] 或文字為「送出」的 button）
-    const form = sel.closest('form');
-    const submitBtn = form
-      ? (form.querySelector('input[type="submit"]') ||
-         form.querySelector('button[type="submit"]') ||
-         Array.from(form.querySelectorAll('button')).find(b => b.textContent.trim() === '送出'))
-      : null;
-
-    if (submitBtn) {
-      console.log('[OA NoTracing] 點擊送出按鈕');
-      submitBtn.click();
-
-      // form 用 data-remote="true" 做 AJAX 送出，不會自動關閉 modal，
-      // 等 AJAX 完成後用 Bootstrap API 關閉
-      setTimeout(() => {
-        const modal = document.getElementById('log-modal');
-        if (modal && window.bootstrap) {
-          bootstrap.Modal.getInstance(modal)?.hide();
-        } else if (modal) {
-          const closeBtn = modal.querySelector('[data-bs-dismiss="modal"], [data-dismiss="modal"]');
-          closeBtn?.click();
-        }
-      }, 800);
-    } else {
-      console.error('[OA NoTracing] 找不到送出按鈕');
-    }
+    btn.disabled = false;
+    btn.textContent = originalText;
   }
 
   /**
@@ -142,12 +96,7 @@
       const originalText = btn.textContent;
       btn.textContent = '處理中…';
 
-      performStatusChange(studentId, kind, reason).finally(() => {
-        setTimeout(() => {
-          btn.disabled = false;
-          btn.textContent = originalText;
-        }, 3000);
-      });
+      submitStatusDirect(studentId, kind, reason, btn, originalText);
     });
 
     return btn;
