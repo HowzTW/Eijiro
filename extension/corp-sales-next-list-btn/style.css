@@ -1,7 +1,7 @@
 .next-list-fab {
   position: fixed;
   bottom: 30px;
-  right: 30px;
+  left: 30px;
   width: 56px;
   height: 56px;
   border-radius: 50%;
