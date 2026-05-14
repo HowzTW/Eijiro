@@ -18,7 +18,7 @@ function extractNumber(td) {
   return cleanNumber(raw);
 }
 
-function createDialButton(number) {
+function createDialButton(number, potentialStudentsId) {
   const btn = document.createElement('a');
   btn.className = 'evox-dial-btn';
   btn.title = `用 EVOX 撥打 ${number}`;
@@ -55,6 +55,16 @@ function createDialButton(number) {
       console.error('無法複製到剪貼簿', err);
     });
 
+    // 新增：勾選對應的 js-student-checkbox（同時比對 data-phone 與 data-potential-students-id）
+    const selector = potentialStudentsId
+      ? `input.js-student-checkbox[data-phone="${number}"][data-potential-students-id="${potentialStudentsId}"]`
+      : `input.js-student-checkbox[data-phone="${number}"]`;
+    const checkbox = document.querySelector(selector);
+    if (checkbox && !checkbox.checked) {
+      checkbox.checked = true;
+      checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
     // 3 秒後恢復原狀
     setTimeout(() => {
       btn.classList.remove('is-dialing');
@@ -74,7 +84,8 @@ function injectButtons() {
     const number = extractNumber(td);
     if (!number || number.length < 8) return; // 過濾掉非電話的內容
 
-    const btn = createDialButton(number);
+    const potentialStudentsId = td.closest('tr')?.dataset?.id || null;
+    const btn = createDialButton(number, potentialStudentsId);
     td.appendChild(btn);
   });
 }
