@@ -139,7 +139,14 @@
             console.error('[EVOX] 無法複製到剪貼簿', err);
           });
 
-          // 3. 3 秒後恢復
+          // 3. 勾選該列的 checkbox
+          const checkbox = row.querySelector('.js-student-checkbox');
+          if (checkbox && !checkbox.checked) {
+            checkbox.checked = true;
+            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+
+          // 4. 3 秒後恢復
           setTimeout(() => {
             btn.classList.remove('is-dialing');
             labelSpan.textContent = originalText;
