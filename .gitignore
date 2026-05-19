@@ -23,6 +23,9 @@ yarn-debug.log*
 yarn-error.log*
 .env
 
+# Claude Code
+.claude/
+
 # Build Artifacts
 **/bin/
 **/obj/
