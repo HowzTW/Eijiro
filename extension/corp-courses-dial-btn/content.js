@@ -67,6 +67,36 @@
         transform: none !important;
         box-shadow: none !important;
       }
+      .evox-invite-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 4px !important;
+        margin-top: 4px !important;
+        margin-left: 4px !important;
+        padding: 3px 10px !important;
+        background: #3498db !important;
+        color: #fff !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        border: none !important;
+        border-radius: 4px !important;
+        cursor: pointer !important;
+        line-height: 1.5 !important;
+        vertical-align: middle !important;
+        text-decoration: none !important;
+        white-space: nowrap !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important;
+        transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease !important;
+      }
+      .evox-invite-btn:hover {
+        background: #2980b9 !important;
+        transform: scale(1.05) !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.4) !important;
+      }
+      .evox-invite-btn:active {
+        transform: scale(0.97) !important;
+      }
     `;
     document.head.appendChild(style);
   }
@@ -109,6 +139,15 @@
         btn.setAttribute('data-phone', phoneClean);
         btn.setAttribute('title', `撥打 ${phoneRaw}`);
         btn.href = `evox://${phoneClean}`;
+
+        // 建立邀約名單按鈕
+        const inviteBtn = document.createElement('a');
+        inviteBtn.className = 'evox-invite-btn';
+        inviteBtn.innerHTML = `<span class="material-icons evox-icon">group</span><span>邀約名單</span>`;
+        inviteBtn.setAttribute('title', `查看 ${phoneRaw} 邀約名單`);
+        inviteBtn.href = `https://corp.orangeapple.co/marketing/sales?kind=&grade_low=0&grade_top=16&search_and_text=&exclude_or_text=&exclude_and_text=&start_date=&end_date=&log_count=&search_or_text=${phoneClean}`;
+        inviteBtn.target = '_blank';
+        inviteBtn.rel = 'noopener noreferrer';
 
         btn.addEventListener('click', e => {
           // 禁止重複點擊
@@ -169,10 +208,11 @@
           span.innerHTML = part; // part 本身可能含有 <a> 等 HTML，保留原樣
           cell.appendChild(span);
 
-          // 在電話號碼（index=1）之後插入按鈕
+          // 在電話號碼（index=1）之後插入撥打與邀約名單按鈕
           if (idx === 1) {
             cell.appendChild(document.createElement('br'));
             cell.appendChild(btn);
+            cell.appendChild(inviteBtn);
           }
         });
       });
