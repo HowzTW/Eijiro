@@ -184,15 +184,6 @@ document.getElementById('recordForm').addEventListener('submit', async (e) => {
   renderList();
 });
 
-// 收到 background 的即將到期通知，跳出 alert
-chrome.runtime.onMessage.addListener((message) => {
-  if (message.type === 'upcomingAlert') {
-    const lines = message.records.map((r) => `${r.date} ${r.time}　${r.phone}`).join('\n');
-    alert(`⚠ 預約回撥即將到期！\n\n${lines}`);
-    renderList();
-  }
-});
-
 // 每 30 秒重新渲染，確保 highlight 狀態即時更新
 setInterval(renderList, 30000);
 

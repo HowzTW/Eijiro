@@ -3,8 +3,7 @@
   "name": "預約回撥排程",
   "version": "1.0",
   "description": "預約回撥排程提醒工具",
-  "permissions": ["storage", "alarms", "tabs", "sidePanel", "windows", "notifications", "scripting"],
-  "host_permissions": ["<all_urls>"],
+  "permissions": ["storage", "alarms", "tabs", "sidePanel", "windows", "notifications"],
   "background": {
     "service_worker": "background.js"
   },

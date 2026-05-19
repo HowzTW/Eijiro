@@ -27,7 +27,7 @@ async function checkUpcoming() {
   });
 
   if (upcoming.length > 0) {
-    // 系統通知（適用 Side Panel 未開啟時）
+    // 系統通知
     chrome.notifications.create('callScheduleAlert', {
       type: 'basic',
       iconUrl: 'icons/icon48.png',
@@ -36,34 +36,29 @@ async function checkUpcoming() {
       requireInteraction: true,
     });
 
-    const alertMessage = `⚠ 預約回撥即將到期！\n\n${upcoming.map((r) => `${r.date} ${r.time}　${r.phone}`).join('\n')}`;
-
-    // 若 Side Panel 已開啟，由 Side Panel 顯示 alert；否則注入到當前分頁
-    chrome.runtime.sendMessage({ type: 'upcomingAlert', records: upcoming }).catch(() => {
-      chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
-        if (tabs[0] && tabs[0].id) {
-          chrome.scripting.executeScript({
-            target: { tabId: tabs[0].id },
-            func: (msg) => {
-              alert(msg);
-              chrome.runtime.sendMessage({ type: 'openSidePanel' });
-            },
-            args: [alertMessage],
-          }).catch(() => {});
-        }
+    // 取得主視窗 ID 與位置，計算螢幕正中央後開啟提醒小視窗
+    chrome.windows.getLastFocused({ populate: false }, (win) => {
+      const mainWindowId = win ? win.id : null;
+      const width = 380;
+      const height = 220;
+      const left = win ? Math.round(win.left + (win.width - width) / 2) : 200;
+      const top = win ? Math.round(win.top + (win.height - height) / 2) : 200;
+      chrome.storage.local.set({ pendingAlert: { records: upcoming, mainWindowId } }, () => {
+        chrome.windows.create({
+          url: chrome.runtime.getURL('alert.html'),
+          type: 'popup',
+          width,
+          height,
+          left,
+          top,
+          focused: true,
+        });
       });
     });
   }
 }
 
-// alert 關閉後，由注入的 script 發訊息來開啟 Side Panel
-chrome.runtime.onMessage.addListener((message, sender) => {
-  if (message.type === 'openSidePanel' && sender.tab) {
-    chrome.sidePanel.open({ windowId: sender.tab.windowId });
-  }
-});
-
-// 使用者點通知後開啟 Side Panel（點通知屬於 user gesture，符合 Chrome 規定）
+// 使用者點通知後開啟 Side Panel
 chrome.notifications.onClicked.addListener((notificationId) => {
   if (notificationId === 'callScheduleAlert') {
     chrome.windows.getLastFocused({ populate: false }, (win) => {
