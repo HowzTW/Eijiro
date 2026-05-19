@@ -23,10 +23,18 @@
     quickFillBtn.style.marginRight = '8px';
     quickFillBtn.textContent = '快速填寫';
 
-    quickFillBtn.addEventListener('click', (e) => {
+    quickFillBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       const currentTextarea = document.querySelector('textarea#dt_admission_comment');
       if (currentTextarea) {
+        try {
+          const clipboardText = await navigator.clipboard.readText();
+          currentTextarea.value = clipboardText;
+          currentTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+        } catch (err) {
+          console.warn('[OA] 無法讀取剪貼簿:', err);
+        }
+
         const text = currentTextarea.value;
         const lines = text.split('\n');
         
