@@ -102,6 +102,7 @@ function renderList() {
           <div class="record-info">
             <div class="record-datetime">📅 ${record.date} ${record.time}</div>
             <div class="record-phone">📞 ${record.phone}</div>
+            ${record.memo ? `<div class="record-memo">${record.memo}</div>` : ''}
           </div>
           <div class="record-actions">
             <button class="btn-open" data-phone="${record.phone}">開啟工作頁面</button>
@@ -146,11 +147,13 @@ function showForm(record = null) {
     document.getElementById('date').value = record.date;
     setSelectedTime(record.time);
     document.getElementById('phone').value = record.phone;
+    document.getElementById('memo').value = record.memo || '';
   } else {
     document.getElementById('editId').value = '';
     document.getElementById('date').value = getLocalDateString();
     setSelectedTime(getLocalTimeString());
     document.getElementById('phone').value = '';
+    document.getElementById('memo').value = '';
   }
 }
 
@@ -169,14 +172,15 @@ document.getElementById('recordForm').addEventListener('submit', async (e) => {
   const date = document.getElementById('date').value;
   const time = getSelectedTime();
   const phone = document.getElementById('phone').value.trim();
+  const memo = document.getElementById('memo').value.trim();
 
   if (editId) {
     const idx = records.findIndex((r) => r.id === editId);
     if (idx !== -1) {
-      records[idx] = { ...records[idx], date, time, phone };
+      records[idx] = { ...records[idx], date, time, phone, memo };
     }
   } else {
-    records.push({ id: Date.now().toString(), date, time, phone });
+    records.push({ id: Date.now().toString(), date, time, phone, memo });
   }
 
   await saveRecords();
