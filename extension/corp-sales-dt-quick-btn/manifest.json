@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "OA Corp Sales：轉為雙師班學生快速按鈕",
+  "version": "1.0",
+  "description": "在名單每列注入「轉雙師班」按鈕，點擊後自動開啟 modal 並執行快速填寫",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://corp.orangeapple.co/marketing/sales*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "world": "MAIN"
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
