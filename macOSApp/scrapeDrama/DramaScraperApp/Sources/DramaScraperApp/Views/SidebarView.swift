@@ -46,11 +46,23 @@ struct SidebarView: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
+                    if let url = URL(string: "https://gimyplus.com") {
+                        NSWorkspace.shared.open(url)
+                    }
+                } label: {
+                    Label("Gimy+", systemImage: "safari")
+                        .labelStyle(.titleAndIcon)
+                }
+                .help("開啟 Gimy+ 劇迷")
+            }
+            ToolbarItem(placement: .primaryAction) {
+                Button {
                     if let url = URL(string: "https://777tv.ai") {
                         NSWorkspace.shared.open(url)
                     }
                 } label: {
-                    Label("小鴨影音", systemImage: "safari")
+                    Label("777TV", systemImage: "safari")
+                        .labelStyle(.titleAndIcon)
                 }
                 .help("開啟小鴨影音 777TV")
             }

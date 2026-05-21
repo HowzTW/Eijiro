@@ -4,6 +4,7 @@ import SwiftUI
 @MainActor
 class ScrapeViewModel: ObservableObject {
     @Published var targetId: String = ""
+    @Published var selectedSource: ScraperSource = .tv777
     @Published var isRunning: Bool = false
     @Published var logs: [ScrapeLog] = []
     
@@ -23,7 +24,7 @@ class ScrapeViewModel: ObservableObject {
         successData = nil
         
         Task {
-            for await status in engine.scrape(id: targetId) {
+            for await status in engine.scrape(id: targetId, source: selectedSource) {
                 handleStatus(status)
             }
             isRunning = false

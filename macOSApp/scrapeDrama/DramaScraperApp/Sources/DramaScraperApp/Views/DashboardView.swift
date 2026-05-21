@@ -98,25 +98,42 @@ struct DramaCardView: View {
                 .clipped()
             
             // 資訊與操作
-            HStack(alignment: .center) {
-                Text(drama.name)
-                    .font(.title3)
-                    .fontWeight(.bold)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.leading)
-                
-                Spacer()
-                
-                Button(role: .destructive) {
-                    showDeleteConfirmation = true
-                } label: {
-                    Image(systemName: "trash")
-                        .foregroundColor(.red)
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(alignment: .top) {
+                    Text(drama.name)
+                        .font(.title3)
+                        .fontWeight(.bold)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+
+                    Spacer()
+
+                    Button(role: .destructive) {
+                        showDeleteConfirmation = true
+                    } label: {
+                        Image(systemName: "trash")
+                            .foregroundColor(.red)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(6)
+                    .background(Color.red.opacity(0.1))
+                    .cornerRadius(6)
                 }
-                .buttonStyle(.plain)
-                .padding(6)
-                .background(Color.red.opacity(0.1))
-                .cornerRadius(6)
+
+                HStack(spacing: 6) {
+                    Text(drama.source)
+                        .font(.caption2)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(drama.source == "Gimy+" ? Color.purple : Color.blue)
+                        .cornerRadius(4)
+
+                    Text("ID: \(drama.numericId)")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
             }
             .padding(12)
             .background(Color(NSColor.controlBackgroundColor))

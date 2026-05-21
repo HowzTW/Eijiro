@@ -2,6 +2,19 @@ import Foundation
 
 // 對應 GAS 回傳的資料結構
 struct Drama: Identifiable, Codable {
+    var source: String {
+        if id.hasPrefix("gimyplus_") { return "Gimy+" }
+        if id.hasPrefix("777tv_") { return "777TV" }
+        return "777TV"
+    }
+
+    var numericId: String {
+        if let range = id.range(of: "_") {
+            return String(id[range.upperBound...])
+        }
+        return id
+    }
+
     var id: String
     var name: String
     var introduction: String

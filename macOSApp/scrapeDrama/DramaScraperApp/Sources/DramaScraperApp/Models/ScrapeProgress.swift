@@ -1,5 +1,21 @@
 import Foundation
 
+enum ScraperSource: String, CaseIterable, Identifiable {
+    case tv777 = "777tv"
+    case gimyplus = "gimyplus"
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .tv777: return "777TV"
+        case .gimyplus: return "Gimy+"
+        }
+    }
+
+    var idPrefix: String { rawValue + "_" }
+}
+
 enum ScrapeStatus {
     case idle
     case processing(message: String)

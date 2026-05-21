@@ -6,14 +6,24 @@ struct ScrapeView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
             
+            // 來源選擇
+            Picker("來源", selection: $viewModel.selectedSource) {
+                ForEach(ScraperSource.allCases) { source in
+                    Text(source.displayName).tag(source)
+                }
+            }
+            .pickerStyle(.segmented)
+            .frame(maxWidth: 240)
+            .disabled(viewModel.isRunning)
+
             // 輸入區塊
             HStack(spacing: 16) {
-                TextField("輸入 777TV 劇集 ID (例如: 351808)", text: $viewModel.targetId)
+                TextField("輸入 \(viewModel.selectedSource.displayName) 劇集 ID", text: $viewModel.targetId)
                     .textFieldStyle(.roundedBorder)
                     .font(.title3)
                     .frame(maxWidth: 400)
                     .disabled(viewModel.isRunning)
-                
+
                 Button(action: {
                     viewModel.startScraping()
                 }) {
@@ -24,7 +34,7 @@ struct ScrapeView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(viewModel.isRunning || viewModel.targetId.trimmingCharacters(in: .whitespaces).isEmpty)
-                
+
                 Spacer()
             }
             
