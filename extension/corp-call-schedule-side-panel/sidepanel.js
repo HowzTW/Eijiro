@@ -105,9 +105,9 @@ function renderList() {
             ${record.memo ? `<div class="record-memo">${record.memo}</div>` : ''}
           </div>
           <div class="record-actions">
-            <button class="btn-open" data-phone="${record.phone}">開啟工作頁面</button>
-            <button class="btn-edit" data-id="${record.id}">編輯</button>
-            <button class="btn-delete" data-id="${record.id}">刪除</button>
+            <button class="btn-open" data-phone="${record.phone}"><span class="material-icons">open_in_new</span> 工作頁面</button>
+<button class="btn-edit" data-id="${record.id}"><span class="material-icons">edit</span> 編輯</button>
+            <button class="btn-delete" data-id="${record.id}"><span class="material-icons">delete</span> 刪除</button>
           </div>
         </div>
       `;

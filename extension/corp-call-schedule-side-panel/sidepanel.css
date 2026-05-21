@@ -228,6 +228,16 @@ button {
   gap: 5px;
 }
 
+.record-actions button {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.record-actions .material-icons {
+  font-size: 13px;
+}
+
 .btn-open {
   background: #2196f3;
   color: white;
@@ -253,6 +263,10 @@ button {
   background: #f44336;
   color: white;
   font-size: 12px;
+}
+
+.btn-delete:hover {
+  background: #d32f2f;
 }
 
 .btn-delete:hover {
