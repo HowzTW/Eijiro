@@ -1,6 +1,7 @@
 (function () {
   const CONTAINER_ID = 'oa-hide-menu-container';
   const BTN_ID      = 'oa-hide-menu-btn';
+  const CALL_BTN_ID = 'oa-call-btn';
   const CLOCK_ID    = 'oa-hide-menu-clock';
   const STYLE_ID    = 'oa-hide-menu-style';
   const STORAGE_KEY = 'oa-menu-collapsed';
@@ -27,7 +28,7 @@
         align-items: center;
         gap: 6px;
       }
-      #${BTN_ID} {
+      #${BTN_ID}, #${CALL_BTN_ID} {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -42,9 +43,9 @@
         transition: background 0.15s ease, transform 0.1s ease;
         flex-shrink: 0;
       }
-      #${BTN_ID}:hover { background: #d35400; transform: scale(1.05); }
-      #${BTN_ID}:active { transform: scale(0.97); }
-      #${BTN_ID} .material-icons { font-size: 20px; line-height: 1; }
+      #${BTN_ID}:hover, #${CALL_BTN_ID}:hover { background: #d35400; transform: scale(1.05); }
+      #${BTN_ID}:active, #${CALL_BTN_ID}:active { transform: scale(0.97); }
+      #${BTN_ID} .material-icons, #${CALL_BTN_ID} .material-icons { font-size: 20px; line-height: 1; }
       /* 時鐘 */
       #${CLOCK_ID} {
         display: inline-flex;
@@ -182,8 +183,9 @@
     if (form && container && !container.contains(form)) {
       formParent      = form.parentElement;
       formNextSibling = form.nextSibling;
-      // 插在時鐘左側，維持 [btn][form][clock] 順序
-      container.insertBefore(form, clock || null);
+      // 插在撥打按鈕左側，維持 [btn][form][call-btn][clock] 順序
+      const callBtn = document.getElementById(CALL_BTN_ID);
+      container.insertBefore(form, callBtn || clock || null);
     }
     document.body.classList.add('oa-menu-collapsed');
     sessionStorage.setItem(STORAGE_KEY, '1');
@@ -222,6 +224,17 @@
         isCollapsed() ? expand(btn) : collapse(btn);
       });
       container.appendChild(btn);
+
+      // 撥打按鈕（在時鐘左側）
+      const callBtn = document.createElement('button');
+      callBtn.id    = CALL_BTN_ID;
+      callBtn.title = '撥打號碼';
+      callBtn.innerHTML = `<span class="material-icons">phone</span>`;
+      callBtn.addEventListener('click', () => {
+        const phone = (document.getElementById('q')?.value ?? '').trim();
+        if (phone) window.open(`evox://${phone}`);
+      });
+      container.appendChild(callBtn);
 
       // 時鐘（永遠在容器最右側）
       const clock = document.createElement('div');
