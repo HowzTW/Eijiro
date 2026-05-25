@@ -1,4 +1,11 @@
 (function() {
+  if (!document.querySelector('link[href*="Material+Icons"]')) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://fonts.googleapis.com/icon?family=Material+Icons';
+    document.head.appendChild(link);
+  }
+
   async function runQuickFill() {
     const textarea = document.querySelector('textarea#dt_admission_comment');
     if (!textarea) return;
@@ -103,33 +110,38 @@
     setTimeout(() => observer.disconnect(), 8000);
   }
 
-  function injectButtonForRow(row) {
-    if (row.querySelector('.oa-dt-quick-btn')) return;
+  function injectButtonForFrame(frame) {
+    if (frame.querySelector('.oa-dt-quick-btn')) return;
+    if (!frame.querySelector('.oa-noanswer-btn')) return;
 
-    const dropdown = row.querySelector('.dropdown');
-    if (!dropdown) return;
+    const row = frame.closest('tr.potential-student');
+    if (!row) return;
 
-    const dtLink = Array.from(dropdown.querySelectorAll('a')).find(
+    const dtLink = Array.from(row.querySelectorAll('a')).find(
       a => a.textContent.trim() === '轉為雙師班學生'
     );
     if (!dtLink) return;
 
+    const sep = document.createElement('span');
+    sep.className = 'material-icons oa-notracing-sep';
+    sep.textContent = 'drag_indicator';
+
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'btn btn-sm oa-dt-quick-btn';
-    btn.textContent = '轉雙師班';
-    btn.style.cssText = 'display:block; margin-top:4px; background-color:#f97316; color:#fff; border-color:#ea580c;';
+    btn.className = 'oa-dt-quick-btn';
+    btn.innerHTML = '<span class="material-icons">how_to_reg</span><span>轉雙師班</span>';
 
     btn.addEventListener('click', () => {
       dtLink.click();
       waitForModalAndFill();
     });
 
-    dropdown.parentElement.appendChild(btn);
+    frame.appendChild(sep);
+    frame.appendChild(btn);
   }
 
   function injectAllButtons() {
-    document.querySelectorAll('tr.potential-student').forEach(injectButtonForRow);
+    document.querySelectorAll('turbo-frame[id^="potential_student_"][id$="_log"]').forEach(injectButtonForFrame);
   }
 
   const observer = new MutationObserver(() => injectAllButtons());

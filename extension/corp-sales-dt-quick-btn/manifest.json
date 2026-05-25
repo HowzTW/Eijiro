@@ -8,6 +8,9 @@
       "matches": [
         "https://corp.orangeapple.co/marketing/sales*"
       ],
+      "css": [
+        "style.css"
+      ],
       "js": [
         "content.js"
       ],
