@@ -127,12 +127,14 @@
       const introHangBtn = createQuickButton('自介掛', 'record_voice_over',   '自介掛',                              studentId, coolingIcon === 'record_voice_over');
       const aiVoiceBtn   = createQuickButton('AI語音', 'smart_toy',           '轉AI語音，自介後仍不接聽。',          studentId, coolingIcon === 'smart_toy');
       const hangupBtn    = createQuickButton('接掛',   'call_end',            '接掛',                                studentId, coolingIcon === 'call_end');
+      const emptyNumBtn  = createQuickButton('空號',   'phone_disabled',      '空號',                                studentId, coolingIcon === 'phone_disabled');
+      const suspendBtn   = createQuickButton('暫停使用', 'pause_circle',      '暫停使用',                            studentId, coolingIcon === 'pause_circle');
       const pasteBtn     = createQuickButton('貼上',   'content_paste',       () => navigator.clipboard.readText(), studentId, coolingIcon === 'content_paste');
 
       // 若有剩餘冷卻時間，設定 timer 在到期後恢復被 disabled 的那顆按鈕
       if (coolingIcon) {
         const remaining = record.expiry - Date.now();
-        const disabledBtn = [noAnswerBtn, transferBtn, introHangBtn, aiVoiceBtn, hangupBtn, pasteBtn]
+        const disabledBtn = [noAnswerBtn, transferBtn, introHangBtn, aiVoiceBtn, hangupBtn, emptyNumBtn, suspendBtn, pasteBtn]
           .find(b => b.querySelector('.oa-icon')?.textContent === coolingIcon);
         if (disabledBtn) {
           setTimeout(() => {
@@ -148,6 +150,8 @@
       frame.appendChild(introHangBtn);
       frame.appendChild(aiVoiceBtn);
       frame.appendChild(hangupBtn);
+      frame.appendChild(emptyNumBtn);
+      frame.appendChild(suspendBtn);
       frame.appendChild(pasteBtn);
 
       frame.dataset.oaNoAnswerProcessed = 'true';
