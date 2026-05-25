@@ -83,7 +83,7 @@
       btn.querySelector('.oa-label').textContent = '處理中...';
     }
 
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
 
@@ -94,7 +94,8 @@
       recentlySubmitted.set(studentId, { expiry: Date.now() + 3000, icon });
       setTimeout(() => recentlySubmitted.delete(studentId), 3000);
 
-      submitLogDirect(studentId, commentValue);
+      const value = typeof commentValue === 'function' ? await commentValue() : commentValue;
+      submitLogDirect(studentId, value);
     });
 
     return btn;
@@ -121,16 +122,17 @@
       const record = recentlySubmitted.get(studentId);
       const coolingIcon = (record && Date.now() < record.expiry) ? record.icon : null;
 
-      const noAnswerBtn  = createQuickButton('未接聽', 'phone_missed',       '',                          studentId, coolingIcon === 'phone_missed');
-      const transferBtn  = createQuickButton('直轉',   'forward',             '直轉',                      studentId, coolingIcon === 'forward');
-      const introHangBtn = createQuickButton('自介掛', 'record_voice_over',   '自介掛',                    studentId, coolingIcon === 'record_voice_over');
-      const aiVoiceBtn   = createQuickButton('AI語音', 'smart_toy',           '轉AI語音，自介後仍不接聽。', studentId, coolingIcon === 'smart_toy');
-      const hangupBtn    = createQuickButton('接掛',   'call_end',            '接掛',                      studentId, coolingIcon === 'call_end');
+      const noAnswerBtn  = createQuickButton('未接聽', 'phone_missed',       '',                                    studentId, coolingIcon === 'phone_missed');
+      const transferBtn  = createQuickButton('直轉',   'forward',             '直轉',                                studentId, coolingIcon === 'forward');
+      const introHangBtn = createQuickButton('自介掛', 'record_voice_over',   '自介掛',                              studentId, coolingIcon === 'record_voice_over');
+      const aiVoiceBtn   = createQuickButton('AI語音', 'smart_toy',           '轉AI語音，自介後仍不接聽。',          studentId, coolingIcon === 'smart_toy');
+      const hangupBtn    = createQuickButton('接掛',   'call_end',            '接掛',                                studentId, coolingIcon === 'call_end');
+      const pasteBtn     = createQuickButton('貼上',   'content_paste',       () => navigator.clipboard.readText(), studentId, coolingIcon === 'content_paste');
 
       // 若有剩餘冷卻時間，設定 timer 在到期後恢復被 disabled 的那顆按鈕
       if (coolingIcon) {
         const remaining = record.expiry - Date.now();
-        const disabledBtn = [noAnswerBtn, transferBtn, introHangBtn, aiVoiceBtn, hangupBtn]
+        const disabledBtn = [noAnswerBtn, transferBtn, introHangBtn, aiVoiceBtn, hangupBtn, pasteBtn]
           .find(b => b.querySelector('.oa-icon')?.textContent === coolingIcon);
         if (disabledBtn) {
           setTimeout(() => {
@@ -146,6 +148,7 @@
       frame.appendChild(introHangBtn);
       frame.appendChild(aiVoiceBtn);
       frame.appendChild(hangupBtn);
+      frame.appendChild(pasteBtn);
 
       frame.dataset.oaNoAnswerProcessed = 'true';
     });
