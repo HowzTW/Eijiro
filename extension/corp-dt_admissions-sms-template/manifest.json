@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "OA Corp：雙師班報名頁簡訊範本自動填入",
+  "version": "1.0",
+  "description": "在 dt_admissions 頁面開啟「發送簡訊」modal 時，自動填入 Line 官方帳號邀請簡訊範本",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://corp.orangeapple.co/dt_admissions/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
