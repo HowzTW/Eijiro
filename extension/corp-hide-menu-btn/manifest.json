@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "OA Corp 功能表隱藏按鈕",
+  "name": "OA Corp：功能表隱藏按鈕",
   "version": "1.0",
-  "description": "在 Corp 頁面注入浮動按鈕，可一鍵切換收合或展開左側導覽選單",
+  "description": "(corp-hide-menu-btn) 在 Corp 頁面注入浮動按鈕，可一鍵切換收合或展開左側導覽選單",
   "content_scripts": [
     {
       "matches": [

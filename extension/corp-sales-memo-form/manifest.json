@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "OA Corp Sales：體驗課程預約紀錄填寫表單",
   "version": "1.0",
-  "description": "點擊工具列圖示開啟體驗課程預約紀錄填寫表單，支援依場次 ID 自動帶入資料",
+  "description": "(corp-sales-memo-form) 點擊工具列圖示開啟體驗課程預約紀錄填寫表單，支援依場次 ID 自動帶入資料",
   "permissions": [
     "tabs"
   ],

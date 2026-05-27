@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "OA Corp Sales：快速尋找下一筆可撥打名單按鈕",
   "version": "1.0",
-  "description": "在銷售頁面依時間規則快速定位下一筆可撥打的潛在學生名單",
+  "description": "(corp-sales-next-list-btn) 在銷售頁面依時間規則快速定位下一筆可撥打的潛在學生名單",
   "permissions": [
     "activeTab"
   ],

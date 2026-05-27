@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "OA Corp Course：教室名稱複製按鈕",
   "version": "1.0",
-  "description": "在課程頁面麵包屑導覽列後，新增一鍵複製教室名稱的按鈕",
+  "description": "(corp-courses-copy-btn) 在課程頁面麵包屑導覽列後，新增一鍵複製教室名稱的按鈕",
   "content_scripts": [
     {
       "matches": [

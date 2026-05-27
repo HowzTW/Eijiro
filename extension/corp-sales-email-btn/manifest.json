@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "OA Corp Sales：Email 複製按鈕",
   "version": "1.1",
-  "description": "在銷售頁面注入 Email 一鍵複製按鈕",
+  "description": "(corp-sales-email-btn) 在銷售頁面注入 Email 一鍵複製按鈕",
   "permissions": [
     "clipboardWrite"
   ],

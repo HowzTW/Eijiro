@@ -1,14 +1,21 @@
 {
   "manifest_version": 3,
-  "name": "預約回撥排程",
+  "name": "OA Corp：預約回撥排程提醒",
   "version": "1.0",
-  "description": "預約回撥排程提醒工具",
-  "permissions": ["storage", "alarms", "tabs", "sidePanel", "windows", "notifications"],
+  "description": "(corp-call-schedule-side-panel) 在 side panel 中可以 瀏覽/新增/修改/刪除 預約回撥的排程，並在時間將將時彈出提醒視窗。",
+  "permissions": [
+    "storage",
+    "alarms",
+    "tabs",
+    "sidePanel",
+    "windows",
+    "notifications"
+  ],
   "background": {
     "service_worker": "background.js"
   },
   "action": {
-    "default_title": "預約回撥排程",
+    "default_title": "OA Corp：預約回撥排程提醒",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "OA Corp Sales：預約撥打提醒",
   "version": "1.0",
-  "description": "於預約撥打時間前 2～4 分鐘，自動彈出桌面提醒通知",
+  "description": "(corp-sales-next-call-alert) 於預約撥打時間前 2～4 分鐘，自動彈出桌面提醒通知",
   "permissions": [
     "alarms",
     "storage",

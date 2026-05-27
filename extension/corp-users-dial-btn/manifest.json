@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "OA Corp User：Evox 撥打按鈕",
   "version": "1.0",
-  "description": "在用戶資料頁面的電話欄位旁，注入 Evox 一鍵撥打按鈕",
+  "description": "(corp-users-dial-btn) 在用戶資料頁面的電話欄位旁，注入 Evox 一鍵撥打按鈕",
   "icons": {
     "16": "icon16.png",
     "48": "icon48.png",

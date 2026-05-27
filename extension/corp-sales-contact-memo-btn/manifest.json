@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "OA Corp Sales：聯絡記錄常用詞𢑥填寫按鈕",
   "version": "1.0",
-  "description": "在聯絡記錄 modal 的文字框旁注入常用詞快速填寫按鈕",
+  "description": "(corp-sales-contact-memo-btn) 在聯絡記錄 modal 的文字框旁注入常用詞快速填寫按鈕",
   "content_scripts": [
     {
       "matches": [

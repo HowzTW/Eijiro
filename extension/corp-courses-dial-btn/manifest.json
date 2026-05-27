@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "OA Corp Course：Evox 撥打按鈕",
   "version": "1.0",
-  "description": "在課程頁面學生表格的電話號碼下方，注入 Evox 一鍵撥打按鈕",
+  "description": "(corp-courses-dial-btn) 在課程頁面學生表格的電話號碼下方，注入 Evox 一鍵撥打按鈕",
   "icons": {
     "16": "icon16.png",
     "48": "icon48.png",

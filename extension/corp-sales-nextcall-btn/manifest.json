@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "OA Corp Sales：預約撥打時間設定按鈕",
   "version": "1.0",
-  "description": "當銷售頁面的下一次撥打時間為空時，顯示提示並提供快速設定預約時間的按鈕",
+  "description": "(corp-sales-nextcall-btn) 當銷售頁面的下一次撥打時間為空時，顯示提示並提供快速設定預約時間的按鈕",
   "content_scripts": [
     {
       "matches": [
