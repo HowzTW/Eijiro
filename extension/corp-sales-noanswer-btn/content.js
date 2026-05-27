@@ -169,7 +169,7 @@
     }
   });
 
-  mainObserver.observe(document.body, {
+  mainObserver.observe(document.documentElement, {
     childList: true,
     subtree: true
   });

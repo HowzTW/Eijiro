@@ -145,7 +145,7 @@
   }
 
   const observer = new MutationObserver(() => injectAllButtons());
-  observer.observe(document.body, { childList: true, subtree: true });
+  observer.observe(document.documentElement, { childList: true, subtree: true });
   injectAllButtons();
 
   console.log('[OA 轉雙師班快速按鈕] 擴充功能載入成功 (MAIN World)');

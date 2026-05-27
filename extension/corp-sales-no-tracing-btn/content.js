@@ -199,7 +199,7 @@
     }
   });
 
-  mainObserver.observe(document.body, { childList: true, subtree: true });
+  mainObserver.observe(document.documentElement, { childList: true, subtree: true });
 
   console.log('[OA NoTracing Extension] 載入成功');
 })();

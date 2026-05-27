@@ -98,7 +98,7 @@ const observer = new MutationObserver(() => {
   injectButtons();
 });
 
-observer.observe(document.body, {
+observer.observe(document.documentElement, {
   childList: true,
   subtree: true,
 });
