@@ -55,7 +55,7 @@
 
   // 監聽 #remote_modal 內容變化（Turbo Frame 載入）
   const observer = new MutationObserver(checkModal);
-  observer.observe(document.body, { childList: true, subtree: true });
+  observer.observe(document.documentElement, { childList: true, subtree: true });
 
   // 初次檢查（若 modal 已存在）
   checkModal();

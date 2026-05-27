@@ -162,7 +162,7 @@
       injectEmailButtons();
     }
   });
-  mainObserver.observe(document.body, { childList: true, subtree: true });
+  mainObserver.observe(document.documentElement, { childList: true, subtree: true });
 
   // 3. 專屬 Turbo Frame 事件監聽
   document.addEventListener('turbo:load', injectEmailButtons);

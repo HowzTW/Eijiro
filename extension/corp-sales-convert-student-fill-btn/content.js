@@ -138,6 +138,6 @@
     }
   });
 
-  observer.observe(document.body, { childList: true, subtree: true });
+  observer.observe(document.documentElement, { childList: true, subtree: true });
   console.log('[OA 雙師班快速填寫按鈕] 擴充功能載入成功 (MAIN World)');
 })();
