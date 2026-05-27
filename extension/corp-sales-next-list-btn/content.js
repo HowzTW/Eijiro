@@ -187,6 +187,40 @@
       };
       _trackingAnimFrame = requestAnimationFrame(trackPosition);
 
+      // 嘗試 focus 同列的「撥打」按鈕（由 corp-sales-dial-btn 注入）
+      const tr = scrollTarget.closest('tr');
+      const dialBtn = tr ? tr.querySelector('.evox-dial-btn') : null;
+      if (dialBtn) {
+        dialBtn.setAttribute('tabindex', '0');
+
+        // 強制顯示 focus ring（不依賴 :focus-visible，避免滑鼠模式下不顯示）
+        dialBtn.style.outline = '3px solid #6f42c1';
+        dialBtn.style.outlineOffset = '2px';
+        dialBtn.style.borderRadius = '4px';
+
+        // <a> 無 href 原生不響應 Space/Enter，手動補上
+        const onKeydown = (e) => {
+          if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault(); // 防止 Space 捲頁
+            dialBtn.click();
+            cleanup();
+          } else if (e.key === 'Escape') {
+            cleanup();
+          }
+        };
+        const cleanup = () => {
+          dialBtn.style.outline = '';
+          dialBtn.style.outlineOffset = '';
+          dialBtn.style.borderRadius = '';
+          dialBtn.removeEventListener('keydown', onKeydown);
+          dialBtn.removeEventListener('blur', cleanup);
+        };
+
+        dialBtn.addEventListener('keydown', onKeydown);
+        dialBtn.addEventListener('blur', cleanup); // focus 離開時自動清除
+        dialBtn.focus({ preventScroll: true });
+      }
+
       // 3 秒後自動消失
       _cleanupTimer = setTimeout(() => {
         indicator.style.opacity = '0';
