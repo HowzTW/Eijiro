@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "OA Corp User：Evox 撥打按鈕",
+  "version": "1.0",
+  "description": "在用戶資料頁面的電話欄位旁，注入 Evox 一鍵撥打按鈕",
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://corp.orangeapple.co/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
