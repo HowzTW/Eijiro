@@ -1,8 +1,26 @@
-function doGet() {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+function doGet(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var type = (e && e.parameter && e.parameter.type) ? e.parameter.type : "";
+
+  if (type === "deleted") {
+    var sheet = ss.getSheetByName("deleted");
+    if (!sheet) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+    var data = sheet.getDataRange().getValues();
+    if (data.length <= 1) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+    var headers = ["id", "name", "deleted_at"];
+    var rows = data.slice(1);
+    var result = rows.map(function(row) {
+      var obj = {};
+      headers.forEach(function(header, i) { obj[header] = row[i]; });
+      return obj;
+    });
+    return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  var sheet = ss.getActiveSheet();
   var data = sheet.getDataRange().getValues();
   if (data.length <= 1) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
-  
+
   var headers = ["id", "name", "introduction", "cover_image", "update_time", "sources"];
   var rows = data.slice(1);
   
@@ -32,10 +50,32 @@ function doPost(e) {
       var lastRow = sheet.getLastRow();
       if (lastRow < 2) return ContentService.createTextOutput("Sheet is empty");
       
-      var data = sheet.getRange(1, 1, lastRow, 1).getValues();
+      var data = sheet.getRange(1, 1, lastRow, 2).getValues();
       for (var i = 1; i < data.length; i++) {
         if (data[i][0].toString() === idToDelete) {
+          var deletedName = data[i][1] ? data[i][1].toString() : "";
           sheet.deleteRow(i + 1);
+
+          // 寫入 deleted Sheet（upsert by id）
+          var deletedSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("deleted");
+          if (deletedSheet) {
+            var now = new Date();
+            var deletedLastRow = deletedSheet.getLastRow();
+            var deletedIdCol = deletedSheet.getRange(1, 1, deletedLastRow || 1, 1).getValues();
+            var deletedRowIndex = -1;
+            for (var j = 1; j < deletedIdCol.length; j++) {
+              if (deletedIdCol[j][0].toString() === idToDelete) {
+                deletedRowIndex = j + 1;
+                break;
+              }
+            }
+            if (deletedRowIndex > -1) {
+              deletedSheet.getRange(deletedRowIndex, 1, 1, 3).setValues([[idToDelete, deletedName, now]]);
+            } else {
+              deletedSheet.appendRow([idToDelete, deletedName, now]);
+            }
+          }
+
           return ContentService.createTextOutput("Deleted ID: " + idToDelete).setMimeType(ContentService.MimeType.TEXT);
         }
       }

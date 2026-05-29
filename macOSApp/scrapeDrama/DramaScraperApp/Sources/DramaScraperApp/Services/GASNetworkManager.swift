@@ -4,6 +4,16 @@ class GASNetworkManager {
     static let shared = GASNetworkManager()
     let gasURLString = "https://script.google.com/macros/s/AKfycbzwHa2fa4e_QdyfD3z01tXepwY9ZyY98UlS_6mjVGOsPZaoHVloSyEc9_kJniuNn2_X/exec"
     
+    func fetchDeletedDramas() async throws -> [DeletedDrama] {
+        guard var components = URLComponents(string: gasURLString) else {
+            throw URLError(.badURL)
+        }
+        components.queryItems = [URLQueryItem(name: "type", value: "deleted")]
+        guard let url = components.url else { throw URLError(.badURL) }
+        let (data, _) = try await URLSession.shared.data(from: url)
+        return try JSONDecoder().decode([DeletedDrama].self, from: data)
+    }
+
     func fetchDramas() async throws -> [Drama] {
         guard let url = URL(string: gasURLString) else {
             throw URLError(.badURL)

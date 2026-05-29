@@ -31,6 +31,10 @@ struct SidebarView: View {
                 NavigationLink(value: "Scraper") {
                     Label("新增劇集", systemImage: "plus.circle")
                 }
+
+                NavigationLink(value: "Deleted") {
+                    Label("已刪除劇集", systemImage: "clock.arrow.circlepath")
+                }
             }
             .navigationTitle("抓劇小幫手")
         } detail: {
@@ -39,6 +43,8 @@ struct SidebarView: View {
                 DashboardView()
             case "Scraper":
                 ScrapeView()
+            case "Deleted":
+                DeletedDramasView()
             default:
                 Text("請選擇左側選單")
             }
