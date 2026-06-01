@@ -1,7 +1,7 @@
 .oa-next-call-modal {
   position: fixed;
   bottom: 20px;
-  right: 20px;
+  left: 20px;
   z-index: 999999;
   background: white;
   border-radius: 12px;
