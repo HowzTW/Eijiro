@@ -82,8 +82,12 @@ class ScraperEngine {
 
                     var processedCount = 0
                     var finalLines: [DramaLine] = []
+                    var totalSourcesJsonChars = 0
+                    let sourcesJsonLimit = 50000
+                    var hitLimit = false
 
                     for rawLine in rawSourcesArr {
+                        if hitLimit { break }
                         var resolvedEpisodes: [DramaEpisode] = []
                         for rawEp in rawLine.episodes {
                             processedCount += 1
@@ -112,9 +116,18 @@ class ScraperEngine {
                             resolvedEpisodes.append(DramaEpisode(name: rawEp.name, playPageUrl: formattedPlayPageUrl, play_url: finalPlayUrl))
                             try await Task.sleep(nanoseconds: 200_000_000)
                         }
-                        finalLines.append(DramaLine(line_name: rawLine.lineName, episodes: resolvedEpisodes))
+                        let resolvedLine = DramaLine(line_name: rawLine.lineName, episodes: resolvedEpisodes)
+                        let lineJsonChars = (try? JSONEncoder().encode(resolvedLine)).flatMap { String(data: $0, encoding: .utf8) }?.count ?? 0
+                        if totalSourcesJsonChars + lineJsonChars + 200 > sourcesJsonLimit {
+                            continuation.yield(.processing(message: "⚠️ 線路「\(rawLine.lineName)」加入後將超過 \(sourcesJsonLimit) 字元限制，已捨棄此條及後續線路"))
+                            hitLimit = true
+                            break
+                        }
+                        finalLines.append(resolvedLine)
+                        totalSourcesJsonChars += lineJsonChars
                     }
 
+                    continuation.yield(.processing(message: "📊 實際儲存 \(finalLines.count) 條線路，線路資料 JSON 約 \(totalSourcesJsonChars) 字元"))
                     continuation.yield(.saving)
                     let drama = Drama(
                         id: ScraperSource.tv777.idPrefix + id,
@@ -200,8 +213,12 @@ class ScraperEngine {
 
                     var processedCount = 0
                     var finalLines: [DramaLine] = []
+                    var totalSourcesJsonChars = 0
+                    let sourcesJsonLimit = 50000
+                    var hitLimit = false
 
                     for rawLine in rawSourcesArr {
+                        if hitLimit { break }
                         var resolvedEpisodes: [DramaEpisode] = []
                         for rawEp in rawLine.episodes {
                             processedCount += 1
@@ -219,9 +236,18 @@ class ScraperEngine {
                             resolvedEpisodes.append(DramaEpisode(name: rawEp.name, playPageUrl: rawEp.playPageUrl, play_url: finalPlayUrl))
                             try await Task.sleep(nanoseconds: 200_000_000)
                         }
-                        finalLines.append(DramaLine(line_name: rawLine.lineName, episodes: resolvedEpisodes))
+                        let resolvedLine = DramaLine(line_name: rawLine.lineName, episodes: resolvedEpisodes)
+                        let lineJsonChars = (try? JSONEncoder().encode(resolvedLine)).flatMap { String(data: $0, encoding: .utf8) }?.count ?? 0
+                        if totalSourcesJsonChars + lineJsonChars + 200 > sourcesJsonLimit {
+                            continuation.yield(.processing(message: "⚠️ 線路「\(rawLine.lineName)」加入後將超過 \(sourcesJsonLimit) 字元限制，已捨棄此條及後續線路"))
+                            hitLimit = true
+                            break
+                        }
+                        finalLines.append(resolvedLine)
+                        totalSourcesJsonChars += lineJsonChars
                     }
 
+                    continuation.yield(.processing(message: "📊 實際儲存 \(finalLines.count) 條線路，線路資料 JSON 約 \(totalSourcesJsonChars) 字元"))
                     continuation.yield(.saving)
                     let drama = Drama(
                         id: ScraperSource.gimyplus.idPrefix + id,
@@ -231,10 +257,6 @@ class ScraperEngine {
                         update_time: "",
                         sources: finalLines
                     )
-                    if let sourcesJson = try? JSONEncoder().encode(finalLines),
-                       let sourcesStr = String(data: sourcesJson, encoding: .utf8) {
-                        continuation.yield(.processing(message: "📊 線路資料 JSON 總字元數：\(sourcesStr.count)"))
-                    }
                     _ = try await GASNetworkManager.shared.syncDrama(drama: drama)
                     continuation.yield(.success(coverImgUrl: coverImageURL, title: title))
                     continuation.finish()
