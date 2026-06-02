@@ -44,6 +44,7 @@
         if (res.ok) {
           btn.textContent = '✓ 已發送';
           btn.classList.replace('btn-success', 'btn-secondary');
+          setTimeout(() => window.open('https://corp.orangeapple.co/sms_messages?q=&commit=%E6%90%9C%E5%B0%8B', '_blank'), 5000);
         } else {
           throw new Error(`HTTP ${res.status}`);
         }
