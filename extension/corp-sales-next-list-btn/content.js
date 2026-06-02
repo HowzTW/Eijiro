@@ -285,7 +285,7 @@
   const observer = new MutationObserver(() => {
     injectCheckboxes();
   });
-  observer.observe(document.body, { childList: true, subtree: true });
+  observer.observe(document.documentElement, { childList: true, subtree: true });
 
   // 處理 Turbolinks/Turbo 頁面切換 (如果有的話)
   document.addEventListener('turbo:load', () => {
