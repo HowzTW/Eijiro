@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "OA Corp：雙師班報名頁簡訊範本自動填入",
-  "version": "1.0",
-  "description": "(corp-dt_admissions-sms-template) 在 dt_admissions 頁面開啟「發送簡訊」modal 時，自動填入 Line 官方帳號邀請簡訊範本",
+  "name": "OA Corp：雙師班報名頁 LINE@ 簡訊快速發送",
+  "version": "1.1",
+  "description": "(corp-dt_admissions-sms-template) 在 dt_admissions 頁面的「修改線上體驗日期」按鈕旁注入「發送LINE@簡訊」按鈕，一鍵直接發送 Line 官方帳號邀請簡訊，無需開啟 modal",
   "content_scripts": [
     {
       "matches": [
