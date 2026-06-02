@@ -176,19 +176,18 @@ class ScraperEngine {
                     }
                     coverImageURL = normalizeURL(coverImageURL)
 
-                    let introduction = try document.select(".box-comment .details-content-all").first()?.text().trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                    let introduction = try document.select(".desc-block").first()?.text().trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
 
-                    // 每個線路區塊：.playlist-mobile，線路名稱在 .gico，集數在 ul[id^=con_playlist_] li a
                     var rawSourcesArr: [(lineName: String, episodes: [(name: String, playPageUrl: String)])] = []
-                    let playlistBlocks = try document.select("div.playlist-mobile")
+                    let playlistBlocks = try document.select("div.playlist-block")
                     var totalEpisodesToFetch = 0
 
                     for block in playlistBlocks.array() {
-                        let lineName = try block.select("div.gico").first()?.text().trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                        let lineName = try block.select(".playlist-block__title").first()?.text().trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
                         if lineName.isEmpty { continue }
 
                         var episodesList: [(name: String, playPageUrl: String)] = []
-                        for el in try block.select("ul[id^=con_playlist_] li a").array() {
+                        for el in try block.select(".playlist-grid a").array() {
                             episodesList.append((name: try el.text().trimmingCharacters(in: .whitespacesAndNewlines), playPageUrl: try el.attr("href")))
                             totalEpisodesToFetch += 1
                         }
@@ -232,6 +231,10 @@ class ScraperEngine {
                         update_time: "",
                         sources: finalLines
                     )
+                    if let sourcesJson = try? JSONEncoder().encode(finalLines),
+                       let sourcesStr = String(data: sourcesJson, encoding: .utf8) {
+                        continuation.yield(.processing(message: "📊 線路資料 JSON 總字元數：\(sourcesStr.count)"))
+                    }
                     _ = try await GASNetworkManager.shared.syncDrama(drama: drama)
                     continuation.yield(.success(coverImgUrl: coverImageURL, title: title))
                     continuation.finish()

@@ -66,6 +66,29 @@ struct DashboardView: View {
     }
 }
 
+struct CopyIdButton: View {
+    let numericId: String
+    @State private var copied = false
+
+    var body: some View {
+        Button {
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(numericId, forType: .string)
+            copied = true
+            Task {
+                try? await Task.sleep(nanoseconds: 800_000_000)
+                copied = false
+            }
+        } label: {
+            Text(copied ? "✓ 已複製" : "ID: \(numericId)")
+            .font(.caption2)
+            .foregroundColor(copied ? .green : .secondary)
+        }
+        .buttonStyle(.plain)
+        .animation(.easeInOut(duration: 0.2), value: copied)
+    }
+}
+
 struct DramaCardView: View {
     let drama: Drama
     let onDelete: () -> Void
@@ -130,9 +153,7 @@ struct DramaCardView: View {
                         .background(drama.source == "Gimy+" ? Color.purple : Color.blue)
                         .cornerRadius(4)
 
-                    Text("ID: \(drama.numericId)")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
+                    CopyIdButton(numericId: drama.numericId)
                 }
             }
             .padding(12)
