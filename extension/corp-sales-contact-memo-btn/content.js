@@ -13,6 +13,19 @@
   const TEXTAREA_SELECTOR = 'textarea[name="potential_student_log[content]"]';
   const INJECTED_ATTR = 'data-oa-memo-injected';
 
+  function getEmailFromForm(form) {
+    const match = form.action.match(/\/potential_students\/(\d+)\//);
+    if (!match) return null;
+    const id = match[1];
+    const el = document.querySelector(`[data-email][data-id="${id}"]`);
+    if (!el) return null;
+    // change_email() 只更新 innerHTML 不更新 data-email，優先取可見文字
+    const textNode = Array.from(el.childNodes).find(n => n.nodeType === Node.TEXT_NODE && n.textContent.trim());
+    const visible = textNode?.textContent?.trim();
+    const email = (visible && /.+@.+\..+/.test(visible)) ? visible : el.getAttribute('data-email');
+    return (email && /.+@.+\..+/.test(email)) ? email : null;
+  }
+
   function injectMemoButtons(form) {
     if (form.hasAttribute(INJECTED_ATTR)) return;
     form.setAttribute(INJECTED_ATTR, 'true');
@@ -23,6 +36,23 @@
 
     const group = document.createElement('div');
     group.className = 'oa-memo-btn-group';
+
+    const email = getEmailFromForm(form);
+    if (email) {
+      const btn = document.createElement('button');
+      btn.className = 'oa-memo-btn';
+      btn.type = 'button';
+      btn.textContent = 'Email';
+      btn.title = email;
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        textarea.value += email;
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        textarea.focus();
+      });
+      group.appendChild(btn);
+    }
 
     OA_MEMO_BUTTONS.forEach(({ label, text }) => {
       const btn = document.createElement('button');
