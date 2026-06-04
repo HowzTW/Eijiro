@@ -48,7 +48,8 @@
       e.preventDefault();
       e.stopPropagation();
 
-      const email = emailElement.getAttribute('data-email') || emailElement.textContent.replace('複製', '').trim();
+      const container = btn.closest('[data-email]');
+      const email = container?.getAttribute('data-email')?.trim();
       if (!isValidEmail(email)) return;
 
       try {
@@ -135,9 +136,17 @@
 
         // 監聽該元素的屬性變化與內容變化
         const observer = new MutationObserver(() => {
+          // 同步 data-email：當 change_email() 只更新 innerHTML 而不更新屬性時，手動補上
+          const textNode = Array.from(el.childNodes)
+            .find(n => n.nodeType === Node.TEXT_NODE && n.textContent.trim());
+          const visibleEmail = textNode?.textContent?.trim();
+          if (visibleEmail && isValidEmail(visibleEmail) && visibleEmail !== el.getAttribute('data-email')) {
+            el.setAttribute('data-email', visibleEmail);
+          }
+
           const currentEmail = el.getAttribute('data-email') || el.textContent;
           updateButtonVisibility(btn, currentEmail);
-          
+
           // 如果更新內容時按鈕又不見了，觸發下一輪掃描
           if (!el.querySelector(`.${BUTTON_CLASS}`)) {
             el.dataset.oaEmailProcessed = 'false';
