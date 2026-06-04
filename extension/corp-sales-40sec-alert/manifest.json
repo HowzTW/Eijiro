@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "OA Corp Sales：40秒提醒器",
+  "version": "1.0",
+  "description": "(corp-sales-40sec-alert) 在業務名單頁面提供每40秒定時提醒功能，以聲音警示並閃爍 FAB 按鈕，提示業務員切換下一筆名單。",
+  "permissions": [
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://corp.orangeapple.co/marketing/sales*"
+      ],
+      "css": [
+        "style.css"
+      ],
+      "js": [
+        "content.js"
+      ]
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
