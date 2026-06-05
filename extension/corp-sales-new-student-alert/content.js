@@ -6,17 +6,14 @@
     document.head.appendChild(link);
   }
 
-  const myTabId = Math.random();
   const audioCtx = new AudioContext();
   ['click', 'keydown', 'touchstart'].forEach(evt =>
     document.addEventListener(evt, () => {
       if (audioCtx.state === 'suspended') audioCtx.resume();
     }, { capture: true, passive: true })
   );
-  const channel = new BroadcastChannel('oa_sales_new_student');
   let observer = null;
   let initialized = false;
-  let pendingAlert = null;
 
   function beep() {
     if (audioCtx.state !== 'running') return;
@@ -163,13 +160,6 @@
     }
   }
 
-  // 若收到其他 tab 廣播且對方 tabId 較小，取消自己的通知（對方優先）
-  channel.onmessage = (e) => {
-    if (e.data.type === 'new_rows' && e.data.tabId < myTabId) {
-      if (pendingAlert) { clearTimeout(pendingAlert); pendingAlert = null; }
-    }
-  };
-
   function startObserving() {
     if (observer) { observer.disconnect(); observer = null; }
     initialized = false;
@@ -189,11 +179,7 @@
       });
       if (newRows.length === 0) return;
 
-      channel.postMessage({ type: 'new_rows', rows: newRows, tabId: myTabId });
-      pendingAlert = setTimeout(() => {
-        pendingAlert = null;
-        showAlert(newRows);
-      }, 100);
+      showAlert(newRows);
     });
 
     observer.observe(tbody, { childList: true });

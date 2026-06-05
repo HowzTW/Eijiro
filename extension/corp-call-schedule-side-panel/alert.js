@@ -26,6 +26,10 @@ async function init() {
     }
     window.close();
   });
+
+  document.getElementById('closeBtn').addEventListener('click', () => {
+    window.close();
+  });
 }
 
 init();
