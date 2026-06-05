@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "OA Corp Sales：課程資訊快速發送按鈕",
+  "version": "1.0",
+  "description": "(corp-sales-info-sending-btn) 在銷售頁面注入課程資訊快速發送按鈕",
+  "content_scripts": [
+    {
+      "matches": [
+        "http://corp.orangeapple.co/marketing/sales*",
+        "https://corp.orangeapple.co/marketing/sales*"
+      ],
+      "css": [
+        "style.css"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

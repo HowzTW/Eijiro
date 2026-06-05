@@ -1,0 +1,43 @@
+.oa-info-btn-wrapper {
+  display: inline-flex !important;
+  flex-wrap: wrap !important;
+  gap: 4px !important;
+  margin-top: 4px !important;
+}
+
+.oa-info-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 3px 10px !important;
+  background-color: #6c757d !important;
+  color: #ffffff !important;
+  border-radius: 4px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  border: none !important;
+  vertical-align: middle !important;
+  line-height: 1.5 !important;
+  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease !important;
+  white-space: nowrap !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important;
+}
+
+.oa-info-btn:hover {
+  background-color: #5a6268 !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.4) !important;
+}
+
+.oa-info-btn:active {
+  transform: scale(0.97) !important;
+}
+
+.oa-info-btn.is-success {
+  background-color: #2ecc71 !important;
+  pointer-events: none !important;
+  transform: none !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important;
+}
