@@ -13,4 +13,7 @@ const OA_MEMO_BUTTONS = [
   { label: '沒留資料', text: '表示沒有留資料，不需要。' },
   { label: '空號', text: '空號' },
   { label: '暫停使用', text: '暫停使用' },
+  { label: '寄簡介', text: '先寄課程資料供參。' },
+  { label: '不要線上', text: '表示不考慮線上課程。' },
+  { label: '轉教室', text: '名單轉。教室。再煩請實體同仁致電家長。' },
 ];
