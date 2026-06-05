@@ -40,6 +40,10 @@ async function loadConfig() {
         const response = await fetch(url);
         configData = await response.json();
         populateDropdowns();
+        document.querySelector('select[name="leaveMotivation"]').value = '家長想讓小朋友學';
+        document.querySelector('select[name="priceReaction"]').value = '體驗看看再說';
+        document.querySelector('select[name="decisionMaker"]').value = '爸媽一起討論';
+        document.querySelector('select[name="customerLevel"]').value = 'B';
         initNav();
         syncStudentCards();
     } catch (error) {
