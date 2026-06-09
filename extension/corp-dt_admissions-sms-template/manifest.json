@@ -6,7 +6,7 @@
   "content_scripts": [
     {
       "matches": [
-        "https://corp.orangeapple.co/dt_admissions/*"
+        "https://corp.orangeapple.co/*"
       ],
       "js": [
         "content.js"

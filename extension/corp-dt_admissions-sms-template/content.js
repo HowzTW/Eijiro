@@ -58,7 +58,12 @@
     anchor.insertAdjacentElement('afterend', btn);
   }
 
+  function isDtAdmissionsPage() {
+    return location.pathname.startsWith('/dt_admissions/');
+  }
+
   function scanAndInject() {
+    if (!isDtAdmissionsPage()) return;
     document.querySelectorAll('[data-bs-target="#set-remote-audition-modal"]').forEach(injectButton);
   }
 
