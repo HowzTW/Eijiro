@@ -1,5 +1,5 @@
 (function () {
-  const TEMPLATE = '【橘子蘋果程式學苑】家長您好，歡迎加入橘子蘋果線上課程官方帳號，加入後須主動傳訊息才會看到您的好友唷！謝謝：https://oaoa.fun/6qhv3g';
+  const TEMPLATE = '家長您好，歡迎加入橘子蘋果線上課程官方帳號，加入後須主動傳訊息才會看到您的好友唷！謝謝：https://oaoa.fun/6qhv3g';
   const BTN_ATTR = 'data-line-sms-injected';
 
   function getCsrfToken() {
