@@ -86,5 +86,9 @@
   const observer = new MutationObserver(() => injectToggle());
   observer.observe(document.documentElement, { childList: true, subtree: true });
 
-  document.addEventListener('turbo:load', injectToggle);
+  document.addEventListener('turbo:load', () => {
+    injectToggle();
+    const checkbox = document.querySelector('.alert-40sec-checkbox');
+    if (checkbox) checkbox.checked = alertInterval !== null;
+  });
 })();
