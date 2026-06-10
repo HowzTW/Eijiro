@@ -437,9 +437,14 @@
                 <!-- 標題與返回 -->
                 <h2 style="margin-bottom: 1.5rem; display: flex; align-items: flex-start; justify-content: space-between;">
                     <div id="playerTitle" style="font-size: 1.8rem; font-weight: 800; color: #fff;"></div>
-                    <button class="btn" onclick="goHome()" style="padding: 0.6rem 1.2rem; border-radius: 12px;">
-                        <span class="material-symbols-outlined">arrow_back</span> 返回
-                    </button>
+                    <div style="display: flex; gap: 0.8rem;">
+                        <button class="btn" id="fullscreenBtn" onclick="enterFullscreen()" style="padding: 0.6rem 1.2rem; border-radius: 12px;">
+                            <span class="material-symbols-outlined">fullscreen</span> 全螢幕
+                        </button>
+                        <button class="btn" onclick="goHome()" style="padding: 0.6rem 1.2rem; border-radius: 12px;">
+                            <span class="material-symbols-outlined">arrow_back</span> 返回
+                        </button>
+                    </div>
                 </h2>
 
                 <video id="videoPlayer" controls></video>
@@ -982,6 +987,15 @@
 
             // 同步進度到雲端
             syncProgressToCloud();
+        }
+
+        function enterFullscreen() {
+            const video = document.getElementById('videoPlayer');
+            if (video.requestFullscreen) {
+                video.requestFullscreen();
+            } else if (video.webkitEnterFullscreen) {
+                video.webkitEnterFullscreen();
+            }
         }
 
         // 續播、上一集、下一集
