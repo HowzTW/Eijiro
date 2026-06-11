@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "OA Corp：雙師班報名頁 測驗邀請快速發送",
+  "version": "1.0",
+  "description": "(corp-dt_admissions-sending-test-btn) 在 dt_admissions 頁面「寄送課程資訊」按鈕旁，注入 SC／PY／MC／麥思 四個測驗邀請快速按鈕，一鍵直接選好測驗類型並送出，免手動操作 modal",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://corp.orangeapple.co/dt_admissions/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
