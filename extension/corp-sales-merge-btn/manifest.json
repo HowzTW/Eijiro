@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "OA Corp Sales：名單合併按鈕",
+  "version": "1.0",
+  "description": "(corp-sales-merge-btn) 在 Corp 銷售名單頁面偵測到重複名單時，於畫面頂部顯示一鍵合併按鈕，自動依序完成所有合併作業",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://corp.orangeapple.co/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle",
+      "world": "MAIN"
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
