@@ -72,6 +72,17 @@ struct SidebarView: View {
                 }
                 .help("開啟小鴨影音 777TV")
             }
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    if let url = URL(string: "https://howztw.github.io/Eijiro/watchDrama/index.html") {
+                        NSWorkspace.shared.open(url)
+                    }
+                } label: {
+                    Label("追劇小幫手", systemImage: "safari")
+                        .labelStyle(.titleAndIcon)
+                }
+                .help("開啟追劇小幫手")
+            }
         }
     }
 }
