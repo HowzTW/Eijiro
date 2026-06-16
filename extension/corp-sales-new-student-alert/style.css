@@ -1,3 +1,62 @@
+/* ── Floating auto-dial switch ── */
+.oa-autodial-fab {
+  position: fixed !important;
+  bottom: 16px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 999998 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: white !important;
+  border-radius: 999px !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2) !important;
+  padding: 8px 16px !important;
+  font-family: sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #444 !important;
+  user-select: none !important;
+  cursor: pointer !important;
+}
+
+.oa-autodial-checkbox {
+  display: none !important;
+}
+
+.oa-autodial-track {
+  position: relative !important;
+  display: inline-block !important;
+  width: 40px !important;
+  height: 22px !important;
+  background: #ccc !important;
+  border-radius: 999px !important;
+  transition: background 0.2s ease !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+}
+
+.oa-autodial-track.is-on {
+  background: #00b050 !important;
+}
+
+.oa-autodial-thumb {
+  position: absolute !important;
+  top: 3px !important;
+  left: 3px !important;
+  width: 16px !important;
+  height: 16px !important;
+  background: white !important;
+  border-radius: 50% !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important;
+  transition: left 0.2s ease !important;
+}
+
+.oa-autodial-track.is-on .oa-autodial-thumb {
+  left: 21px !important;
+}
+
+/* ── Dial button ── */
 .oa-dial-btn {
   display: inline-flex !important;
   align-items: center !important;

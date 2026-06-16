@@ -15,6 +15,71 @@
   let observer = null;
   let initialized = false;
 
+  const VALID_GRADES = new Set(['一年級','二年級','三年級','四年級','五年級','六年級','七年級','八年級','九年級']);
+  const STORAGE_KEY = 'newStudentAutoDialEnabled';
+
+  // ── Auto-dial switch state ──────────────────────────────────────────────────
+  let autoDialEnabled = false;
+
+  function setAutoDialEnabled(val) {
+    autoDialEnabled = val;
+    const cb = document.querySelector('.oa-autodial-checkbox');
+    if (cb) cb.checked = val;
+    const track = document.querySelector('.oa-autodial-track');
+    if (track) track.classList.toggle('is-on', val);
+  }
+
+  chrome.storage.sync.get(STORAGE_KEY, (result) => {
+    setAutoDialEnabled(!!result[STORAGE_KEY]);
+  });
+
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'sync' && STORAGE_KEY in changes) {
+      setAutoDialEnabled(!!changes[STORAGE_KEY].newValue);
+    }
+  });
+
+  // ── Floating switch UI ──────────────────────────────────────────────────────
+  function createSwitch() {
+    if (document.querySelector('.oa-autodial-fab')) return;
+
+    const fab = document.createElement('div');
+    fab.className = 'oa-autodial-fab';
+
+    const label = document.createElement('span');
+    label.className = 'oa-autodial-label';
+    label.textContent = '自動撥打';
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.className = 'oa-autodial-checkbox';
+    checkbox.checked = autoDialEnabled;
+
+    const track = document.createElement('span');
+    track.className = 'oa-autodial-track' + (autoDialEnabled ? ' is-on' : '');
+
+    const thumb = document.createElement('span');
+    thumb.className = 'oa-autodial-thumb';
+    track.appendChild(thumb);
+
+    track.addEventListener('click', () => {
+      const val = !checkbox.checked;
+      checkbox.checked = val;
+      track.classList.toggle('is-on', val);
+      chrome.storage.sync.set({ [STORAGE_KEY]: val });
+    });
+
+    fab.appendChild(label);
+    fab.appendChild(checkbox);
+    fab.appendChild(track);
+    document.body.appendChild(fab);
+
+    const style = document.createElement('style');
+    style.textContent = '#all_students { margin-bottom: 80px !important; }';
+    document.head.appendChild(style);
+  }
+
+  // ── Audio ───────────────────────────────────────────────────────────────────
   function beep() {
     if (audioCtx.state !== 'running') return;
     const osc = audioCtx.createOscillator();
@@ -29,12 +94,12 @@
     osc.stop(audioCtx.currentTime + 0.8);
   }
 
+  // ── Data extraction ─────────────────────────────────────────────────────────
   function cleanNumber(raw) {
     return raw.replace(/[^0-9+]/g, '');
   }
 
   function extractPhone(td) {
-    // 優先抓第一個 text node（電話可能直接放在 td 裡）
     const textNode = Array.from(td.childNodes).find(
       n => n.nodeType === Node.TEXT_NODE && n.textContent.trim()
     );
@@ -42,7 +107,6 @@
       const cleaned = cleanNumber(textNode.textContent.trim());
       if (cleaned.length >= 8) return cleaned;
     }
-    // 其次找非 evox-dial-btn 的 <a>（電話在連結文字裡）
     const anchor = td.querySelector('a:not(.evox-dial-btn)');
     if (anchor) {
       const cleaned = cleanNumber(anchor.textContent.trim());
@@ -62,6 +126,7 @@
     return { phone, grade };
   }
 
+  // ── Toast ───────────────────────────────────────────────────────────────────
   function showToast(rows) {
     const existing = document.querySelector('.oa-new-student-toast');
     if (existing) existing.remove();
@@ -70,7 +135,7 @@
     toast.className = 'oa-new-student-toast';
     toast.style.cssText = `
       position: fixed;
-      bottom: 20px;
+      bottom: 70px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 999999;
@@ -91,6 +156,8 @@
     `;
     toast.appendChild(header);
 
+    const dialBtns = [];
+
     rows.forEach(({ phone, grade }) => {
       const row = document.createElement('div');
       row.style.cssText = 'display:flex; align-items:center; gap:8px; padding:6px 0; border-top:1px solid #f0f0f0;';
@@ -101,6 +168,8 @@
 
       const btn = document.createElement('a');
       btn.className = 'oa-dial-btn';
+      btn.dataset.phone = phone;
+      btn.dataset.grade = grade;
       btn.title = `用 EVOX 撥打 ${phone}`;
       btn.tabIndex = 0;
       btn.innerHTML = '<span class="material-icons evox-icon">call</span><span class="evox-label">撥打</span>';
@@ -133,6 +202,7 @@
         }, 3000);
       });
 
+      dialBtns.push(btn);
       row.appendChild(info);
       row.appendChild(btn);
       toast.appendChild(row);
@@ -144,11 +214,15 @@
     const firstBtn = toast.querySelector('.oa-dial-btn');
     if (firstBtn) firstBtn.focus();
     setTimeout(() => { if (toast.parentNode) toast.remove(); }, 60000);
+
+    return dialBtns;
   }
 
+  // ── Alert ───────────────────────────────────────────────────────────────────
   function showAlert(rows) {
     beep();
-    showToast(rows);
+    const dialBtns = showToast(rows);
+
     if (Notification.permission === 'granted') {
       const now = new Date();
       const ts = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
@@ -158,8 +232,14 @@
       });
       notif.onclick = () => window.focus();
     }
+
+    if (autoDialEnabled) {
+      const targetBtn = dialBtns.find(btn => VALID_GRADES.has(btn.dataset.grade));
+      if (targetBtn) targetBtn.click();
+    }
   }
 
+  // ── Observer ────────────────────────────────────────────────────────────────
   function startObserving() {
     if (observer) { observer.disconnect(); observer = null; }
     initialized = false;
@@ -191,6 +271,7 @@
     } else {
       startObserving();
     }
+    createSwitch();
   }
 
   requestAndStart();
