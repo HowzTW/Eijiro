@@ -21,6 +21,21 @@
   user-select: none;
 }
 
+.alert-40sec-seconds {
+  width: 46px;
+  font-size: 13px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 2px 4px;
+  outline: none;
+}
+
+.alert-40sec-seconds:disabled {
+  background: #f0f0f0;
+  color: #999;
+}
+
 /* 隱藏原生 checkbox */
 .alert-40sec-checkbox {
   display: none;

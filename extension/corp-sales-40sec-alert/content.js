@@ -34,10 +34,10 @@
     pulseFAB();
   }
 
-  function startAlert() {
+  function startAlert(seconds) {
     if (alertInterval) return;
     onTick(); // 立即執行一次
-    alertInterval = setInterval(onTick, 40000);
+    alertInterval = setInterval(onTick, seconds * 1000);
   }
 
   function stopAlert() {
@@ -64,17 +64,34 @@
 
     const labelText = document.createElement('span');
     labelText.className = 'alert-40sec-label-text';
-    labelText.textContent = '📣 40秒提醒';
+    labelText.textContent = '📣 提醒間隔';
+
+    const secondsInput = document.createElement('input');
+    secondsInput.type = 'number';
+    secondsInput.className = 'alert-40sec-seconds';
+    secondsInput.value = 40;
+    secondsInput.min = 5;
+    secondsInput.max = 300;
+
+    const secondsLabel = document.createElement('span');
+    secondsLabel.className = 'alert-40sec-label-text';
+    secondsLabel.textContent = '秒';
 
     checkbox.addEventListener('change', () => {
       if (checkbox.checked) {
-        startAlert();
+        const seconds = Math.min(300, Math.max(5, parseInt(secondsInput.value) || 40));
+        secondsInput.value = seconds;
+        secondsInput.disabled = true;
+        startAlert(seconds);
       } else {
         stopAlert();
+        secondsInput.disabled = false;
       }
     });
 
     wrapper.appendChild(labelText);
+    wrapper.appendChild(secondsInput);
+    wrapper.appendChild(secondsLabel);
     wrapper.appendChild(checkbox);
     wrapper.appendChild(track);
 
