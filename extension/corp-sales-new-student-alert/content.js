@@ -216,7 +216,14 @@
 
     if (autoDialEnabled) {
       const targetBtn = dialBtns.find(btn => VALID_GRADES.has(btn.dataset.grade));
-      if (targetBtn) targetBtn.click();
+      if (targetBtn) {
+        targetBtn.click();
+        autoDialEnabled = false;
+        const cb = document.querySelector('.oa-autodial-checkbox');
+        if (cb) cb.checked = false;
+        const track = document.querySelector('.oa-autodial-track');
+        if (track) track.classList.remove('is-on');
+      }
     }
   }
 
