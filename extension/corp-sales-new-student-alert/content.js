@@ -16,28 +16,9 @@
   let initialized = false;
 
   const VALID_GRADES = new Set(['一年級','二年級','三年級','四年級','五年級','六年級','七年級','八年級','九年級']);
-  const STORAGE_KEY = 'newStudentAutoDialEnabled';
 
-  // ── Auto-dial switch state ──────────────────────────────────────────────────
+  // ── Auto-dial switch state（每個 tab 獨立，初始為 off）──────────────────────
   let autoDialEnabled = false;
-
-  function setAutoDialEnabled(val) {
-    autoDialEnabled = val;
-    const cb = document.querySelector('.oa-autodial-checkbox');
-    if (cb) cb.checked = val;
-    const track = document.querySelector('.oa-autodial-track');
-    if (track) track.classList.toggle('is-on', val);
-  }
-
-  chrome.storage.sync.get(STORAGE_KEY, (result) => {
-    setAutoDialEnabled(!!result[STORAGE_KEY]);
-  });
-
-  chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'sync' && STORAGE_KEY in changes) {
-      setAutoDialEnabled(!!changes[STORAGE_KEY].newValue);
-    }
-  });
 
   // ── Floating switch UI ──────────────────────────────────────────────────────
   function createSwitch() {
@@ -65,8 +46,8 @@
     track.addEventListener('click', () => {
       const val = !checkbox.checked;
       checkbox.checked = val;
+      autoDialEnabled = val;
       track.classList.toggle('is-on', val);
-      chrome.storage.sync.set({ [STORAGE_KEY]: val });
     });
 
     fab.appendChild(label);

@@ -4,8 +4,7 @@
   "version": "1.0",
   "description": "(corp-sales-new-student-alert) 偵測銷售頁面出現新潛在學生名單時，自動發出聲音與桌面通知",
   "permissions": [
-    "notifications",
-    "storage"
+    "notifications"
   ],
   "content_scripts": [
     {
