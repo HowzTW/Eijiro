@@ -1,21 +1,53 @@
 (function() {
-  // 建立並注入 FAB 按鈕
+  // 目前模式：'dial'（撥打）或 'missed'（未接聽）
+  let _mode = 'dial';
+
+  // 建立並注入 FAB 按鈕與模式切換 toggle
   function injectFAB() {
-    if (document.querySelector('.next-list-fab')) return;
+    if (document.querySelector('.next-list-fab-container')) return;
+
+    const container = document.createElement('div');
+    container.className = 'next-list-fab-container';
 
     const btn = document.createElement('button');
     btn.className = 'next-list-fab';
     btn.title = '尋找下一筆撥打名單';
-    
-    // 使用 Material Design 的 Phone Forward 圖標
     btn.innerHTML = `
       <svg viewBox="0 0 24 24">
         <path d="M18 11l5-5-5-5v3h-4v4h4v3zm2 4.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.59l2.2-2.21c.28-.26.36-.65.25-1C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/>
       </svg>
     `;
-
     btn.addEventListener('click', findNextAndScroll);
-    document.body.appendChild(btn);
+
+    const toggle = document.createElement('div');
+    toggle.className = 'next-list-mode-toggle';
+
+    const dialOpt = document.createElement('button');
+    dialOpt.className = 'next-list-mode-opt active';
+    dialOpt.type = 'button';
+    dialOpt.textContent = '撥打';
+    dialOpt.addEventListener('click', () => {
+      _mode = 'dial';
+      dialOpt.classList.add('active');
+      missedOpt.classList.remove('active');
+    });
+
+    const missedOpt = document.createElement('button');
+    missedOpt.className = 'next-list-mode-opt';
+    missedOpt.type = 'button';
+    missedOpt.textContent = '未接聽';
+    missedOpt.addEventListener('click', () => {
+      _mode = 'missed';
+      missedOpt.classList.add('active');
+      dialOpt.classList.remove('active');
+    });
+
+    toggle.appendChild(dialOpt);
+    toggle.appendChild(missedOpt);
+
+    container.appendChild(btn);
+    container.appendChild(toggle);
+    document.body.appendChild(container);
   }
 
   // 注入 checkbox 到所有符合條件的 <small> 元件
@@ -187,38 +219,49 @@
       };
       _trackingAnimFrame = requestAnimationFrame(trackPosition);
 
-      // 嘗試 focus 同列的「撥打」按鈕（由 corp-sales-dial-btn 注入）
+      // 依 _mode 找對應的操作按鈕
       const tr = scrollTarget.closest('tr');
-      const dialBtn = tr ? tr.querySelector('.evox-dial-btn') : null;
-      if (dialBtn) {
-        dialBtn.setAttribute('tabindex', '0');
+      let actionBtn = null;
+      if (_mode === 'dial') {
+        // 撥打模式：找由 corp-sales-dial-btn 注入的撥打按鈕
+        actionBtn = tr ? tr.querySelector('.evox-dial-btn') : null;
+      } else {
+        // 未接聽模式：找由 corp-sales-noanswer-btn 注入的未接聽按鈕
+        actionBtn = tr
+          ? Array.from(tr.querySelectorAll('button.oa-noanswer-btn'))
+              .find(b => b.querySelector('.oa-label')?.textContent === '未接聽') ?? null
+          : null;
+      }
+
+      if (actionBtn) {
+        actionBtn.setAttribute('tabindex', '0');
 
         // 強制顯示 focus ring（不依賴 :focus-visible，避免滑鼠模式下不顯示）
-        dialBtn.style.outline = '3px solid #6f42c1';
-        dialBtn.style.outlineOffset = '2px';
-        dialBtn.style.borderRadius = '4px';
+        actionBtn.style.outline = '3px solid #6f42c1';
+        actionBtn.style.outlineOffset = '2px';
+        actionBtn.style.borderRadius = '4px';
 
         // <a> 無 href 原生不響應 Space/Enter，手動補上
         const onKeydown = (e) => {
           if (e.key === ' ' || e.key === 'Enter') {
             e.preventDefault(); // 防止 Space 捲頁
-            dialBtn.click();
+            actionBtn.click();
             cleanup();
           } else if (e.key === 'Escape') {
             cleanup();
           }
         };
         const cleanup = () => {
-          dialBtn.style.outline = '';
-          dialBtn.style.outlineOffset = '';
-          dialBtn.style.borderRadius = '';
-          dialBtn.removeEventListener('keydown', onKeydown);
-          dialBtn.removeEventListener('blur', cleanup);
+          actionBtn.style.outline = '';
+          actionBtn.style.outlineOffset = '';
+          actionBtn.style.borderRadius = '';
+          actionBtn.removeEventListener('keydown', onKeydown);
+          actionBtn.removeEventListener('blur', cleanup);
         };
 
-        dialBtn.addEventListener('keydown', onKeydown);
-        dialBtn.addEventListener('blur', cleanup); // focus 離開時自動清除
-        dialBtn.focus({ preventScroll: true });
+        actionBtn.addEventListener('keydown', onKeydown);
+        actionBtn.addEventListener('blur', cleanup); // focus 離開時自動清除
+        actionBtn.focus({ preventScroll: true });
       }
 
       // 3 秒後自動消失
