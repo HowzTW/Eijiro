@@ -70,6 +70,43 @@ function createDialButton(number, potentialStudentsId) {
       btn.classList.remove('is-dialing');
       labelSpan.textContent = originalText;
     }, 3000);
+
+    // 稍候 150ms（讓 evox:// 協定觸發不衝突），focus 同列的「未接聽」按鈕
+    setTimeout(() => {
+      const tr = btn.closest('tr');
+      const noAnswerBtn = tr
+        ? Array.from(tr.querySelectorAll('button.oa-noanswer-btn'))
+            .find(b => b.querySelector('.oa-label')?.textContent === '未接聽') ?? null
+        : null;
+
+      if (!noAnswerBtn) return;
+
+      noAnswerBtn.setAttribute('tabindex', '0');
+      noAnswerBtn.style.outline = '3px solid #6f42c1';
+      noAnswerBtn.style.outlineOffset = '2px';
+      noAnswerBtn.style.borderRadius = '4px';
+
+      const cleanup = () => {
+        noAnswerBtn.style.outline = '';
+        noAnswerBtn.style.outlineOffset = '';
+        noAnswerBtn.style.borderRadius = '';
+        noAnswerBtn.removeEventListener('keydown', onKeydown);
+        noAnswerBtn.removeEventListener('blur', cleanup);
+      };
+      const onKeydown = (e) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault();
+          noAnswerBtn.click();
+          cleanup();
+        } else if (e.key === 'Escape') {
+          cleanup();
+        }
+      };
+
+      noAnswerBtn.addEventListener('keydown', onKeydown);
+      noAnswerBtn.addEventListener('blur', cleanup);
+      noAnswerBtn.focus({ preventScroll: true });
+    }, 150);
   });
   return btn;
 }
