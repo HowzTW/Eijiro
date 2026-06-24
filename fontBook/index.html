@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>字型書 FontBook — 50 款免費可商用字型</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  <link rel="icon" href="icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ── Fixed Header ── -->
+  <header id="header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <img class="brand-icon" src="icon.png" alt="字型書 Logo">
+        <div class="brand-text">
+          <h1>字型書</h1>
+          <span class="brand-en">FontBook</span>
+        </div>
+      </div>
+      <div class="header-meta" aria-hidden="true">
+        <span class="meta-dot"></span>
+        <span>50 款免費可商用字型</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Sticky Filter + Search ── -->
+  <div class="filter-section" id="filterSection">
+    <div class="filter-inner">
+
+      <!-- Category chips -->
+      <div class="filter-row" id="categoryFilters" role="group" aria-label="依分類篩選"></div>
+
+    </div>
+  </div>
+
+  <!-- ── Main Content ── -->
+  <main class="main-content" id="mainContent">
+    <div class="results-bar">
+      <span id="resultsCount" role="status" aria-live="polite">載入中…</span>
+    </div>
+    <div class="card-grid" id="cardGrid"></div>
+    <div class="empty-state" id="emptyState" hidden>
+      <span class="material-symbols-outlined empty-icon" aria-hidden="true">search_off</span>
+      <p>找不到符合條件的字型</p>
+      <button onclick="resetFilters()">清除所有篩選</button>
+    </div>
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-attr">
+        <span class="material-symbols-outlined" aria-hidden="true">info</span>
+        <div>
+          <p>
+            資料來源：
+            <a href="https://www.storm.mg/lifestyle/4444444" target="_blank" rel="noopener">
+              風傳媒《2026免費中英日文字體大全》
+            </a>
+            ／ 作者：洪煜勛
+          </p>
+          <p>原文最後更新：2026-06-17　資料整理：2026-06-24</p>
+        </div>
+      </div>
+      <p class="footer-note">本頁資料僅供索引參考，各字型版權歸原作者所有，使用前請詳閱各授權條款。</p>
+    </div>
+  </footer>
+
+  <!-- ── Drawer Overlay ── -->
+  <div class="drawer-overlay" id="drawerOverlay" aria-hidden="true"></div>
+
+  <!-- ── Detail Drawer ── -->
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="字型詳情">
+    <div class="drawer-topbar">
+      <button class="drawer-close" id="drawerClose" aria-label="關閉詳情">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div id="drawerBody"></div>
+  </aside>
+
+  <!-- ── Back to Top ── -->
+  <button class="back-to-top" id="backToTop" aria-label="回到頂端">
+    <span class="material-symbols-outlined">arrow_upward</span>
+  </button>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

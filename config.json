@@ -1,5 +1,6 @@
 {
     "displayOrder": [
+        "fontBook",
         "ayuSongbook",
         "watchDrama",
         "dailyQuotation",
@@ -20,6 +21,13 @@
         "godDecision"
     ],
     "cards": {
+        "fontBook": {
+            "href": "fontBook/index.html",
+            "icon": "auto_stories",
+            "title": "字型書",
+            "description": "50 款免費可商用中文字型索引，支援分類篩選與預覽圖瀏覽。",
+            "stats": "Font Browser"
+        },
         "watchDrama": {
             "href": "watchDrama/index.html",
             "icon": "featured_video",
