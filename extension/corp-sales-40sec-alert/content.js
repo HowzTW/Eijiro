@@ -69,7 +69,7 @@
     const secondsInput = document.createElement('input');
     secondsInput.type = 'number';
     secondsInput.className = 'alert-40sec-seconds';
-    secondsInput.value = 40;
+    secondsInput.value = 43;
     secondsInput.min = 5;
     secondsInput.max = 300;
 
