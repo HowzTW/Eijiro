@@ -12,8 +12,8 @@
   <link rel="stylesheet" href="style.css">
   <script>
     (function(){
-      var s = localStorage.getItem('fontBook-font-scale');
-      if (s) document.documentElement.style.fontSize = s + 'px';
+      var s = localStorage.getItem('fontBook-font-scale') || '22';
+      document.documentElement.style.fontSize = s + 'px';
     })();
   </script>
 </head>
@@ -35,7 +35,7 @@
       </div>
       <div class="font-size-control" aria-label="字型大小">
         <button class="font-size-btn" id="fontSizeDown" aria-label="縮小字型">A−</button>
-        <span class="font-size-label" id="fontSizeLabel">16px</span>
+        <span class="font-size-label" id="fontSizeLabel">22px</span>
         <button class="font-size-btn" id="fontSizeUp" aria-label="放大字型">A+</button>
       </div>
     </div>

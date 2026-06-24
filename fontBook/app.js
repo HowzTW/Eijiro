@@ -285,7 +285,7 @@ function resetFilters() {
 }
 
 /* ── Font Size Control ── */
-const FONT_SIZES = [14, 16, 18, 20, 22];
+const FONT_SIZES = [20, 22, 24, 26, 28];
 const FONT_LS_KEY = 'fontBook-font-scale';
 
 function initFontSizeControl() {
