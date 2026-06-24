@@ -284,10 +284,35 @@ function resetFilters() {
   renderCards();
 }
 
+/* ── Font Size Control ── */
+const FONT_SIZES = [14, 16, 18, 20, 22];
+const FONT_LS_KEY = 'fontBook-font-scale';
+
+function initFontSizeControl() {
+  const saved = parseInt(localStorage.getItem(FONT_LS_KEY));
+  let idx = FONT_SIZES.indexOf(saved);
+  if (idx === -1) idx = 1; // 預設 16px
+
+  function apply(newIdx) {
+    idx = newIdx;
+    const px = FONT_SIZES[idx];
+    document.documentElement.style.fontSize = px + 'px';
+    document.getElementById('fontSizeLabel').textContent = px + 'px';
+    document.getElementById('fontSizeDown').disabled = idx === 0;
+    document.getElementById('fontSizeUp').disabled   = idx === FONT_SIZES.length - 1;
+    localStorage.setItem(FONT_LS_KEY, px);
+  }
+
+  apply(idx);
+  document.getElementById('fontSizeDown').addEventListener('click', () => { if (idx > 0) apply(idx - 1); });
+  document.getElementById('fontSizeUp').addEventListener('click',   () => { if (idx < FONT_SIZES.length - 1) apply(idx + 1); });
+}
+
 /* ── Init ── */
 function init() {
   renderCategoryFilters();
   renderCards();
+  initFontSizeControl();
 
   /* Drawer */
   document.getElementById('drawerClose').addEventListener('click', closeDrawer);

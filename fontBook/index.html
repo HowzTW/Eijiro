@@ -10,6 +10,12 @@
   <link rel="icon" href="icon.png" type="image/png">
   <link rel="apple-touch-icon" href="icon.png">
   <link rel="stylesheet" href="style.css">
+  <script>
+    (function(){
+      var s = localStorage.getItem('fontBook-font-scale');
+      if (s) document.documentElement.style.fontSize = s + 'px';
+    })();
+  </script>
 </head>
 <body>
 
@@ -26,6 +32,11 @@
       <div class="header-meta" aria-hidden="true">
         <span class="meta-dot"></span>
         <span>50 款免費可商用字型</span>
+      </div>
+      <div class="font-size-control" aria-label="字型大小">
+        <button class="font-size-btn" id="fontSizeDown" aria-label="縮小字型">A−</button>
+        <span class="font-size-label" id="fontSizeLabel">16px</span>
+        <button class="font-size-btn" id="fontSizeUp" aria-label="放大字型">A+</button>
       </div>
     </div>
   </header>
