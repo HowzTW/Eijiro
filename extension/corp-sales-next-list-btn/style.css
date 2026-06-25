@@ -9,6 +9,28 @@
   z-index: 9999;
 }
 
+.next-list-status-light {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.72);
+  border-radius: 10px;
+  padding: 6px;
+  color: #bbb;
+  transition: color 0.3s ease, filter 0.3s ease;
+}
+
+.next-list-status-light svg {
+  width: 32px;
+  height: 32px;
+  fill: currentColor;
+}
+
+.next-list-status-light.is-on {
+  color: #00c851;
+  filter: drop-shadow(0 0 7px rgba(0, 200, 81, 0.85));
+}
+
 .next-list-fab {
   width: 56px;
   height: 56px;

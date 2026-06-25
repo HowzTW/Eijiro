@@ -2,12 +2,36 @@
   // 目前模式：'dial'（撥打）或 'missed'（未接聽）
   let _mode = 'dial';
 
+  const SVG_BULB = `<svg viewBox="0 0 24 24"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>`;
+
+  let _statusLightEl = null;
+  let _focusListenersAdded = false;
+
+  function updateStatusLight() {
+    if (!_statusLightEl) return;
+    const focused = document.hasFocus() && document.visibilityState === 'visible';
+    _statusLightEl.innerHTML = SVG_BULB;
+    _statusLightEl.classList.toggle('is-on', focused);
+  }
+
   // 建立並注入 FAB 按鈕與模式切換 toggle
   function injectFAB() {
     if (document.querySelector('.next-list-fab-container')) return;
 
     const container = document.createElement('div');
     container.className = 'next-list-fab-container';
+
+    const statusLight = document.createElement('div');
+    statusLight.className = 'next-list-status-light';
+    _statusLightEl = statusLight;
+
+    if (!_focusListenersAdded) {
+      window.addEventListener('focus', updateStatusLight);
+      window.addEventListener('blur', updateStatusLight);
+      document.addEventListener('visibilitychange', updateStatusLight);
+      _focusListenersAdded = true;
+    }
+    updateStatusLight();
 
     const btn = document.createElement('button');
     btn.className = 'next-list-fab';
@@ -45,6 +69,7 @@
     toggle.appendChild(dialOpt);
     toggle.appendChild(missedOpt);
 
+    container.appendChild(statusLight);
     container.appendChild(btn);
     container.appendChild(toggle);
     document.body.appendChild(container);
