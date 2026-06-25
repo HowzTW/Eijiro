@@ -91,6 +91,7 @@
       checkbox.addEventListener('click', e => e.stopPropagation());
 
       small.insertBefore(checkbox, small.firstChild);
+      small.appendChild(document.createElement('br'));
     });
   }
 
