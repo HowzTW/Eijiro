@@ -40,6 +40,7 @@ async function loadConfig() {
         const response = await fetch(url);
         configData = await response.json();
         populateDropdowns();
+        populateQuickNoteButtons();
         document.querySelector('select[name="leaveMotivation"]').value = '家長想讓小朋友學';
         document.querySelector('select[name="priceReaction"]').value = '體驗看看再說';
         document.querySelector('select[name="decisionMaker"]').value = '爸媽一起討論';
@@ -78,6 +79,20 @@ function populateSelect(name, options) {
             select.appendChild(o);
         });
         select.value = currentValue;
+    });
+}
+
+function populateQuickNoteButtons() {
+    const container = document.getElementById('quickNoteButtons');
+    if (!container || !configData?.quickNotes) return;
+    container.innerHTML = '';
+    configData.quickNotes.forEach(({ label, text }) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'quick-note-btn';
+        btn.textContent = label;
+        btn.dataset.quickNoteText = text;
+        container.appendChild(btn);
     });
 }
 
@@ -973,6 +988,20 @@ document.addEventListener('click', function (e) {
     const copyBtn = e.target.closest('[data-copy-target]');
     if (copyBtn) {
         copyToClipboard(copyBtn.dataset.copyTarget, copyBtn);
+        return;
+    }
+
+    // Quick note buttons
+    const quickNoteBtn = e.target.closest('.quick-note-btn');
+    if (quickNoteBtn) {
+        const textarea = document.querySelector('[name="mainNote"]');
+        if (textarea) {
+            const appendText = quickNoteBtn.dataset.quickNoteText;
+            textarea.value = textarea.value
+                ? textarea.value + '\n' + appendText
+                : appendText;
+            textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        }
         return;
     }
 

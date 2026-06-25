@@ -442,6 +442,31 @@
         }
 
         .close-btn:hover { color: #333; }
+
+        .quick-note-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .quick-note-btn {
+            padding: 6px 14px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 20px;
+            background: white;
+            color: #555;
+            font-size: 0.85rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+        }
+
+        .quick-note-btn:hover {
+            background-color: var(--required-filled);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
     </style>
 </head>
 
@@ -582,6 +607,7 @@
                 </div>
                 <div class="form-group">
                     <textarea name="mainNote" rows="3" placeholder="請輸入額外聯絡紀錄..."></textarea>
+                    <div class="quick-note-buttons" id="quickNoteButtons"></div>
                 </div>
             </div>
         </form>
