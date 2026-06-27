@@ -1,0 +1,846 @@
+<!doctype html>
+<html lang="zh-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>首爾深度遊：在地年輕人的私藏漫遊地圖</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    img, svg { display: block; max-width: 100%; }
+    button { font: inherit; cursor: pointer; border: none; }
+
+    :root {
+      --font-display: 'Archivo', sans-serif;
+      --font-sans: 'Noto Sans TC', sans-serif;
+      --bg: #FFE94D;
+      --surface: #0A0A0A;
+      --text: #0A0A0A;
+      --text-on-dark: #FFE94D;
+      --border: #0A0A0A;
+      --accent: #FF3D00;
+      --accent-2: #0066FF;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: #1a1a1a;
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 32px 16px;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .canvas {
+      width: 1200px;
+      background: var(--bg);
+      position: relative;
+      border: 4px solid var(--border);
+      box-shadow: 10px 10px 0 #000;
+    }
+
+    /* ---- HERO ---- */
+    .hero {
+      background: var(--surface);
+      padding: 64px 72px 56px;
+      border-bottom: 4px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      margin-bottom: 28px;
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 80px;
+      line-height: 0.9;
+      letter-spacing: -0.03em;
+      color: var(--text-on-dark);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--bg);
+      opacity: 0.35;
+      font-size: 0.6em;
+      display: block;
+      letter-spacing: 0.02em;
+    }
+
+    .hero-sub {
+      font-size: 17px;
+      color: rgba(255,233,77,0.55);
+      font-weight: 400;
+      line-height: 1.6;
+      max-width: 520px;
+      margin: 24px 0 36px;
+    }
+
+    .hero-counts {
+      display: flex;
+      gap: 48px;
+    }
+
+    .hero-count-item { display: flex; flex-direction: column; }
+
+    .hero-count-num {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 64px;
+      line-height: 1;
+      color: var(--bg);
+      letter-spacing: -0.04em;
+    }
+
+    .hero-count-label {
+      font-size: 12px;
+      color: rgba(255,233,77,0.45);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .hero-deco {
+      position: absolute;
+      right: 40px;
+      bottom: -20px;
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 220px;
+      line-height: 1;
+      color: rgba(255,233,77,0.05);
+      letter-spacing: -0.05em;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* ---- FILTERS ---- */
+    .filters-section {
+      padding: 20px 72px;
+      border-bottom: 4px solid var(--border);
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filters-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-right: 6px;
+      opacity: 0.45;
+    }
+
+    .filter-btn {
+      background: transparent;
+      border: 2px solid rgba(10,10,10,0.25);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 14px;
+      cursor: pointer;
+      transition: all 140ms ease;
+      letter-spacing: 0.04em;
+    }
+
+    .filter-btn:hover { border-color: var(--text); }
+
+    .filter-btn.active {
+      background: var(--surface);
+      color: var(--text-on-dark);
+      border-color: var(--surface);
+      box-shadow: 3px 3px 0 rgba(0,0,0,0.4);
+    }
+
+    /* ---- NEIGHBORHOODS ---- */
+    .neighborhoods { padding: 0 72px; }
+
+    details.nbhd-item {
+      border-bottom: 3px solid rgba(10,10,10,0.12);
+      transition: background 180ms ease;
+    }
+    details.nbhd-item:last-child { border-bottom: none; }
+    details.nbhd-item:hover { background: rgba(255,255,255,0.18); }
+
+    .nbhd-summary {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 26px 0;
+      cursor: pointer;
+      list-style: none;
+    }
+    .nbhd-summary::-webkit-details-marker { display: none; }
+
+    .nbhd-num {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      color: rgba(10,10,10,0.28);
+      min-width: 26px;
+    }
+
+    .nbhd-vibe {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border: 2px solid currentColor;
+      flex-shrink: 0;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .nbhd-vibe.v-night  { color: var(--accent); border-color: var(--accent); }
+    .nbhd-vibe.v-art    { color: var(--accent-2); border-color: var(--accent-2); }
+    .nbhd-vibe.v-food   { color: #1A8C00; border-color: #1A8C00; }
+    .nbhd-vibe.v-life   { color: #8000CC; border-color: #8000CC; }
+    .nbhd-vibe.v-shop   { color: #C05800; border-color: #C05800; }
+    .nbhd-vibe.v-arts   { color: var(--accent-2); border-color: var(--accent-2); }
+
+    .nbhd-names { flex: 0 0 220px; }
+
+    .nbhd-zh {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 26px;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+    }
+
+    .nbhd-kr {
+      font-size: 12px;
+      color: rgba(10,10,10,0.42);
+      margin-top: 3px;
+      font-style: italic;
+    }
+
+    .nbhd-tagline {
+      font-size: 14px;
+      color: rgba(10,10,10,0.58);
+      line-height: 1.5;
+      flex: 1;
+    }
+
+    .nbhd-chevron {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 22px;
+      transition: transform 200ms ease;
+      flex-shrink: 0;
+      opacity: 0.5;
+    }
+    details[open] .nbhd-chevron { transform: rotate(45deg); opacity: 1; }
+
+    /* ---- DETAIL ---- */
+    .nbhd-detail {
+      padding: 0 0 28px 46px;
+      animation: slide-down 240ms ease;
+    }
+
+    @keyframes slide-down {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .nbhd-highlights {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .nbhd-highlight {
+      background: var(--surface);
+      color: var(--text-on-dark);
+      padding: 14px 18px;
+      flex: 1;
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
+    }
+
+    .nbhd-highlight-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-on-dark);
+      opacity: 0.4;
+      margin-bottom: 7px;
+    }
+
+    .nbhd-highlight-text {
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .nbhd-for {
+      font-size: 13px;
+      color: rgba(10,10,10,0.52);
+      line-height: 1.55;
+    }
+    .nbhd-for strong { color: var(--text); font-weight: 700; }
+
+    /* ---- ROUTES ---- */
+    .routes-section {
+      background: var(--surface);
+      padding: 52px 72px 60px;
+      border-top: 4px solid var(--border);
+    }
+
+    .routes-eyebrow {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-on-dark);
+      opacity: 0.35;
+      margin-bottom: 8px;
+    }
+
+    .routes-heading {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 52px;
+      color: var(--text-on-dark);
+      letter-spacing: -0.03em;
+      line-height: 0.95;
+      text-transform: uppercase;
+      margin-bottom: 40px;
+    }
+
+    .routes-grid { display: flex; flex-direction: column; gap: 16px; }
+
+    .route-card {
+      border: 3px solid rgba(255,233,77,0.15);
+      padding: 24px 28px;
+      transition: border-color 180ms ease, transform 180ms ease, background 180ms ease;
+      cursor: default;
+    }
+
+    .route-card:hover {
+      border-color: var(--bg);
+      transform: translateX(6px);
+      background: rgba(255,233,77,0.04);
+    }
+
+    .route-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    .route-icon {
+      width: 36px;
+      height: 36px;
+      border: 2px solid var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .route-name {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 20px;
+      color: var(--text-on-dark);
+      letter-spacing: -0.01em;
+    }
+
+    .route-stops {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding-left: 50px;
+    }
+
+    .route-stop {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255,233,77,0.75);
+    }
+
+    .route-arrow {
+      font-size: 12px;
+      color: rgba(255,233,77,0.25);
+      font-weight: 700;
+    }
+
+    /* ---- FOOTER ---- */
+    .footer {
+      background: var(--bg);
+      border-top: 4px solid var(--border);
+      padding: 18px 72px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-note {
+      font-size: 11px;
+      color: rgba(10,10,10,0.38);
+      font-style: italic;
+    }
+
+    .footer-brand {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* ---- TOOLTIPS ---- */
+    .tooltip-trigger {
+      position: relative;
+      cursor: help;
+      border-bottom: 1px dashed currentColor;
+      text-decoration: none;
+    }
+
+    .tooltip-trigger .tooltip {
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      background: var(--surface);
+      color: var(--text-on-dark);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 1.5;
+      padding: 10px 14px;
+      border: 2px solid var(--bg);
+      width: max-content;
+      max-width: 220px;
+      letter-spacing: 0;
+      text-transform: none;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease;
+      z-index: 100;
+      box-shadow: 4px 4px 0 rgba(255,233,77,0.3);
+    }
+
+    .tooltip-trigger .tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: var(--surface);
+    }
+
+    .tooltip-trigger .tooltip.right {
+      left: auto;
+      right: 0;
+      transform: translateX(0) translateY(4px);
+    }
+    .tooltip-trigger:hover .tooltip.right,
+    .tooltip-trigger:focus-visible .tooltip.right {
+      transform: translateX(0) translateY(0);
+    }
+    .tooltip-trigger .tooltip.right::after {
+      left: auto;
+      right: 18px;
+      transform: none;
+    }
+
+    .tooltip-trigger:hover .tooltip,
+    .tooltip-trigger:focus-visible .tooltip {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Tooltips inside .nbhd-highlight (dark bg) keep the dark style */
+    .nbhd-highlight .tooltip-trigger .tooltip {
+      background: #2a2a2a;
+      border-color: rgba(255,233,77,0.4);
+      color: var(--text-on-dark);
+    }
+    .nbhd-highlight .tooltip-trigger .tooltip::after {
+      border-top-color: #2a2a2a;
+    }
+
+    /* ---- ENTRANCE ANIMATION ---- */
+    .hero,
+    .filters-section,
+    .neighborhoods,
+    .routes-section,
+    .footer {
+      opacity: 0;
+      transform: translateY(10px);
+      animation: enter 600ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+    }
+
+    .hero              { animation-delay:   0ms; }
+    .filters-section   { animation-delay:  80ms; }
+    .neighborhoods     { animation-delay: 160ms; }
+    .routes-section    { animation-delay: 240ms; }
+    .footer            { animation-delay: 300ms; }
+
+    @keyframes enter { to { opacity: 1; transform: translateY(0); } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero, .filters-section, .neighborhoods, .routes-section, .footer {
+        animation: none; opacity: 1; transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="canvas">
+
+    <!-- HERO -->
+    <header class="hero" aria-label="首爾深度遊標題">
+      <div class="hero-tag">Seoul Deep Dive</div>
+      <h1>首爾<br>深度遊<em>第 2、3 訪專屬</em></h1>
+      <p class="hero-sub">跳過明洞、弘大、北村 — 走進在地年輕人的私藏漫遊地圖</p>
+      <div class="hero-counts">
+        <div class="hero-count-item">
+          <span class="hero-count-num">7</span>
+          <span class="hero-count-label">個隱藏街區</span>
+        </div>
+        <div class="hero-count-item">
+          <span class="hero-count-num">3</span>
+          <span class="hero-count-label">條精選路線</span>
+        </div>
+      </div>
+      <div class="hero-deco" aria-hidden="true">서울</div>
+    </header>
+
+    <!-- FILTERS -->
+    <section class="filters-section" aria-label="依風格篩選街區">
+      <span class="filters-label">篩選風格</span>
+      <button class="filter-btn active" data-filter="all">全部</button>
+      <button class="filter-btn" data-filter="夜生活">夜生活</button>
+      <button class="filter-btn" data-filter="藝術工業">藝術工業</button>
+      <button class="filter-btn" data-filter="美食">美食</button>
+      <button class="filter-btn" data-filter="生活感">生活感</button>
+      <button class="filter-btn" data-filter="購物">購物</button>
+      <button class="filter-btn" data-filter="文藝">文藝</button>
+    </section>
+
+    <!-- NEIGHBORHOODS -->
+    <section class="neighborhoods" aria-label="7 個隱藏街區">
+
+      <!-- 01 新堂洞 -->
+      <details class="nbhd-item" data-vibe="夜生活" open>
+        <summary class="nbhd-summary">
+          <span class="nbhd-num">01</span>
+          <span class="nbhd-vibe v-night">夜生活</span>
+          <div class="nbhd-names">
+            <div class="nbhd-zh">
+              <span class="tooltip-trigger">新堂洞<span class="tooltip">신당동 · Sindang-dong<br>在地暱稱「Hip-dangdong (힙당동)」</span></span>
+            </div>
+            <div class="nbhd-kr">Sindang-dong · 힙당동</div>
+          </div>
+          <div class="nbhd-tagline">復古與魔幻的共存 — 傳統中央市場 × 概念酒吧</div>
+          <span class="nbhd-chevron" aria-hidden="true">+</span>
+        </summary>
+        <div class="nbhd-detail">
+          <div class="nbhd-highlights">
+            <div class="nbhd-highlight">
+              <div class="nbhd-highlight-label">必訪亮點</div>
+              <div class="nbhd-highlight-text">
+                <span class="tooltip-trigger">Zoo Sindang（主神堂）<span class="tooltip">偽裝成巫術堂的概念酒吧，是新堂洞最具話題性的夜生活空間</span></span> —— 偽裝成巫術堂的酒吧
+              </div>
+            </div>
+            <div class="nbhd-highlight">
+              <div class="nbhd-highlight-label">隱藏景點</div>
+              <div class="nbhd-highlight-text">Mail Room 濃縮咖啡吧 — 隱身老舊郵局，需用鑰匙取餐</div>
+            </div>
+          </div>
+          <p class="nbhd-for"><strong>適合：</strong>追求獵奇概念空間與夜生活體驗的旅人。比已商業化的聖水洞保留更多老建築韻味。</p>
+        </div>
+      </details>
+
+      <!-- 02 文來洞 -->
+      <details class="nbhd-item" data-vibe="藝術工業">
+        <summary class="nbhd-summary">
+          <span class="nbhd-num">02</span>
+          <span class="nbhd-vibe v-art">藝術工業</span>
+          <div class="nbhd-names">
+            <div class="nbhd-zh">
+              <span class="tooltip-trigger">文來洞<span class="tooltip">문래동 · Mullae-dong<br>白天是鐵工廠區，傍晚搖身成藝文聚落</span></span>
+            </div>
+            <div class="nbhd-kr">Mullae-dong · 문래동</div>
+          </div>
+          <div class="nbhd-tagline">鐵工廠裡的工業藝術區 — 大人的躲貓貓</div>
+          <span class="nbhd-chevron" aria-hidden="true">+</span>
+        </summary>
+        <div class="nbhd-detail">
+          <div class="nbhd-highlights">
+            <div class="nbhd-highlight">
+              <div class="nbhd-highlight-label">白天</div>
+              <div class="nbhd-highlight-text">運作中的金屬加工廠區，切削聲與鐵鏽感共存</div>
+            </div>
+            <div class="nbhd-highlight">
+              <div class="nbhd-highlight-label">傍晚變身</div>
+              <div class="nbhd-highlight-text">獨立藝廊、文青咖啡廳、精釀啤酒吧、黑膠露天酒吧</div>
+            </div>
+          </div>
+          <p class="nbhd-for"><strong>適合：</strong>喜歡小眾音樂、硬核文青風及在地創作圈氣息的人。左邊是切削鋼鐵的工廠，右邊是黑膠酒吧。</p>
+        </div>
+      </details>
+
+      <!-- 03 龍理團路 -->
+      <details class="nbhd-item" data-vibe="美食">
+        <summary class="nbhd-summary">
+          <span class="nbhd-num">03</span>
+          <span class="nbhd-vibe v-food">美食</span>
+          <div class="nbhd-names">
+            <div class="nbhd-zh">
+              <span class="tooltip-trigger">龍理團路<span class="tooltip">용리단길 · Yongridan-gil<br>位於新龍山站與三角地站之間</span></span>
+            </div>
+            <div class="nbhd-kr">Yongridan-gil · 용리단길</div>
+          </div>
+          <div class="nbhd-tagline">精緻異國美食激戰區 — 首爾上班族下班聚會首選</div>
+          <span class="nbhd-chevron" aria-hidden="true">+</span>
+        </summary>
+        <div class="nbhd-detail">
+          <div class="nbhd-highlights">
+            <div class="nbhd-highlight">
+              <div class="nbhd-highlight-label">必訪店家</div>
+              <div class="nbhd-highlight-text">Teddy Beurre House — 歐式復古感法式可頌名店</div>
+            </div>
+            <div class="nbhd-highlight">
+              <div class="nbhd-highlight-label">美食密度</div>
+              <div class="nbhd-highlight-text">日式、法式、港式、台式等多國料理高度集中</div>
+            </div>
+          </div>
+          <p class="nbhd-for"><strong>適合：</strong>重視餐點質感、拍照美感與約會氛圍的旅人。</p>
+        </div>
+      </details>
+
+      <!-- 04 望遠洞 -->
+      <details class="nbhd-item" data-vibe="生活感">
+        <summary class="nbhd-summary">
+          <span class="nbhd-num">04</span>
+          <span class="nbhd-vibe v-life">生活感</span>
+          <div class="nbhd-names">
+            <div class="nbhd-zh">
+              <span class="tooltip-trigger">望遠洞<span class="tooltip">망원동 · Mangwon-dong<br>鄰近弘大但更安靜，有望遠漢江公園</span></span>
+            </div>
+            <div class="nbhd-kr">Mangwon-dong · 망원동</div>
+          </div>
+          <div class="nbhd-tagline">最道地的在地生活感 — 體驗韓國人真實週末</div>
+          <span class="nbhd-chevron" aria-hidden="true">+</span>
+        </summary>
+        <div class="nbhd-detail">
+          <div class="nbhd-highlights">
+            <div class="nbhd-highlight">
+              <div class="nbhd-highlight-label">推薦行程</div>
+              <div class="nbhd-highlight-text">逛望遠市場在地美食 → 巷弄咖啡廳 → 漢江公園看夕陽</div>
+            </div>
+            <div class="nbhd-highlight">
+              <div class="nbhd-highlight-label">氣氛</div>
+              <div class="nbhd-highlight-text">氣質優雅、比弘大安靜，充滿韓國人日常生活氣息</div>
+            </div>
+          </div>
+          <p class="nbhd-for"><strong>適合：</strong>想體驗韓國人真實週末生活、不喜歡擁擠觀光景點的旅人。</p>
+        </div>
+      </details>
+
+      <!-- 05 漢南洞 -->
+      <details class="nbhd-item" data-vibe="購物">
+        <summary class="nbhd-summary">
+          <span class="nbhd-num">05</span>
+          <span class="nbhd-vibe v-shop">購物</span>
+          <div class="nbhd-names">
+            <div class="nbhd-zh">
+              <span class="tooltip-trigger">漢南洞<span class="tooltip">한남동 · Hannam-dong<br>首爾時尚風向球，依山傍水，步調比聖水洞優雅</span></span>
+            </div>
+            <div class="nbhd-kr">Hannam-dong · 한남동</div>
+          </div>
+          <div class="nbhd-tagline">時尚潮人與小眾香氛殿堂 — 比聖水洞更優雅</div>
+          <span class="nbhd-chevron" aria-hidden="true">+</span>
+        </summary>
+        <div class="nbhd-detail">
+          <div class="nbhd-highlights">
+            <div class="nbhd-highlight">
+              <div class="nbhd-highlight-label">品牌推薦</div>
+              <div class="nbhd-highlight-text">
+                <span class="tooltip-trigger">Mardi Mercredi<span class="tooltip">韓國本土設計師品牌，以花卉圖案聞名</span></span>、
+                <span class="tooltip-trigger">Nonfiction<span class="tooltip">韓國小眾香氛品牌旗艦店</span></span>、Tamburins 旗艦店
+              </div>
+            </div>
+            <div class="nbhd-highlight">
+              <div class="nbhd-highlight-label">氣氛</div>
+              <div class="nbhd-highlight-text">依山傍水、步調悠閒，高質感設計師品牌聚集地</div>
+            </div>
+          </div>
+          <p class="nbhd-for"><strong>適合：</strong>追求韓國本土設計師品牌、小眾香氛，不想買大眾品牌的潮流愛好者。</p>
+        </div>
+      </details>
+
+      <!-- 06 解放村 -->
+      <details class="nbhd-item" data-vibe="夜生活">
+        <summary class="nbhd-summary">
+          <span class="nbhd-num">06</span>
+          <span class="nbhd-vibe v-night">夜生活</span>
+          <div class="nbhd-names">
+            <div class="nbhd-zh">
+              <span class="tooltip-trigger">解放村<span class="tooltip">해방촌 · Haebangchon<br>南山附近，坡度較陡 — 建議穿舒適好走的鞋</span></span>
+            </div>
+            <div class="nbhd-kr">Haebangchon · 해방촌</div>
+          </div>
+          <div class="nbhd-tagline">坡道上的大人感夜景 — 屋頂酒吧俯瞰南山</div>
+          <span class="nbhd-chevron" aria-hidden="true">+</span>
+        </summary>
+        <div class="nbhd-detail">
+          <div class="nbhd-highlights">
+            <div class="nbhd-highlight">
+              <div class="nbhd-highlight-label">特色</div>
+              <div class="nbhd-highlight-text">彎曲坡道與小巷構成，異國風情濃厚</div>
+            </div>
+            <div class="nbhd-highlight">
+              <div class="nbhd-highlight-label">必體驗</div>
+              <div class="nbhd-highlight-text">隱藏屋頂餐酒館（Rooftop Bar）俯瞰城市與南山夜景</div>
+            </div>
+          </div>
+          <p class="nbhd-for"><strong>適合：</strong>喜歡夜景、屋頂酒吧與異國風情小巷。⚠️ 坡度較陡，穿舒適好走的鞋。</p>
+        </div>
+      </details>
+
+      <!-- 07 延南洞 -->
+      <details class="nbhd-item" data-vibe="文藝">
+        <summary class="nbhd-summary">
+          <span class="nbhd-num">07</span>
+          <span class="nbhd-vibe v-arts">文藝</span>
+          <div class="nbhd-names">
+            <div class="nbhd-zh">
+              <span class="tooltip-trigger">延南洞<span class="tooltip">연남동 · Yeonnam-dong<br>鄰近弘大但更靜謐，京義線林蔭道穿越其中</span></span>
+            </div>
+            <div class="nbhd-kr">Yeonnam-dong · 연남동</div>
+          </div>
+          <div class="nbhd-tagline">比弘大安靜的文藝巷弄 — 京義線廢鐵道散步</div>
+          <span class="nbhd-chevron" aria-hidden="true">+</span>
+        </summary>
+        <div class="nbhd-detail">
+          <div class="nbhd-highlights">
+            <div class="nbhd-highlight">
+              <div class="nbhd-highlight-label">必訪</div>
+              <div class="nbhd-highlight-text">
+                <span class="tooltip-trigger">京義線林蔭道<span class="tooltip">舊鐵路改建的線性公園，首爾最浪漫的步行路線之一</span></span> — 廢棄鐵道改建的城市綠道
+              </div>
+            </div>
+            <div class="nbhd-highlight">
+              <div class="nbhd-highlight-label">最佳時段</div>
+              <div class="nbhd-highlight-text">平日下午，獨立選物店與甜點店林立，人潮最少</div>
+            </div>
+          </div>
+          <p class="nbhd-for"><strong>適合：</strong>想遠離人潮、在文藝巷弄中悠閒散步、挖掘獨立小店的旅人。</p>
+        </div>
+      </details>
+
+    </section>
+
+    <!-- ROUTES -->
+    <section class="routes-section" aria-label="推薦路線安排">
+      <div class="routes-eyebrow">建議路線安排</div>
+      <div class="routes-heading">3 條<br>精選路線</div>
+      <div class="routes-grid">
+
+        <div class="route-card">
+          <div class="route-header">
+            <div class="route-icon" aria-hidden="true">🎨</div>
+            <span class="route-name">文青藝術與微醺版</span>
+          </div>
+          <div class="route-stops">
+            <span class="route-stop">文來洞（下午散步）</span>
+            <span class="route-arrow">→</span>
+            <span class="route-stop">三角地 / 文來洞酒吧微醺</span>
+          </div>
+        </div>
+
+        <div class="route-card">
+          <div class="route-header">
+            <div class="route-icon" aria-hidden="true">🌅</div>
+            <span class="route-name">在地生活與漢江版</span>
+          </div>
+          <div class="route-stops">
+            <span class="route-stop">望遠市場（午餐）</span>
+            <span class="route-arrow">→</span>
+            <span class="route-stop">望遠洞咖啡廳</span>
+            <span class="route-arrow">→</span>
+            <span class="route-stop">漢江公園看夕陽</span>
+            <span class="route-arrow">→</span>
+            <span class="route-stop">延南洞晚餐</span>
+          </div>
+        </div>
+
+        <div class="route-card">
+          <div class="route-header">
+            <div class="route-icon" aria-hidden="true">🌃</div>
+            <span class="route-name">坡道夜景版</span>
+          </div>
+          <div class="route-stops">
+            <span class="route-stop">解放村坡道散步（傍晚）</span>
+            <span class="route-arrow">→</span>
+            <span class="route-stop">新興市場附近晚餐</span>
+            <span class="route-arrow">→</span>
+            <span class="route-stop">屋頂酒吧夜景</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <span class="footer-note">適合第 2、3 次造訪首爾的旅人 · 內容來源：在地年輕人口碑推薦</span>
+      <span class="footer-brand">Seoul Deep Dive</span>
+    </footer>
+
+  </main>
+
+  <script>
+    // Filter chips
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const nbhdItems  = document.querySelectorAll('.nbhd-item');
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.dataset.filter;
+        nbhdItems.forEach(item => {
+          item.style.display = (filter === 'all' || item.dataset.vibe === filter) ? '' : 'none';
+        });
+      });
+    });
+  </script>
+</body>
+</html>
