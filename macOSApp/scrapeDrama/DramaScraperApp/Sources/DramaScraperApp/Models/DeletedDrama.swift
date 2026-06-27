@@ -5,6 +5,21 @@ struct DeletedDrama: Identifiable, Codable {
     var name: String
     var deleted_at: String
 
+    enum CodingKeys: String, CodingKey {
+        case id, name, deleted_at
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        if let intId = try? container.decode(Int.self, forKey: .id) {
+            id = String(intId)
+        } else {
+            id = try container.decode(String.self, forKey: .id)
+        }
+        name = try container.decode(String.self, forKey: .name)
+        deleted_at = try container.decode(String.self, forKey: .deleted_at)
+    }
+
     var source: String {
         if id.hasPrefix("gimyplus_") { return "Gimy+" }
         if id.hasPrefix("777tv_") { return "777TV" }
