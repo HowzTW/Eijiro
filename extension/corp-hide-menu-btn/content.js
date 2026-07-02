@@ -2,6 +2,8 @@
   const CONTAINER_ID = 'oa-hide-menu-container';
   const BTN_ID      = 'oa-hide-menu-btn';
   const CALL_BTN_ID = 'oa-call-btn';
+  const SALES_BTN_ID     = 'oa-sales-btn';
+  const POTENTIAL_BTN_ID = 'oa-potential-btn';
   const CLOCK_ID    = 'oa-hide-menu-clock';
   const STYLE_ID    = 'oa-hide-menu-style';
   const STORAGE_KEY = 'oa-menu-collapsed';
@@ -28,7 +30,7 @@
         align-items: center;
         gap: 6px;
       }
-      #${BTN_ID}, #${CALL_BTN_ID} {
+      #${BTN_ID}, #${CALL_BTN_ID}, #${SALES_BTN_ID}, #${POTENTIAL_BTN_ID} {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -43,9 +45,41 @@
         transition: background 0.15s ease, transform 0.1s ease;
         flex-shrink: 0;
       }
-      #${BTN_ID}:hover, #${CALL_BTN_ID}:hover { background: #d35400; transform: scale(1.05); }
-      #${BTN_ID}:active, #${CALL_BTN_ID}:active { transform: scale(0.97); }
-      #${BTN_ID} .material-icons, #${CALL_BTN_ID} .material-icons { font-size: 20px; line-height: 1; }
+      #${BTN_ID}:hover:not(:disabled), #${CALL_BTN_ID}:hover:not(:disabled), #${SALES_BTN_ID}:hover:not(:disabled), #${POTENTIAL_BTN_ID}:hover:not(:disabled) { background: #d35400; transform: scale(1.05); }
+      #${BTN_ID}:active:not(:disabled), #${CALL_BTN_ID}:active:not(:disabled), #${SALES_BTN_ID}:active:not(:disabled), #${POTENTIAL_BTN_ID}:active:not(:disabled) { transform: scale(0.97); }
+      #${BTN_ID} .material-icons, #${CALL_BTN_ID} .material-icons, #${SALES_BTN_ID} .material-icons, #${POTENTIAL_BTN_ID} .material-icons { font-size: 20px; line-height: 1; }
+      /* 空值時的 disabled 樣式 */
+      #${CALL_BTN_ID}:disabled, #${SALES_BTN_ID}:disabled, #${POTENTIAL_BTN_ID}:disabled {
+        background: #adb5bd;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+      /* 自訂 tooltip */
+      #${CONTAINER_ID} [data-tip] { position: relative; }
+      #${CONTAINER_ID} [data-tip]::after {
+        content: attr(data-tip);
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 0;
+        background: rgba(33,37,41,0.92);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 400;
+        padding: 4px 8px;
+        border-radius: 4px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translateY(-4px);
+        transition: opacity 0.15s ease, transform 0.15s ease;
+        z-index: 10000;
+      }
+      #${CONTAINER_ID} [data-tip]:hover::after {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
       /* 時鐘 */
       #${CLOCK_ID} {
         display: inline-flex;
@@ -175,6 +209,15 @@
     return document.getElementById('search_students');
   }
 
+  // ── #q 為空時，停用撥打與名單搜尋按鈕 ────────────────────────────────────
+  function updateSearchBtnState() {
+    const hasQ = !!(document.getElementById('q')?.value ?? '').trim();
+    [CALL_BTN_ID, SALES_BTN_ID, POTENTIAL_BTN_ID].forEach((id) => {
+      const b = document.getElementById(id);
+      if (b) b.disabled = !hasQ;
+    });
+  }
+
   // ── 收合：將 form 插到時鐘左側，保留 Stimulus binding ────────────────────
   function collapse(btn) {
     const form      = getSearchForm();
@@ -218,7 +261,7 @@
       // 切換按鈕
       const btn = document.createElement('button');
       btn.id    = BTN_ID;
-      btn.title = '收合/展開側邊欄';
+      btn.dataset.tip = '收合/展開左側導覽選單';
       btn.innerHTML = `<span class="material-icons">${isCollapsed() ? 'menu' : 'menu_open'}</span>`;
       btn.addEventListener('click', () => {
         isCollapsed() ? expand(btn) : collapse(btn);
@@ -228,7 +271,7 @@
       // 撥打按鈕（在時鐘左側）
       const callBtn = document.createElement('button');
       callBtn.id    = CALL_BTN_ID;
-      callBtn.title = '撥打號碼';
+      callBtn.dataset.tip = 'EVOX撥打電話';
       callBtn.innerHTML = `<span class="material-icons">phone</span>`;
       callBtn.addEventListener('click', () => {
         const phone = (document.getElementById('q')?.value ?? '').trim();
@@ -241,6 +284,27 @@
       clock.id          = CLOCK_ID;
       clock.textContent = formatTime(getServerNow());
       container.appendChild(clock);
+
+      // 名單查詢按鈕（時鐘右側）：讀取 #q 的值，開新分頁搜尋
+      const makeSearchBtn = (id, tip, icon, urlPrefix) => {
+        const b = document.createElement('button');
+        b.id    = id;
+        b.dataset.tip = tip;
+        b.innerHTML = `<span class="material-icons">${icon}</span>`;
+        b.addEventListener('click', () => {
+          const q = (document.getElementById('q')?.value ?? '').trim();
+          if (q) window.open(urlPrefix + encodeURIComponent(q), '_blank');
+        });
+        container.appendChild(b);
+      };
+      makeSearchBtn(
+        SALES_BTN_ID, '搜尋線上潛在名單', 'cloud',
+        'https://corp.orangeapple.co/marketing/sales?kind=&grade_low=0&grade_top=16&search_and_text=&exclude_or_text=&exclude_and_text=&start_date=&end_date=&log_count=&search_or_text='
+      );
+      makeSearchBtn(
+        POTENTIAL_BTN_ID, '搜尋全域潛在名單', 'public',
+        'https://corp.orangeapple.co/potential_students?student_type=&grade_low=0&grade_top=16&pages%5B%5D=all&statuses%5B%5D=all&sources%5B%5D=all&district_ids%5B%5D=all&start_date=&end_date=&search_and_text=&exclude_or_text=&exclude_and_text=&search_or_text='
+      );
 
       document.body.appendChild(container);
       startClock();
@@ -256,6 +320,8 @@
         document.body.classList.add('oa-menu-collapsed');
       }
     }
+
+    updateSearchBtnState();
   }
 
   // ── Turbo 導航前：將 form 移回 nav，確保 permanent 機制正常 ───────────────
@@ -268,6 +334,11 @@
       formParent      = null;
       formNextSibling = null;
     }
+  });
+
+  // ── #q 輸入時同步按鈕狀態（事件委派，不受 Turbo 重建影響）────────────────
+  document.addEventListener('input', (e) => {
+    if (e.target?.id === 'q') updateSearchBtnState();
   });
 
   // ── 初次執行與 Turbo 事件 ─────────────────────────────────────────────────
