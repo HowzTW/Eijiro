@@ -215,7 +215,9 @@
     }
 
     if (autoDialEnabled) {
-      const targetBtn = dialBtns.find(btn => VALID_GRADES.has(btn.dataset.grade));
+      const targetBtn = dialBtns.find(btn =>
+        VALID_GRADES.has(btn.dataset.grade) && !btn.dataset.phone.startsWith('+')
+      );
       if (targetBtn) {
         targetBtn.click();
         autoDialEnabled = false;
