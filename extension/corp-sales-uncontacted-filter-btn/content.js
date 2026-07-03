@@ -7,6 +7,9 @@
 
   let _fabEl = null;
   let _fadeTimer = null;
+  let _paneObserver = null;
+  let _observedPane = null;
+  let _prevActive = false;
 
   function getPane() {
     return document.querySelector('#new_students');
@@ -89,24 +92,45 @@
     });
   }
 
-  // 切回新名單分頁時：復原名單並重新顯示 FAB
-  function onTabShown() {
-    if (isNewListActive()) {
+  // 分頁 active 狀態改變時：切回新名單復原名單並重新顯示 FAB，切走則隱藏 FAB
+  function onActiveChanged(nowActive) {
+    if (nowActive) {
       clearTimeout(_fadeTimer);
       restoreRows();
     }
     updateFabVisibility();
   }
 
-  // Bootstrap 5 的 tab 切換會發出原生 DOM 事件，content script 可直接監聽
-  document.addEventListener('shown.bs.tab', onTabShown);
+  // 監看 #new_students pane 的 class 變化。
+  // 分頁切換有兩套機制：新名單是 Bootstrap tab（發 shown.bs.tab 事件），
+  // 其他分頁是 data-remote AJAX 連結（伺服器回傳 JS 直接改 class、不發事件），
+  // 因此不能靠事件，只能直接監看 class 屬性。
+  function observePane() {
+    const pane = getPane();
+    if (!pane || pane === _observedPane) return;
 
-  // 處理 Turbo 頁面切換
+    if (_paneObserver) _paneObserver.disconnect();
+    _observedPane = pane;
+    _prevActive = pane.classList.contains('active');
+
+    _paneObserver = new MutationObserver(() => {
+      const nowActive = _observedPane.classList.contains('active');
+      // fade 過程 class 會變動多次，只在 active 狀態實際轉變時動作
+      if (nowActive === _prevActive) return;
+      _prevActive = nowActive;
+      onActiveChanged(nowActive);
+    });
+    _paneObserver.observe(pane, { attributes: true, attributeFilter: ['class'] });
+  }
+
+  // 處理 Turbo 頁面切換（pane 會是新的 DOM 元素，需重新監看）
   document.addEventListener('turbo:load', () => {
     injectFAB();
+    observePane();
     updateFabVisibility();
   });
 
   // 自動執行注入
   injectFAB();
+  observePane();
 })();
