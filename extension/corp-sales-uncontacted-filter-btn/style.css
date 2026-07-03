@@ -1,0 +1,52 @@
+.uncontacted-filter-fab {
+  position: fixed;
+  bottom: 16px;
+  left: 30px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #198754;
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 1;
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s, opacity 0.4s;
+}
+
+.uncontacted-filter-fab:hover {
+  background-color: #146c43;
+  transform: scale(1.05);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4), 0 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+.uncontacted-filter-fab:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.uncontacted-filter-fab svg {
+  width: 28px;
+  height: 28px;
+  fill: currentColor;
+}
+
+/* 過濾完成後的淡出效果 */
+.uncontacted-filter-fab.is-fading {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 不在新名單分頁，或已淡出完成時完全隱藏 */
+.uncontacted-filter-fab.is-hidden {
+  display: none;
+}
+
+/* 被過濾隱藏的名單列 */
+tr.uncontacted-filter-row-hidden {
+  display: none;
+}

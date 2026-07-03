@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "OA Corp Sales：新名單未聯絡過濾按鈕",
+  "version": "1.0",
+  "description": "(corp-sales-uncontacted-filter-btn) 在新名單分頁提供左下角 FAB，一鍵隱藏已有聯絡記錄的名單，僅保留從未聯絡（-）的名單",
+  "permissions": [
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://corp.orangeapple.co/marketing/sales*"
+      ],
+      "css": [
+        "style.css"
+      ],
+      "js": [
+        "content.js"
+      ]
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
