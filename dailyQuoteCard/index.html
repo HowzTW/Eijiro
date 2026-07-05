@@ -3,59 +3,138 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#221244">
 <title>每日箴言小卡產生器</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#f2f4f7;color:#1f2933;font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;font-size:16px;line-height:1.6}
-.wrap{max-width:1100px;margin:0 auto;padding:20px 16px 40px}
-h1{font-size:24px;margin:8px 0 20px}
-.grid{display:grid;grid-template-columns:minmax(320px,430px) 1fr;gap:20px;align-items:start}
-@media (max-width:860px){.grid{grid-template-columns:1fr}}
-.panel{background:#fff;border-radius:12px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:16px}
-.panel h2{font-size:17px;margin:0 0 12px}
-label{display:block;font-size:15px;font-weight:700;margin:10px 0 4px}
-select,input[type=text],textarea{width:100%;font-size:16px;font-family:inherit;padding:8px 10px;border:1px solid #c5cdd6;border-radius:8px;background:#fff;color:inherit}
+:root{
+  --bg1:#221244;--bg2:#3b1d63;--bg3:#122a52;
+  --gold:#f0c04a;--gold-2:#e0a23a;
+  --ink:#f5f2ff;
+  --ink-dim:rgba(245,242,255,.62);
+  --glass:rgba(255,255,255,.09);
+  --stroke:rgba(255,255,255,.20);
+  --field:rgba(9,5,28,.35);
+  --r-l:20px;--r-m:13px;
+  --shadow:0 10px 34px rgba(8,4,30,.38);
+}
+body{
+  margin:0;color:var(--ink);
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  font-size:16px;line-height:1.6;
+  background:linear-gradient(136deg,var(--bg1) 0%,var(--bg2) 46%,var(--bg3) 100%) fixed;
+  min-height:100vh;
+}
+/* 兩顆柔光暈：紫光（左上）與金光（右下），呼應圖卡的金色 */
+body::before,body::after{content:'';position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(90px)}
+body::before{width:52vw;height:52vw;left:-14vw;top:-16vw;background:rgba(168,85,247,.30)}
+body::after{width:46vw;height:46vw;right:-12vw;bottom:-14vw;background:rgba(240,176,74,.20)}
+.wrap{position:relative;z-index:1;max-width:1160px;margin:0 auto;padding:26px 18px 48px}
+.app-head{display:flex;align-items:center;gap:16px;margin:6px 0 26px}
+.app-head .mark{
+  font-family:'Material Symbols Rounded';font-size:52px;line-height:1;flex:none;
+  background:linear-gradient(135deg,#f6cf6b,#e0a23a);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.app-head h1{font-size:26px;letter-spacing:.04em;margin:0;font-weight:800}
+.app-head .sub{margin:2px 0 0;font-size:14px;color:var(--ink-dim);letter-spacing:.14em}
+.grid{display:grid;grid-template-columns:minmax(330px,430px) 1fr;gap:22px;align-items:start}
+@media (max-width:880px){.grid{grid-template-columns:1fr}}
+.panel{
+  background:var(--glass);
+  -webkit-backdrop-filter:blur(22px) saturate(1.5);
+  backdrop-filter:blur(22px) saturate(1.5);
+  border:1px solid var(--stroke);
+  border-radius:var(--r-l);
+  box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.14);
+  padding:20px 22px;margin-bottom:18px;
+}
+/* 不支援 backdrop-filter 的瀏覽器改用實色深底，確保可讀性 */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .panel{background:rgba(24,14,52,.88)}
+}
+.panel h2{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;letter-spacing:.22em;color:var(--gold);margin:0 0 14px}
+.step{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#f6cf6b,#e0a23a);color:#2c1d07;font-size:13px;letter-spacing:0;flex:none}
+label{display:block;font-size:14px;font-weight:700;letter-spacing:.06em;color:var(--ink-dim);margin:12px 0 6px}
+input[type=text],textarea{
+  width:100%;font-size:16px;font-family:inherit;color:var(--ink);
+  background:var(--field);border:1px solid var(--stroke);border-radius:var(--r-m);
+  padding:10px 12px;transition:border-color .2s,box-shadow .2s;
+}
 textarea{resize:vertical;line-height:1.7}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+input[type=text]:focus,textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(240,192,74,.22)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch}
 .date-row{position:relative}
-.date-display{flex:1;min-width:185px;background:#fff;font-size:17px;white-space:nowrap}
-.date-display:hover{background:#f0f3f6}
+button{
+  font-family:inherit;font-size:16px;font-weight:700;color:var(--ink);
+  background:rgba(255,255,255,.10);border:1px solid var(--stroke);border-radius:var(--r-m);
+  padding:10px 16px;cursor:pointer;
+  transition:background .2s,transform .15s,box-shadow .2s;
+}
+button:hover{background:rgba(255,255,255,.18);transform:translateY(-1px)}
+button:active{transform:translateY(0)}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.seg{flex:1;display:flex;align-items:stretch;min-width:230px;background:rgba(255,255,255,.07);border:1px solid var(--stroke);border-radius:var(--r-m);overflow:hidden}
+.seg button{flex:none;border:0;border-radius:0;background:transparent}
+.seg button:hover{background:rgba(255,255,255,.14);transform:none}
+.seg .date-display{flex:1;border-left:1px solid var(--stroke);border-right:1px solid var(--stroke);white-space:nowrap;padding:10px 8px}
 #dateInput{position:absolute;left:50%;bottom:0;width:1px;height:1px;opacity:0;border:0;padding:0;pointer-events:none}
-#dateInput.exposed{position:static;width:100%;height:auto;opacity:1;pointer-events:auto;font-size:16px;font-family:inherit;padding:8px 10px;border:1px solid #c5cdd6;border-radius:8px;margin-top:10px}
-button{font-family:inherit;font-size:16px;font-weight:700;padding:9px 18px;border-radius:8px;border:1px solid #c5cdd6;background:#fff;color:#1f2933;cursor:pointer}
-button:hover{background:#f0f3f6}
-button.primary{background:#1a6ee0;border-color:#1a6ee0;color:#fff;width:100%;padding:12px;font-size:17px}
-button.primary:hover{background:#155ec2}
-.dropzone{border:2px dashed #9aa7b4;border-radius:10px;padding:26px 14px;text-align:center;color:#52606d;cursor:pointer;user-select:none}
-.dropzone.dragover{border-color:#1a6ee0;background:#eef4fd}
-.dropzone.loaded{border-style:solid;border-color:#2f9e44;color:#2b6a34;background:#f2fbf4}
-.hint{font-size:14px;color:#66727e;margin:8px 0 0}
-.preview-panel{position:sticky;top:16px}
-canvas{display:block;width:100%;height:auto;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.18);background:#2c3648}
-@media (max-width:860px){.preview-panel{position:static}}
+#dateInput.exposed{position:static;width:100%;height:auto;opacity:1;pointer-events:auto;font-size:16px;font-family:inherit;color:var(--ink);background:var(--field);padding:10px 12px;border:1px solid var(--stroke);border-radius:var(--r-m);margin-top:10px;color-scheme:dark}
+button.primary{
+  width:100%;padding:13px;font-size:17px;letter-spacing:.08em;border:none;color:#332108;
+  background:linear-gradient(135deg,#f6cf6b,#e0a23a);
+  box-shadow:0 8px 22px rgba(224,162,58,.35);
+}
+button.primary:hover{background:linear-gradient(135deg,#f9d87e,#e8ab42);box-shadow:0 10px 28px rgba(224,162,58,.5);transform:translateY(-1px)}
+.dropzone{
+  border:1.5px dashed rgba(255,255,255,.35);border-radius:var(--r-m);
+  padding:30px 14px;text-align:center;color:var(--ink-dim);cursor:pointer;user-select:none;
+  background:rgba(255,255,255,.04);transition:border-color .2s,background .2s,color .2s;
+}
+.dropzone:hover{border-color:rgba(240,192,74,.6);color:var(--ink)}
+.dropzone.dragover{border-color:var(--gold);background:rgba(240,192,74,.10);color:var(--ink)}
+.dropzone.loaded{border-style:solid;border-color:rgba(240,192,74,.75);background:rgba(240,192,74,.10);color:var(--gold)}
+.hint{font-size:13.5px;color:var(--ink-dim);margin:10px 0 0}
+.preview-panel{position:sticky;top:18px;display:flex;flex-direction:column;align-items:center;gap:12px;padding:24px}
+canvas{
+  display:block;width:100%;max-width:540px;height:auto;border-radius:14px;
+  box-shadow:0 26px 64px rgba(4,2,18,.55),0 0 90px rgba(240,192,74,.12);
+  background:#222c40;
+}
+.canvas-caption{font-size:13px;letter-spacing:.14em;color:var(--ink-dim)}
+@media (max-width:880px){.preview-panel{position:static}}
 </style>
 </head>
 <body>
 <div class="wrap">
-<h1>每日箴言小卡產生器</h1>
+<header class="app-head">
+  <div class="mark material-symbols-rounded" aria-hidden="true">add_photo_alternate</div>
+  <div>
+    <h1>每日箴言小卡產生器</h1>
+    <p class="sub">選日期 · 改文字 · 上背景 · 出圖卡</p>
+  </div>
+</header>
 <div class="grid">
   <div>
     <section class="panel">
-      <h2>1. 選擇日期</h2>
+      <h2><span class="step">1</span>選擇日期</h2>
       <div class="row date-row">
-        <button id="btnPrev" type="button" aria-label="前一日">◀ 前一日</button>
-        <button id="btnDate" type="button" class="date-display" title="點擊選擇日期"></button>
-        <button id="btnNext" type="button" aria-label="後一日">後一日 ▶</button>
+        <div class="seg">
+          <button id="btnPrev" type="button" aria-label="前一日" title="前一日">◀</button>
+          <button id="btnDate" type="button" class="date-display" title="點擊選擇日期"></button>
+          <button id="btnNext" type="button" aria-label="後一日" title="後一日">▶</button>
+        </div>
         <button id="btnToday" type="button">今天</button>
         <input id="dateInput" type="date" aria-label="選擇日期">
       </div>
       <p class="hint">點擊中間的日期可開啟日曆直接選擇。</p>
     </section>
     <section class="panel">
-      <h2>2. 確認文字</h2>
+      <h2><span class="step">2</span>確認文字</h2>
       <label for="taContent">箴言內容</label>
       <textarea id="taContent" rows="6"></textarea>
       <label for="inSource">出處</label>
@@ -63,18 +142,19 @@ canvas{display:block;width:100%;height:auto;border-radius:8px;box-shadow:0 2px 1
       <p class="hint">作者固定為「——池田大作」。修改文字後預覽即時更新。</p>
     </section>
     <section class="panel">
-      <h2>3. 上傳背景圖片</h2>
+      <h2><span class="step">3</span>上傳背景圖片</h2>
       <div id="dropzone" class="dropzone" tabindex="0"><span id="dropHint">點擊選擇圖片，或將圖片拖放到這裡</span></div>
       <input id="fileInput" type="file" accept="image/*" hidden>
       <p class="hint">背景會自動置中裁切為 3:4（1536×2048）。建議選用主題單純、留白較多的圖片。</p>
     </section>
     <section class="panel">
-      <h2>4. 下載</h2>
+      <h2><span class="step">4</span>下載</h2>
       <button id="btnDownload" class="primary" type="button">下載 PNG 圖卡</button>
     </section>
   </div>
   <div class="panel preview-panel">
     <canvas id="cv" width="1536" height="2048"></canvas>
+    <div class="canvas-caption">直式 3:4 · 1536×2048 · PNG</div>
   </div>
 </div>
 </div>
@@ -106,7 +186,7 @@ function isoDate(){return curDate.getFullYear()+'-'+pad(curDate.getMonth()+1)+'-
 
 function setDate(d){
   curDate=d;
-  btnDate.textContent='📅 '+displayDate();
+  btnDate.textContent=displayDate();
   dateInput.value=isoDate();
   loadQuote();
 }
