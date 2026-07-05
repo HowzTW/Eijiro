@@ -2,8 +2,10 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#221244">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>每日箴言小卡產生器</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,6 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
 <style>
 *{box-sizing:border-box}
+html{background:#221244} /* overscroll 回彈時不露白 */
 :root{
   --bg1:#221244;--bg2:#3b1d63;--bg3:#122a52;
   --gold:#f0c04a;--gold-2:#e0a23a;
@@ -33,7 +36,16 @@ body{
 body::before,body::after{content:'';position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(90px)}
 body::before{width:52vw;height:52vw;left:-14vw;top:-16vw;background:rgba(168,85,247,.30)}
 body::after{width:46vw;height:46vw;right:-12vw;bottom:-14vw;background:rgba(240,176,74,.20)}
-.wrap{position:relative;z-index:1;max-width:1160px;margin:0 auto;padding:26px 18px 48px}
+.wrap{position:relative;z-index:1;max-width:1160px;margin:0 auto;padding:26px 18px 48px;padding-top:calc(26px + env(safe-area-inset-top,0px))}
+/* iOS 主畫面 App：狀態列底下的固定毛玻璃底條，捲動內容從其下方穿過，時間電量保持可讀 */
+.statusbar-backdrop{
+  position:fixed;top:0;left:0;right:0;
+  height:env(safe-area-inset-top,0px);
+  background:rgba(20,10,45,.72);
+  -webkit-backdrop-filter:blur(14px);
+  backdrop-filter:blur(14px);
+  z-index:99;pointer-events:none;
+}
 .app-head{display:flex;align-items:center;gap:16px;margin:6px 0 26px}
 .app-head .mark{
   font-family:'Material Symbols Rounded';font-size:52px;line-height:1;flex:none;
@@ -110,6 +122,7 @@ canvas{
 </style>
 </head>
 <body>
+<div class="statusbar-backdrop" aria-hidden="true"></div>
 <div class="wrap">
 <header class="app-head">
   <div class="mark material-symbols-rounded" aria-hidden="true">add_photo_alternate</div>
