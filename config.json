@@ -1,5 +1,6 @@
 {
     "displayOrder": [
+        "dailyQuoteCard",
         "fontBook",
         "ayuSongbook",
         "watchDrama",
@@ -153,6 +154,13 @@
             "title": "每日箴言 (新版)",
             "description": "引導式每日金句產生器，支援高畫質圖片下載與 AI 提示詞助手。",
             "stats": "Wizard App"
+        },
+        "dailyQuoteCard": {
+            "href": "dailyQuoteCard/index.html",
+            "icon": "add_photo_alternate",
+            "title": "每日箴言小卡產生器",
+            "description": "選擇日期查詢箴言，上傳背景圖即時合成文字，一鍵下載直式 3:4 高畫質小卡。",
+            "stats": "Card Maker"
         },
         "ayuSongbook": {
             "href": "ayuSongbook/index.html",
