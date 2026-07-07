@@ -99,8 +99,8 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .mode-seg button.active{background:linear-gradient(135deg,#f6cf6b,#e0a23a);color:#2c1d07}
 .size-seg{min-width:170px;align-items:center}
 .size-seg[hidden]{display:none}
-.size-seg button:first-child{border-right:1px solid var(--stroke)}
-.size-seg button:last-child{border-left:1px solid var(--stroke)}
+.size-seg>*+*:not(.px){border-left:1px solid var(--stroke)}
+.size-seg button{padding:10px 12px;font-size:22px}
 .size-seg input{flex:1;width:64px;min-width:0;text-align:right;background:transparent;border:0;border-radius:0;color:var(--ink);font-size:16px;font-weight:700;font-family:inherit;padding:10px 2px}
 .size-seg input:focus{outline:none}
 .size-seg input::-webkit-outer-spin-button,.size-seg input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
@@ -171,10 +171,12 @@ canvas{
           <button id="btnSizeManual" type="button">手動</button>
         </div>
         <div class="seg size-seg" id="sizeSeg" hidden>
-          <button id="btnSizeDown" type="button" aria-label="減小字級">−</button>
-          <input id="sizeInput" type="number" min="24" max="240" step="8" aria-label="字級（px）">
+          <button id="btnSizeDown8" type="button" class="material-symbols-rounded" aria-label="減少 8px" title="減少 8px">keyboard_double_arrow_left</button>
+          <button id="btnSizeDown1" type="button" class="material-symbols-rounded" aria-label="減少 1px" title="減少 1px">chevron_left</button>
+          <input id="sizeInput" type="number" min="24" max="240" step="1" aria-label="字級（px）">
           <span class="px">px</span>
-          <button id="btnSizeUp" type="button" aria-label="增大字級">＋</button>
+          <button id="btnSizeUp1" type="button" class="material-symbols-rounded" aria-label="增加 1px" title="增加 1px">chevron_right</button>
+          <button id="btnSizeUp8" type="button" class="material-symbols-rounded" aria-label="增加 8px" title="增加 8px">keyboard_double_arrow_right</button>
         </div>
       </div>
       <p class="hint warn" id="sizeWarn" hidden>目前字級超出版面，文字可能壓到署名。</p>
@@ -217,7 +219,8 @@ const dropzone=document.getElementById('dropzone'),dropHint=document.getElementB
 const fileInput=document.getElementById('fileInput'),btnDownload=document.getElementById('btnDownload');
 const btnSizeAuto=document.getElementById('btnSizeAuto'),btnSizeManual=document.getElementById('btnSizeManual');
 const sizeSeg=document.getElementById('sizeSeg'),sizeInput=document.getElementById('sizeInput');
-const btnSizeDown=document.getElementById('btnSizeDown'),btnSizeUp=document.getElementById('btnSizeUp');
+const btnSizeDown8=document.getElementById('btnSizeDown8'),btnSizeDown1=document.getElementById('btnSizeDown1');
+const btnSizeUp1=document.getElementById('btnSizeUp1'),btnSizeUp8=document.getElementById('btnSizeUp8');
 const sizeWarn=document.getElementById('sizeWarn');
 let bgImg=null,rafPending=false;
 let curDate=new Date();
@@ -286,7 +289,7 @@ function markMetrics(size){
   const ms=Math.round(size*1.8);
   ctx.font='900 '+ms+'px Georgia,serif';
   const mL=ctx.measureText('“'),mR=ctx.measureText('”');
-  return {ms,ascL:mL.actualBoundingBoxAscent,descR:mR.actualBoundingBoxDescent};
+  return {ms,ascL:mL.actualBoundingBoxAscent,ascR:mR.actualBoundingBoxAscent};
 }
 // 以指定字級排版：斷行、行高（1.5×）、左上引號保留高度一次算齊
 function layoutAt(text,size){
@@ -374,17 +377,18 @@ function draw(){
       lastBaseline=y;
       y+=fit.lineH;
     }
-    // 右下金黃引號：下緣對齊箴言最後一行的下緣；
-    // 預設在區塊右緣，最後一行太長時自動右移，避免壓到行尾文字
+    // 右下金黃引號：上緣對齊箴言最後一行的上緣；
+    // 左緣必須在文字區塊右緣(QX+QW)之右，且與行尾至少保持 24px 間隙
     ctx.font='900 '+fit.size+'px '+STACK;
     const lastM=ctx.measureText(fit.lines[fit.lines.length-1]);
-    const lastBottom=lastBaseline+lastM.actualBoundingBoxDescent;
+    const lastTop=lastBaseline-lastM.actualBoundingBoxAscent;
     ctx.font='900 '+mk.ms+'px Georgia,serif';
-    const markX=Math.max(QX+QW+14, QX+lastM.width+24+ctx.measureText('”').width);
+    const mw=ctx.measureText('”').width;
+    const markX=Math.max(QX+QW, QX+lastM.width+24)+mw;
     ctx.textAlign='right';
     shadow(true,12,4);
     ctx.fillStyle=GOLD;
-    ctx.fillText('”',markX,lastBottom-mk.descR);
+    ctx.fillText('”',markX,lastTop+mk.ascR);
     shadow(false);
   }
   // 作者：——池田大作（金黃粗體，主文下方偏右；68 放大兩級距 → 84）
@@ -466,10 +470,13 @@ function setManualSize(v){
   sizeInput.value=v;
   requestDraw();
 }
+function curSize(){return manualSize||lastAutoSize||116;}
 btnSizeAuto.addEventListener('click',()=>setSizeMode('auto'));
 btnSizeManual.addEventListener('click',()=>setSizeMode('manual'));
-btnSizeDown.addEventListener('click',()=>setManualSize((manualSize||lastAutoSize||116)-8));
-btnSizeUp.addEventListener('click',()=>setManualSize((manualSize||lastAutoSize||116)+8));
+btnSizeDown8.addEventListener('click',()=>setManualSize(curSize()-8));
+btnSizeDown1.addEventListener('click',()=>setManualSize(curSize()-1));
+btnSizeUp1.addEventListener('click',()=>setManualSize(curSize()+1));
+btnSizeUp8.addEventListener('click',()=>setManualSize(curSize()+8));
 sizeInput.addEventListener('change',()=>setManualSize(parseFloat(sizeInput.value)));
 dropzone.addEventListener('click',()=>fileInput.click());
 dropzone.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();fileInput.click();}});
