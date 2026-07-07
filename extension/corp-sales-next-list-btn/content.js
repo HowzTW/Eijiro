@@ -1,6 +1,41 @@
 (function() {
-  // 目前模式：'dial'（撥打）或 'missed'（未接聽）
+  // 目前模式：'dial'（撥打）、'missed'（未接聽）或 'auto'（自動）
   let _mode = 'dial';
+
+  // 模式選項按鈕（mode -> element），由 injectFAB 建立
+  let _modeOpts = {};
+
+  function setMode(mode) {
+    const prev = _mode;
+    _mode = mode;
+    Object.entries(_modeOpts).forEach(([m, btn]) => {
+      btn.classList.toggle('active', m === mode);
+    });
+    // 離開自動模式：取消 background 的 alarm 排程
+    if (prev === 'auto' && mode !== 'auto') {
+      chrome.runtime.sendMessage({ type: 'auto-cancel' }).catch(() => {});
+    }
+    // 切入自動模式：立即執行第一輪，之後每輪結束時才排下一次 alarm
+    if (mode === 'auto' && prev !== 'auto') {
+      runAutoCycle();
+    }
+  }
+
+  function runAutoCycle() {
+    if (_mode !== 'auto') return;
+    findNextAndScroll();
+  }
+
+  // 請 background service worker 排下一次 40~50 秒隨機的 alarm
+  function scheduleNextAutoTick() {
+    chrome.runtime.sendMessage({ type: 'auto-schedule' }).catch(() => {});
+  }
+
+  // 接收 background 的 alarm 觸發（頁面重新載入後 _mode 會重設，
+  // runAutoCycle 的模式檢查可安全忽略殘留的 alarm）
+  chrome.runtime.onMessage.addListener((msg) => {
+    if (msg && msg.type === 'auto-tick') runAutoCycle();
+  });
 
   const SVG_BULB = `<svg viewBox="0 0 24 24"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>`;
 
@@ -46,28 +81,16 @@
     const toggle = document.createElement('div');
     toggle.className = 'next-list-mode-toggle';
 
-    const dialOpt = document.createElement('button');
-    dialOpt.className = 'next-list-mode-opt active';
-    dialOpt.type = 'button';
-    dialOpt.textContent = '撥打';
-    dialOpt.addEventListener('click', () => {
-      _mode = 'dial';
-      dialOpt.classList.add('active');
-      missedOpt.classList.remove('active');
+    _modeOpts = {};
+    [['dial', '撥打'], ['missed', '未接聽'], ['auto', '自動']].forEach(([mode, label]) => {
+      const opt = document.createElement('button');
+      opt.className = 'next-list-mode-opt' + (mode === _mode ? ' active' : '');
+      opt.type = 'button';
+      opt.textContent = label;
+      opt.addEventListener('click', () => setMode(mode));
+      _modeOpts[mode] = opt;
+      toggle.appendChild(opt);
     });
-
-    const missedOpt = document.createElement('button');
-    missedOpt.className = 'next-list-mode-opt';
-    missedOpt.type = 'button';
-    missedOpt.textContent = '未接聽';
-    missedOpt.addEventListener('click', () => {
-      _mode = 'missed';
-      missedOpt.classList.add('active');
-      dialOpt.classList.remove('active');
-    });
-
-    toggle.appendChild(dialOpt);
-    toggle.appendChild(missedOpt);
 
     container.appendChild(statusLight);
     container.appendChild(btn);
@@ -98,6 +121,12 @@
   function findNextAndScroll() {
     const frames = Array.from(document.querySelectorAll('turbo-frame[id^="potential_student_"][id$="_log"]'));
     if (frames.length === 0) {
+      if (_mode === 'auto') {
+        // 自動模式：無資料即停止自動，切回預設「撥打」（不彈窗）
+        console.log('[NextList] 自動模式停止：頁面上找不到通話記錄元件');
+        setMode('dial');
+        return;
+      }
       alert('頁面上找不到任何通話記錄元件。');
       return;
     }
@@ -161,6 +190,12 @@
     }
 
     // 如果都沒有符合條件
+    if (_mode === 'auto') {
+      // 自動模式：沒有可撥打名單即停止自動，切回預設「撥打」（不彈窗）
+      console.log('[NextList] 自動模式停止：目前沒有符合撥打條件的名單');
+      setMode('dial');
+      return;
+    }
     alert('目前沒有符合撥打條件的名單（無資料，或全部皆為 4 小時內之今日通話）。');
   }
 
@@ -252,14 +287,24 @@
         // 撥打模式：找由 corp-sales-dial-btn 注入的撥打按鈕
         actionBtn = tr ? tr.querySelector('.evox-dial-btn') : null;
       } else {
-        // 未接聽模式：找由 corp-sales-noanswer-btn 注入的未接聽按鈕
+        // 未接聽 / 自動模式：找由 corp-sales-noanswer-btn 注入的未接聽按鈕
         actionBtn = tr
           ? Array.from(tr.querySelectorAll('button.oa-noanswer-btn'))
               .find(b => b.querySelector('.oa-label')?.textContent === '未接聽') ?? null
           : null;
       }
 
-      if (actionBtn) {
+      if (_mode === 'auto') {
+        if (!actionBtn) {
+          // 找不到未接聽按鈕（noanswer extension 未載入等）→ 停止自動，避免空轉
+          console.log('[NextList] 自動模式停止：目標列上找不到未接聽按鈕');
+          setMode('dial');
+        } else {
+          // 已定位到目標才按下未接聽；按鈕冷卻中（disabled）則跳過本輪
+          if (!actionBtn.disabled) actionBtn.click();
+          scheduleNextAutoTick();
+        }
+      } else if (actionBtn) {
         actionBtn.setAttribute('tabindex', '0');
 
         // 強制顯示 focus ring（不依賴 :focus-visible，避免滑鼠模式下不顯示）
