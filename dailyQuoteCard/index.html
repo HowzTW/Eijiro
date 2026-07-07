@@ -94,6 +94,18 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .seg button{flex:none;border:0;border-radius:0;background:transparent}
 .seg button:hover{background:rgba(255,255,255,.14);transform:none}
 .seg .date-display{flex:1;border-left:1px solid var(--stroke);border-right:1px solid var(--stroke);white-space:nowrap;padding:10px 8px}
+.mode-seg{flex:none;min-width:0}
+.mode-seg button{padding:10px 20px}
+.mode-seg button.active{background:linear-gradient(135deg,#f6cf6b,#e0a23a);color:#2c1d07}
+.size-seg{min-width:170px;align-items:center}
+.size-seg[hidden]{display:none}
+.size-seg button:first-child{border-right:1px solid var(--stroke)}
+.size-seg button:last-child{border-left:1px solid var(--stroke)}
+.size-seg input{flex:1;width:64px;min-width:0;text-align:right;background:transparent;border:0;border-radius:0;color:var(--ink);font-size:16px;font-weight:700;font-family:inherit;padding:10px 2px}
+.size-seg input:focus{outline:none}
+.size-seg input::-webkit-outer-spin-button,.size-seg input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.size-seg .px{color:var(--ink-dim);font-size:14px;padding:0 10px 0 4px;align-self:center}
+.hint.warn{color:#f5b04a;font-weight:700}
 #dateInput{position:absolute;left:50%;bottom:0;width:1px;height:1px;opacity:0;border:0;padding:0;pointer-events:none}
 #dateInput.exposed{position:static;width:100%;height:auto;opacity:1;pointer-events:auto;font-size:16px;font-family:inherit;color:var(--ink);background:var(--field);padding:10px 12px;border:1px solid var(--stroke);border-radius:var(--r-m);margin-top:10px;color-scheme:dark}
 button.primary{
@@ -152,6 +164,20 @@ canvas{
       <textarea id="taContent" rows="6"></textarea>
       <label for="inSource">出處</label>
       <input id="inSource" type="text">
+      <label>主箴言字級</label>
+      <div class="row">
+        <div class="seg mode-seg">
+          <button id="btnSizeAuto" type="button" class="active">自動</button>
+          <button id="btnSizeManual" type="button">手動</button>
+        </div>
+        <div class="seg size-seg" id="sizeSeg" hidden>
+          <button id="btnSizeDown" type="button" aria-label="減小字級">−</button>
+          <input id="sizeInput" type="number" min="24" max="240" step="8" aria-label="字級（px）">
+          <span class="px">px</span>
+          <button id="btnSizeUp" type="button" aria-label="增大字級">＋</button>
+        </div>
+      </div>
+      <p class="hint warn" id="sizeWarn" hidden>目前字級超出版面，文字可能壓到署名。</p>
       <p class="hint">作者固定為「——池田大作」。修改文字後預覽即時更新。</p>
     </section>
     <section class="panel">
@@ -189,8 +215,13 @@ const btnToday=document.getElementById('btnToday');
 const taContent=document.getElementById('taContent'),inSource=document.getElementById('inSource');
 const dropzone=document.getElementById('dropzone'),dropHint=document.getElementById('dropHint');
 const fileInput=document.getElementById('fileInput'),btnDownload=document.getElementById('btnDownload');
+const btnSizeAuto=document.getElementById('btnSizeAuto'),btnSizeManual=document.getElementById('btnSizeManual');
+const sizeSeg=document.getElementById('sizeSeg'),sizeInput=document.getElementById('sizeInput');
+const btnSizeDown=document.getElementById('btnSizeDown'),btnSizeUp=document.getElementById('btnSizeUp');
+const sizeWarn=document.getElementById('sizeWarn');
 let bgImg=null,rafPending=false;
 let curDate=new Date();
+let sizeMode='auto',manualSize=null,lastAutoSize=null;
 
 function pad(n){return String(n).padStart(2,'0');}
 function dateKey(){return pad(curDate.getMonth()+1)+'月'+pad(curDate.getDate())+'日';}
@@ -209,6 +240,7 @@ function shiftDate(n){
   setDate(d);
 }
 function loadQuote(){
+  if(sizeMode!=='auto')setSizeMode('auto');  // 切換日期時回到自動縮字
   const q=QUOTES[dateKey()];
   taContent.value=q?q.c:'';
   inSource.value=q?q.s:'';
@@ -256,17 +288,28 @@ function markMetrics(size){
   const mL=ctx.measureText('“'),mR=ctx.measureText('”');
   return {ms,ascL:mL.actualBoundingBoxAscent,descR:mR.actualBoundingBoxDescent};
 }
+// 以指定字級排版：斷行、行高（1.5×）、左上引號保留高度一次算齊
+function layoutAt(text,size){
+  const lines=wrapText(text,'900 '+size+'px '+STACK,QW);
+  const lineH=Math.round(size*1.5);
+  const resv=Math.ceil(size*0.2+markMetrics(size).ascL);
+  return{size,lines,lineH,resv};
+}
 // 主箴言自動縮字：區域頂端先保留左上引號的高度（確保引號不跑到日期/標題旁），
 // 再從最大字級往下試，直到整段放得進剩餘高度
 function fitQuote(text){
   for(let size=156;size>=60;size-=8){
-    const lines=wrapText(text,'900 '+size+'px '+STACK,QW);
-    const lineH=Math.round(size*1.5);
-    const resv=Math.ceil(size*0.2+markMetrics(size).ascL);
-    if(lines.length*lineH<=QBOX.h-resv)return{size,lines,lineH,resv};
+    const f=layoutAt(text,size);
+    if(f.lines.length*f.lineH<=QBOX.h-f.resv)return f;
   }
-  const size=60,resv=Math.ceil(60*0.2+markMetrics(60).ascL);
-  return{size,lines:wrapText(text,'900 60px '+STACK,QW),lineH:90,resv};
+  return layoutAt(text,60);
+}
+// 依目前模式取得排版：自動＝逐級試排（並記下結果字級），手動＝直接用指定字級
+function currentFit(text){
+  if(sizeMode==='manual'&&manualSize)return layoutAt(text,manualSize);
+  const f=fitQuote(text);
+  lastAutoSize=f.size;
+  return f;
 }
 
 function drawOutlined(text,x,y,fill,lineWidth){
@@ -304,13 +347,18 @@ function draw(){
   // 日期：OO月OO日（白色粗體＋黑描邊）
   ctx.font='700 74px '+STACK;
   drawOutlined(dateKey(),W/2,352,'#fff',6);
-  // 主箴言：白色粗體＋黑描邊＋陰影，區域內垂直置中
+  // 主箴言：白色粗體＋黑描邊＋陰影，區域內垂直置中；
+  // 手動字級排不下時改為頂端對齊、只往下溢出，並顯示警告
   const text=taContent.value.trim();
+  if(sizeWarn)sizeWarn.hidden=true;
   if(text){
-    const fit=fitQuote(text);
+    const fit=currentFit(text);
     const mk=markMetrics(fit.size);
     const totalH=fit.lines.length*fit.lineH;
-    let y=QBOX.top+fit.resv+(QBOX.h-fit.resv-totalH)/2+Math.round(fit.size*0.85);
+    const availH=QBOX.h-fit.resv;
+    const overflow=totalH>availH;
+    if(overflow&&sizeWarn)sizeWarn.hidden=false;
+    let y=QBOX.top+fit.resv+(overflow?0:(availH-totalH)/2)+Math.round(fit.size*0.85);
     // 左上金黃引號（置於主文第一行上方；fitQuote 已保留高度，不會侵入日期/標題）
     ctx.textAlign='left';
     ctx.font='900 '+mk.ms+'px Georgia,serif';
@@ -399,6 +447,30 @@ dateInput.addEventListener('change',()=>{
 });
 taContent.addEventListener('input',requestDraw);
 inSource.addEventListener('input',requestDraw);
+function setSizeMode(m){
+  sizeMode=m;
+  btnSizeAuto.classList.toggle('active',m==='auto');
+  btnSizeManual.classList.toggle('active',m==='manual');
+  sizeSeg.hidden=(m!=='manual');
+  if(m==='manual'){
+    manualSize=lastAutoSize||116;  // 初始值 = 目前自動縮字的結果
+    sizeInput.value=manualSize;
+  }
+  requestDraw();
+}
+function setManualSize(v){
+  v=Math.round(v);
+  if(!isFinite(v))v=manualSize||lastAutoSize||116;
+  v=Math.min(240,Math.max(24,v));
+  manualSize=v;
+  sizeInput.value=v;
+  requestDraw();
+}
+btnSizeAuto.addEventListener('click',()=>setSizeMode('auto'));
+btnSizeManual.addEventListener('click',()=>setSizeMode('manual'));
+btnSizeDown.addEventListener('click',()=>setManualSize((manualSize||lastAutoSize||116)-8));
+btnSizeUp.addEventListener('click',()=>setManualSize((manualSize||lastAutoSize||116)+8));
+sizeInput.addEventListener('change',()=>setManualSize(parseFloat(sizeInput.value)));
 dropzone.addEventListener('click',()=>fileInput.click());
 dropzone.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();fileInput.click();}});
 dropzone.addEventListener('dragover',e=>{e.preventDefault();dropzone.classList.add('dragover');});
