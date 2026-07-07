@@ -5,6 +5,12 @@
   // 模式選項按鈕（mode -> element），由 injectFAB 建立
   let _modeOpts = {};
 
+  // 自動模式已成功送出未接聽的學生 ID（studentId 字串）。
+  // host 頁面在背景分頁時，Turbo/ActionCable 觸發的畫面重繪可能不會即時發生，
+  // 導致該筆記錄的時間顯示與按鈕狀態維持舊值，選取邏輯會誤判為仍可再次撥打。
+  // 因此改為自己記住已處理過的學生 ID，選取名單時主動排除，不依賴頁面畫面是否已更新。
+  const _autoProcessedStudentIds = new Set();
+
   function setMode(mode) {
     const prev = _mode;
     _mode = mode;
@@ -140,6 +146,10 @@
     const threeH59mInMs = (3 * 60 + 59) * 60 * 1000;
 
     const recordList = frames.map(frame => {
+      // 跳過自動模式已處理過的學生（不依賴頁面畫面是否已更新）
+      const studentIdMatch = frame.id.match(/^potential_student_(\d+)_log$/);
+      if (studentIdMatch && _autoProcessedStudentIds.has(studentIdMatch[1])) return null;
+
       const small = frame.querySelector('small');
       if (!small) return null;
 
@@ -299,9 +309,15 @@
           // 找不到未接聽按鈕（noanswer extension 未載入等）→ 停止自動，避免空轉
           console.log('[NextList] 自動模式停止：目標列上找不到未接聽按鈕');
           setMode('dial');
+        } else if (actionBtn.disabled) {
+          // 按鈕冷卻中（剛被處理過還沒恢復）→ 跳過本輪，等下一輪重新選取
+          console.log('[NextList] 自動模式本輪跳過：未接聽按鈕冷卻中');
+          scheduleNextAutoTick();
         } else {
-          // 已定位到目標才按下未接聽；按鈕冷卻中（disabled）則跳過本輪
-          if (!actionBtn.disabled) actionBtn.click();
+          // 已定位到目標才按下未接聽；記住此學生已處理，避免頁面畫面未即時更新時重複選中
+          const studentIdMatch = scrollTarget.id.match(/^potential_student_(\d+)_log$/);
+          if (studentIdMatch) _autoProcessedStudentIds.add(studentIdMatch[1]);
+          actionBtn.click();
           scheduleNextAutoTick();
         }
       } else if (actionBtn) {
