@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "OA Corp Sales：快速尋找下一筆可撥打名單按鈕（支援自動模式）",
   "version": "1.1",
-  "description": "(corp-sales-next-list-btn) 在銷售頁面依時間規則快速定位下一筆可撥打的潛在學生名單；自動模式以 40~50 秒隨機間隔自動定位並送出未接聽紀錄",
+  "description": "(corp-sales-next-list-btn) 在銷售頁面依時間規則快速定位下一筆可撥打的潛在學生名單；自動模式以 35~45 秒隨機間隔自動定位並送出未接聽紀錄",
   "permissions": [
     "activeTab",
     "alarms"
