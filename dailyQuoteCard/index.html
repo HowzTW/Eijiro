@@ -303,7 +303,7 @@ function layoutAt(text,size){
 // 主箴言自動縮字：區域頂端先保留左上引號的高度（確保引號不跑到日期/標題旁），
 // 再從最大字級往下試，直到整段放得進剩餘高度
 function fitQuote(text){
-  for(let size=156;size>=60;size-=8){
+  for(let size=156;size>=60;size-=1){
     const f=layoutAt(text,size);
     if(f.lines.length*f.lineH<=QBOX.h-f.resv)return f;
   }
