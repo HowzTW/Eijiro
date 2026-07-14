@@ -1,6 +1,6 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
-import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronRight, Cloud, CloudOff, Gauge, Menu, RefreshCw, Settings2, X } from 'lucide-vue-next'
+import { ArrowLeft, ArrowRight, Check, ChevronRight, Cloud, CloudOff, Gauge, Menu, RefreshCw, Settings2, X } from 'lucide-vue-next'
 import LoadingState from './components/LoadingState.vue'
 import PhraseCard from './components/PhraseCard.vue'
 import QuantifiersTopic from './components/QuantifiersTopic.vue'
@@ -23,14 +23,18 @@ const contentHash = ref('')
 const updatedAt = ref('')
 const settingsOpen = ref(false)
 const mobileMenuOpen = ref(false)
+const navigationDirection = ref('next')
 const tabElements = new Map()
 
 const { voices, rate, selectedVoiceURI, setRate, setVoice, stop } = useSpeech()
 
-const allTopics = computed(() => [
-  ...dynamicTopics.value.map((topic) => ({ ...topic, type: 'phrases' })),
-  ...fixedTopics,
-].sort((left, right) => left.displayOrder - right.displayOrder))
+const allTopics = computed(() => {
+  const databaseTopics = [...dynamicTopics.value]
+    .sort((left, right) => left.displayOrder - right.displayOrder)
+    .map((topic) => ({ ...topic, type: 'phrases' }))
+
+  return [...databaseTopics, ...fixedTopics]
+})
 
 const activeIndex = computed(() => Math.max(0, allTopics.value.findIndex((topic) => topic.id === activeTopicId.value)))
 const activeTopic = computed(() => allTopics.value[activeIndex.value] || null)
@@ -44,6 +48,15 @@ const statusLabel = computed(() => {
   if (contentStatus.value === 'error') return '動態內容未載入'
   return '讀取旅遊筆記'
 })
+const pageTransitionName = computed(() => navigationDirection.value === 'previous' ? 'topic-slide-previous' : 'topic-slide-next')
+
+function updateNavigationDirection(id) {
+  const currentIndex = allTopics.value.findIndex((topic) => topic.id === activeTopicId.value)
+  const targetIndex = allTopics.value.findIndex((topic) => topic.id === id)
+  if (currentIndex >= 0 && targetIndex >= 0 && currentIndex !== targetIndex) {
+    navigationDirection.value = targetIndex > currentIndex ? 'next' : 'previous'
+  }
+}
 
 function routeTopicId() {
   return decodeURIComponent(window.location.hash.replace(/^#\/?/, '').trim())
@@ -51,6 +64,7 @@ function routeTopicId() {
 
 function setActiveTopic(id, { replace = false } = {}) {
   if (!allTopics.value.some((topic) => topic.id === id)) return
+  updateNavigationDirection(id)
   activeTopicId.value = id
   const hash = `#/${id}`
   if (replace) window.history.replaceState(null, '', hash)
@@ -64,7 +78,10 @@ function setActiveTopic(id, { replace = false } = {}) {
 function syncRoute() {
   const requested = routeTopicId()
   const fallback = allTopics.value[0]?.id
-  if (allTopics.value.some((topic) => topic.id === requested)) activeTopicId.value = requested
+  if (allTopics.value.some((topic) => topic.id === requested)) {
+    updateNavigationDirection(requested)
+    activeTopicId.value = requested
+  }
   else if (fallback) setActiveTopic(fallback, { replace: true })
 }
 
@@ -151,6 +168,11 @@ onBeforeUnmount(() => {
         </button>
       </nav>
 
+      <button class="side-rail__settings" type="button" @click="settingsOpen = true">
+        <Settings2 :size="20" />
+        <span>語音設定</span>
+      </button>
+
       <div class="side-rail__footer">
         <span class="sync-dot" :class="`sync-dot--${contentStatus}`"></span>
         <div><strong>{{ statusLabel }}</strong><small v-if="contentHash">版本 {{ contentHash.slice(0, 8) }}</small></div>
@@ -184,46 +206,41 @@ onBeforeUnmount(() => {
         <LoadingState />
       </template>
 
-      <template v-else-if="activeTopic">
-        <header class="page-heading">
+      <Transition :name="pageTransitionName" mode="out-in">
+        <div v-if="!isInitialLoading && activeTopic" :key="activeTopic.id" class="topic-page">
+          <header class="page-heading">
           <div>
             <p class="eyebrow">Travel phrasebook · {{ String(activeIndex + 1).padStart(2, '0') }}</p>
             <h2>{{ activeTopic.title }}</h2>
-            <p v-if="activeTopic.type === 'phrases'">把想說的話放大、聽清楚，再帶著走。</p>
-            <p v-else-if="activeTopic.type === 'quantifiers'">從數字、量詞到點餐例句，一次整理成隨身小抄。</p>
-            <p v-else>挑一段影片，讓耳朵先熟悉韓語的聲音。</p>
           </div>
-          <div class="page-heading__tools">
-            <span v-if="activeTopic.type === 'phrases'"><BookOpen :size="17" />{{ activeTopic.phrases.length }} 句</span>
-            <button type="button" @click="settingsOpen = true"><Settings2 :size="18" />語音設定</button>
-          </div>
-        </header>
+          </header>
 
-        <section
-          class="topic-stage"
-          :aria-labelledby="`topic-${activeTopic.id}`"
-          @touchstart.passive="swipe.onTouchStart"
-          @touchend.passive="swipe.onTouchEnd"
-          @touchcancel.passive="swipe.onTouchCancel"
-        >
-          <h2 :id="`topic-${activeTopic.id}`" class="sr-only">{{ activeTopic.title }}</h2>
-          <div v-if="activeTopic.type === 'phrases'" class="phrase-grid">
-            <PhraseCard v-for="phrase in activeTopic.phrases" :key="phrase.id" :phrase="phrase" :accent="activeAccent" />
-          </div>
-          <QuantifiersTopic v-else-if="activeTopic.type === 'quantifiers'" :topic="activeTopic" :accent="activeAccent" />
-          <ResourcesTopic v-else :topic="activeTopic" />
-        </section>
+          <section
+            class="topic-stage"
+            :aria-labelledby="`topic-${activeTopic.id}`"
+            @touchstart.passive="swipe.onTouchStart"
+            @touchend.passive="swipe.onTouchEnd"
+            @touchcancel.passive="swipe.onTouchCancel"
+          >
+            <h2 :id="`topic-${activeTopic.id}`" class="sr-only">{{ activeTopic.title }}</h2>
+            <div v-if="activeTopic.type === 'phrases'" class="phrase-grid">
+              <PhraseCard v-for="phrase in activeTopic.phrases" :key="phrase.id" :phrase="phrase" :accent="activeAccent" />
+            </div>
+            <QuantifiersTopic v-else-if="activeTopic.type === 'quantifiers'" :topic="activeTopic" :accent="activeAccent" />
+            <ResourcesTopic v-else :topic="activeTopic" />
+          </section>
 
-        <nav class="page-turner" aria-label="前後主題">
-          <button type="button" :disabled="!previousTopic" @click="goPrevious">
-            <ArrowLeft :size="19" /><span><small>上一個主題</small>{{ previousTopic?.navLabel || '已是第一頁' }}</span>
-          </button>
-          <div aria-hidden="true"><span v-for="topic in allTopics" :key="topic.id" :class="{ active: topic.id === activeTopic.id }"></span></div>
-          <button type="button" :disabled="!nextTopic" @click="goNext">
-            <span><small>下一個主題</small>{{ nextTopic?.navLabel || '旅程完成' }}</span><ArrowRight :size="19" />
-          </button>
-        </nav>
-      </template>
+          <nav class="page-turner" aria-label="前後主題">
+            <button type="button" :disabled="!previousTopic" @click="goPrevious">
+              <ArrowLeft :size="19" /><span><small>上一個主題</small>{{ previousTopic?.navLabel || '已是第一頁' }}</span>
+            </button>
+            <div aria-hidden="true"><span v-for="topic in allTopics" :key="topic.id" :class="{ active: topic.id === activeTopic.id }"></span></div>
+            <button type="button" :disabled="!nextTopic" @click="goNext">
+              <span><small>下一個主題</small>{{ nextTopic?.navLabel || '旅程完成' }}</span><ArrowRight :size="19" />
+            </button>
+          </nav>
+        </div>
+      </Transition>
     </main>
 
     <div v-if="settingsOpen" class="settings-layer" role="presentation" @click.self="settingsOpen = false">
