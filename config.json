@@ -11,6 +11,7 @@
         "bloodStatus",
         "bingeWatching",
         "koreanNote",
+        "koreanNoteV2",
         "mdViewer",
         "menuViewer2026",
         "ayuOrder",
@@ -119,6 +120,13 @@
             "title": "韓語筆記",
             "description": "韓文學習進度與每日單字累積。",
             "stats": "Education"
+        },
+        "koreanNoteV2": {
+            "href": "koreanNoteV2/index.html",
+            "icon": "travel_explore",
+            "title": "Hatarō KoreanNote",
+            "description": "旅途中隨手就能用的韓語筆記，支援主題切換、韓語朗讀與離線閱讀。",
+            "stats": "New Travel Edition"
         },
         "uiPalette": {
             "href": "uiPalette/index.html",

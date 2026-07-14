@@ -1,0 +1,36 @@
+export const quantifiersTopic = {
+  id: 'quantifiers',
+  displayOrder: 7,
+  navLabel: '數量量詞',
+  title: '數量＋量詞句型',
+  accentColor: 'orange',
+  type: 'quantifiers',
+  pattern: {
+    parts: ['[名詞]', '[數字＋量詞]', '주세요'],
+    translation: '請給我 [幾份／幾杯／幾個] [名詞]。',
+  },
+  counters: [
+    ['잔', 'jan', '杯（飲料）'],
+    ['개', 'gae', '個（物品）'],
+    ['병', 'byeong', '瓶'],
+    ['그릇', 'geureut', '碗'],
+    ['접시', 'jeopshi', '盤'],
+    ['인분', 'inbun', '人份（餐點）'],
+    ['장', 'jang', '張（票券）'],
+    ['권', 'gwon', '本（書籍）'],
+    ['켤레', 'kyeolle', '雙（鞋襪）'],
+    ['벌', 'beol', '件（衣服）'],
+  ],
+  numbers: [
+    ['1', '한', 'han'], ['2', '두', 'du'], ['3', '세', 'se'], ['4', '네', 'ne'], ['5', '다섯', 'daseot'],
+    ['6', '여섯', 'yeoseot'], ['7', '일곱', 'ilgop'], ['8', '여덟', 'yeodeol'], ['9', '아홉', 'ahop'], ['10', '열', 'yeol'],
+  ],
+  phrases: [
+    { id: 'quantifiers-01', cardTitle: '一杯水', korean: '물 한잔 주세요', romanization: 'mul hanjan juseyo', translation: '請給我一杯水。', usageNote: '' },
+    { id: 'quantifiers-02', cardTitle: '兩杯啤酒', korean: '맥주 두잔 주세요', romanization: 'maekju dujan juseyo', translation: '請給我兩杯啤酒。', usageNote: '' },
+    { id: 'quantifiers-03', cardTitle: '三杯咖啡', korean: '커피 세잔 주세요', romanization: 'keopi sejan juseyo', translation: '請給我三杯咖啡。', usageNote: '' },
+    { id: 'quantifiers-04', cardTitle: '兩份紫菜飯捲', korean: '김밥 두개 주세요', romanization: 'gimbap dugae juseyo', translation: '請給我兩份紫菜飯捲。', usageNote: '' },
+    { id: 'quantifiers-05', cardTitle: '一碗拉麵', korean: '라면 한그릇 주세요', romanization: 'ramyeon hangeureut juseyo', translation: '請給我一碗拉麵。', usageNote: '' },
+    { id: 'quantifiers-06', cardTitle: '一瓶汽水', korean: '사이다 한병 주세요', romanization: 'saida hanbyeong juseyo', translation: '請給我一瓶汽水。', usageNote: '' },
+  ],
+}
