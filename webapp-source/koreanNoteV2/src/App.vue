@@ -253,7 +253,8 @@ onBeforeUnmount(() => {
         <fieldset>
           <legend>朗讀速度</legend>
           <label :class="{ selected: rate === 1 }"><input type="radio" name="speech-rate" :checked="rate === 1" @change="setRate(1)" /><span><Check :size="16" />正常</span><small>適合跟讀與日常確認</small></label>
-          <label :class="{ selected: rate === 0.72 }"><input type="radio" name="speech-rate" :checked="rate === 0.72" @change="setRate(0.72)" /><span><Check :size="16" />慢速</span><small>拆解發音、第一次練習</small></label>
+          <label :class="{ selected: rate === 0.75 }"><input type="radio" name="speech-rate" :checked="rate === 0.75" @change="setRate(0.75)" /><span><Check :size="16" />慢速</span><small>放慢句子，適合跟讀練習</small></label>
+          <label :class="{ selected: rate === 0.6 }"><input type="radio" name="speech-rate" :checked="rate === 0.6" @change="setRate(0.6)" /><span><Check :size="16" />逐字練習</span><small>更清楚拆解每個音節</small></label>
         </fieldset>
 
         <label v-if="voices.length > 1" class="voice-select">

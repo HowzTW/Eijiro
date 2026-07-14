@@ -19,7 +19,8 @@ function savePreference(key, value) {
   }
 }
 
-const rate = ref(Number(readPreference('hataro-korean-note:speech-rate')) || 1)
+const savedRate = Number(readPreference('hataro-korean-note:speech-rate'))
+const rate = ref(savedRate === 0.72 ? 0.75 : [1, 0.75, 0.6].includes(savedRate) ? savedRate : 1)
 const selectedVoiceURI = ref(readPreference('hataro-korean-note:voice'))
 
 function refreshVoices() {
