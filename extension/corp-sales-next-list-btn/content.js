@@ -43,7 +43,17 @@
     if (msg && msg.type === 'auto-tick') runAutoCycle();
   });
 
-  const SVG_BULB = `<svg viewBox="0 0 24 24"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>`;
+  // 注入 Google Material Icons 字型（實心／線框兩種樣式）
+  function ensureMaterialIconFont(family) {
+    const href = `https://fonts.googleapis.com/icon?family=${family}`;
+    if (document.querySelector(`link[href="${href}"]`)) return;
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    document.head.appendChild(link);
+  }
+  ensureMaterialIconFont('Material+Icons');
+  ensureMaterialIconFont('Material+Icons+Outlined');
 
   let _statusLightEl = null;
   let _focusListenersAdded = false;
@@ -51,8 +61,8 @@
   function updateStatusLight() {
     if (!_statusLightEl) return;
     const focused = document.hasFocus() && document.visibilityState === 'visible';
-    _statusLightEl.innerHTML = SVG_BULB;
-    _statusLightEl.classList.toggle('is-on', focused);
+    _statusLightEl.innerHTML = '<span>wb_sunny</span>';
+    _statusLightEl.firstElementChild.className = focused ? 'material-icons' : 'material-icons-outlined';
   }
 
   // 建立並注入 FAB 按鈕與模式切換 toggle
@@ -98,8 +108,12 @@
       toggle.appendChild(opt);
     });
 
-    container.appendChild(statusLight);
-    container.appendChild(btn);
+    const row = document.createElement('div');
+    row.className = 'next-list-fab-row';
+    row.appendChild(statusLight);
+    row.appendChild(btn);
+
+    container.appendChild(row);
     container.appendChild(toggle);
     document.body.appendChild(container);
   }
