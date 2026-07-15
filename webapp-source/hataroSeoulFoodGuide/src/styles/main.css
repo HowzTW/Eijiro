@@ -114,11 +114,99 @@ a { color: inherit; }
 
 .site-footer { min-height: 160px; padding: 35px 0 80px; display: flex; justify-content: space-between; align-items: flex-start; border-top: 1px solid var(--line); }.site-footer p { margin: 0; color: var(--ink-soft); font-size: 10px; line-height: 1.8; text-align: right; }.wishlist-fab { position: fixed; z-index: 19; right: 22px; bottom: 22px; min-height: 48px; padding: 9px 14px; display: flex; align-items: center; gap: 8px; border: 0; border-radius: 999px; background: var(--ink); color: white; box-shadow: 0 12px 35px rgba(23,63,53,.3); cursor: pointer; }.wishlist-fab span { font-size: 11px; font-weight: 800; }.wishlist-fab strong { display: grid; place-items: center; min-width: 23px; height: 23px; padding: 0 5px; border-radius: 999px; background: var(--orange); font-size: 10px; }
 
+/* Desktop and tablet typography: keep all visible copy at 16px or above. */
+@media (min-width: 721px) {
+  body { font-size: 18px; }
+  .site-header { height: 88px; }
+  .brand__mark { font-size: 20px; }
+  .brand strong { font-size: 22px; }
+  .brand small { font-size: 16px; letter-spacing: .08em; }
+  .site-header nav button { font-size: 18px; }
+  .nav-count { min-width: 28px; height: 28px; font-size: 16px; }
+
+  .home-hero::after { font-size: 16px; letter-spacing: .18em; }
+  .eyebrow { font-size: 16px; line-height: 1.5; letter-spacing: .14em; }
+  .home-hero__subtitle { font-size: 26px; }
+  .home-hero__intro { font-size: 19px; line-height: 1.8; }
+  .hero-button, .primary-button { min-height: 52px; font-size: 18px; }
+  .guide-card small, .guide-card span { font-size: 16px; letter-spacing: .05em; }
+  .guide-card strong { font-size: 29px; }
+  .hero-seal small { font-size: 16px; }
+  .home-hero__stamp span, .home-hero__stamp small { font-size: 16px; letter-spacing: .04em; }
+
+  .guide-stats article { min-height: 132px; }
+  .guide-stats span { font-size: 18px; }
+  .guide-stats small { font-size: 16px; letter-spacing: .08em; }
+  .section-heading > p { font-size: 18px; line-height: 1.75; }
+  .featured-grid button { min-height: 240px; }
+  .featured-grid__number { font-size: 16px; }
+  .featured-grid__tier { width: 36px; height: 36px; font-size: 18px; }
+  .featured-grid strong { font-size: 26px; }
+  .featured-grid > button > span[lang], .featured-grid small { font-size: 16px; line-height: 1.5; }
+
+  .explorer-toolbar { gap: 16px; padding-block: 16px; }
+  .search-field { min-height: 56px; }
+  .search-field input { font-size: 18px; }
+  .sort-field { min-height: 56px; font-size: 16px; }
+  .sort-field select { min-width: 180px; font-size: 17px; }
+  .explorer-layout { grid-template-columns: 270px minmax(0,1fr); gap: 34px; }
+  .filter-panel { padding: 26px 22px; }
+  .filter-panel__heading small { font-size: 16px; }
+  .filter-panel__heading h2 { font-size: 28px; }
+  .field-label, .toggle-list legend, .toggle-list label { font-size: 16px; line-height: 1.45; }
+  .field-label { gap: 8px; margin-bottom: 18px; }
+  .field-label select { height: 50px; font-size: 16px; }
+  .toggle-list { gap: 14px; }
+  .toggle-list input { width: 20px; height: 20px; }
+  .reset-button { min-height: 48px; font-size: 16px; }
+
+  .results-summary { height: 54px; font-size: 16px; }
+  .results-summary strong { font-size: 21px; }
+  .results-summary span { font-size: 16px; }
+  .restaurant-card { padding: 24px; }
+  .pill, .status-pill { min-height: 32px; padding: 6px 10px; font-size: 16px; }
+  .icon-button { width: 42px; height: 42px; }
+  .restaurant-card__names strong { font-size: 29px; line-height: 1.2; }
+  .restaurant-card__names span, .restaurant-card__chef, .restaurant-card__meta { font-size: 16px; line-height: 1.55; }
+  .score-strip { min-height: 64px; }
+  .tier { width: 40px; height: 40px; font-size: 21px; }
+  .score-strip > div strong { font-size: 30px; }
+  .score-strip > div small, .price-level span { font-size: 16px; }
+  .restaurant-card__comment { min-height: 92px; font-size: 19px; line-height: 1.7; }
+  .restaurant-card__flags, .caution-preview { font-size: 16px; line-height: 1.6; }
+  .text-button, .wishlist-button { min-height: 46px; font-size: 16px; }
+
+  .loading-state p, .error-state p, .empty-state p { font-size: 18px; }
+  .detail-hero__names, .detail-hero > p:last-of-type { font-size: 18px; }
+  .detail-score small { font-size: 16px; }
+  .important-notice { font-size: 18px; }
+  .detail-section h3 { font-size: 24px; }
+  .detail-section p { font-size: 18px; }
+  .info-grid dt { font-size: 16px; }
+  .info-grid dd { font-size: 19px; }
+  .info-grid dd small { font-size: 16px; }
+  .feature-chips span { font-size: 16px; }
+  .detail-section blockquote { font-size: 20px; }
+  .caution-list { font-size: 18px; }
+  .external-button { min-height: 48px; font-size: 16px; }
+  .detail-section--sources li { font-size: 16px; line-height: 1.5; }
+  .detail-footer button { min-height: 48px; font-size: 16px; }
+
+  .wishlist-drawer header small { font-size: 16px; }
+  .wishlist-empty p, .wishlist-groups section > h3 { font-size: 16px; }
+  .wishlist-item__main strong { font-size: 21px; }
+  .wishlist-item__main span, .wishlist-item__main small, .wishlist-drawer > footer button { font-size: 16px; }
+  .wishlist-drawer > footer button { min-height: 48px; }
+  .site-footer p { font-size: 16px; }
+  .wishlist-fab span, .wishlist-fab strong { font-size: 16px; }
+  .wishlist-fab strong { min-width: 28px; height: 28px; }
+}
+
 @media (max-width: 960px) {
   .home-hero { min-height: 620px; grid-template-columns: 1fr .72fr; padding-left: 6%; }.home-hero h1 { font-size: 59px; }.home-hero__visual { transform: scale(.87); transform-origin: right center; }
   .guide-stats { width: 92%; }.guide-stats article { padding: 22px 17px; }
   .featured-grid { grid-template-columns: repeat(2,1fr); }.featured-grid button:nth-child(2) { border-right: 0; }.featured-grid button:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
-  .explorer-layout { grid-template-columns: 205px minmax(0,1fr); gap: 20px; }.restaurant-grid { grid-template-columns: 1fr; }
+  .explorer-layout { grid-template-columns: 250px minmax(0,1fr); gap: 20px; }.restaurant-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 720px) {
