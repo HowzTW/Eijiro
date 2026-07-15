@@ -131,7 +131,7 @@ onBeforeUnmount(() => {
       </a>
       <nav aria-label="主要導覽">
         <button type="button" @click="scrollToExplorer">探索餐廳</button>
-        <button type="button" :aria-label="`開啟想去清單，目前 ${wishlist.size} 間`" @click="wishlistOpen = true"><Bookmark :size="18" />想去清單<span class="nav-count">{{ wishlist.size }}</span></button>
+        <button type="button" :aria-label="`開啟想去清單，目前 ${wishlist.size} 間`" @click="wishlistOpen = true"><Bookmark :size="20" /><span class="nav-label">想去清單</span><span class="nav-count">{{ wishlist.size }}</span></button>
       </nav>
     </header>
 
