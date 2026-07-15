@@ -12,6 +12,7 @@
         "bingeWatching",
         "koreanNote",
         "koreanNoteV2",
+        "hataroSeoulFoodGuide",
         "mdViewer",
         "menuViewer2026",
         "ayuOrder",
@@ -127,6 +128,13 @@
             "title": "Hatarō KoreanNote",
             "description": "旅途中隨手就能用的韓語筆記，支援主題切換、韓語朗讀與離線閱讀。",
             "stats": "New Travel Edition"
+        },
+        "hataroSeoulFoodGuide": {
+            "href": "hataroSeoulFoodGuide/index.html",
+            "icon": "restaurant_menu",
+            "title": "哈太郎首爾美食朝聖指南",
+            "description": "《黑白大廚篇》首爾餐廳指南，可依季別、地區、料理與推薦等級探索並建立想去清單。",
+            "stats": "Seoul Food Guide"
         },
         "uiPalette": {
             "href": "uiPalette/index.html",

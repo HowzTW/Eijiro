@@ -1,0 +1,471 @@
+{
+  "metadata": {
+    "title": "哈太郎首爾美食朝聖指南：黑白大廚篇",
+    "version": "1.0.0",
+    "lastUpdated": "2026-07-14",
+    "language": "zh-TW",
+    "currency": "KRW",
+    "recordCount": 18,
+    "scope": "Culinary Class Wars seasons 1 and 2; Seoul restaurants plus selected historical closures"
+  },
+  "enums": {
+    "team": ["white-spoon", "black-spoon"],
+    "status": ["open", "temporarily-closed", "closed", "upcoming", "unknown"],
+    "priorityTier": ["S", "A", "B", "C"],
+    "naverLinkType": ["direct-place", "short-direct", "search", "missing"]
+  },
+  "restaurants": [
+    {
+      "id": "restaurant-evett",
+      "name": {"zhTw": "Restaurant EVETT", "ko": "에빗", "en": "Restaurant EVETT"},
+      "chef": {"nameZhTw": "Joseph Lidgerwood", "nameKo": "조셉 리저우드", "nameEn": "Joseph Lidgerwood", "season": 1, "team": "white-spoon", "showNickname": null, "affiliationStatus": "owner-chef", "affiliationNotes": null},
+      "restaurant": {
+        "status": "open",
+        "cuisine": ["現代韓式", "精緻餐飲"],
+        "description": "以韓國食材、發酵與採集元素重新詮釋的當代套餐，重點在食材故事與感官體驗。",
+        "district": {"zhTw": "江南區", "ko": "강남구", "en": "Gangnam-gu"},
+        "neighborhood": {"zhTw": "狎鷗亭／新沙", "ko": "압구정·신사", "en": "Apgujeong/Sinsa"},
+        "address": {"zhTw": "首爾江南區島山大路45街10-5，1樓", "ko": "서울 강남구 도산대로45길 10-5 1층", "en": "1F, 10-5 Dosan-daero 45-gil, Gangnam-gu, Seoul"},
+        "coordinates": {"latitude": null, "longitude": null}
+      },
+      "booking": {"required": true, "catchTableAvailable": true, "catchTableUrl": "https://www.catchtable.net/shop/evett", "bookingMode": ["reservation"], "bookingDifficulty": 5, "bookingNotes": "需留意訂金與取消期限；近期公開規則為 48 小時前取消。"},
+      "maps": {"naverMapUrl": "https://naver.me/F2Zuq8j6", "naverLinkType": "short-direct", "googleMapsUrl": "https://maps.app.goo.gl/Y7goTa5XoGff3mSR9"},
+      "pricing": {"priceLevel": 5, "lunchKrw": null, "dinnerKrw": null, "averagePerPersonKrw": 300000, "priceNotes": "套餐與 pairing 會調整；數字為不含高階酒搭的預算約值。"},
+      "features": {"fineDining": true, "casual": false, "soloFriendly": false, "alcoholPairing": true, "traditionalLiquor": true, "photoFriendly": true, "englishFriendly": true, "vegetarianOptions": false},
+      "recommendation": {"hataroScore": 4.5, "priorityTier": "S", "worthDetour": true, "bestFor": ["韓國食材創意", "特殊紀念餐", "完整套餐體驗"], "eijiroComment": "不是只靠節目名氣；它把韓國食材做成有敘事、又不失趣味的一整晚。", "cautions": ["價位高", "訂位極難", "特殊飲食限制需事前確認"]},
+      "media": {"officialWebsite": "https://restaurantevett.com/", "instagramUrl": "https://www.instagram.com/restaurantevett"},
+      "sources": [
+        {"label": "CATCHTABLE shop", "url": "https://www.catchtable.net/shop/evett", "checkedAt": "2026-07-14", "supports": ["booking", "open-status"]},
+        {"label": "CATCHTABLE current guide", "url": "https://www.catchtable.net/discovery/culinary-class-war-chefs-restaurants-in-korea.html", "checkedAt": "2026-07-14", "supports": ["address", "hours", "open-status"]},
+        {"label": "Naver Maps", "url": "https://naver.me/F2Zuq8j6", "checkedAt": "2026-07-14", "supports": ["map-link"]}
+      ],
+      "tags": ["第一季", "白湯匙", "江南", "現代韓式", "Fine Dining", "Michelin"]
+    },
+    {
+      "id": "yun-seoul",
+      "name": {"zhTw": "Yun Seoul", "ko": "윤서울", "en": "Yun Seoul"},
+      "chef": {"nameZhTw": "金度潤", "nameKo": "김도윤", "nameEn": "Kim Do-yoon", "season": 1, "team": "white-spoon", "showNickname": null, "affiliationStatus": "owner-chef", "affiliationNotes": null},
+      "restaurant": {
+        "status": "open", "cuisine": ["現代韓式", "發酵料理", "精緻餐飲"],
+        "description": "以發酵、熟成、乾燥與時令韓國食材建立細緻層次的現代韓式套餐。",
+        "district": {"zhTw": "江南區", "ko": "강남구", "en": "Gangnam-gu"},
+        "neighborhood": {"zhTw": "狎鷗亭", "ko": "압구정", "en": "Apgujeong"},
+        "address": {"zhTw": "首爾江南區宣陵路805，1樓", "ko": "서울 강남구 선릉로 805 1층", "en": "1F, 805 Seolleung-ro, Gangnam-gu, Seoul"},
+        "coordinates": {"latitude": null, "longitude": null}
+      },
+      "booking": {"required": true, "catchTableAvailable": true, "catchTableUrl": "https://www.catchtable.net/shop/yunseoul", "bookingMode": ["reservation"], "bookingDifficulty": 5, "bookingNotes": "需提前告知過敏；近期規則為每人至少一杯飲料，包廂另有瓶裝酒條件。"},
+      "maps": {"naverMapUrl": "https://naver.me/FIfsMdk6", "naverLinkType": "short-direct", "googleMapsUrl": "https://maps.app.goo.gl/uJ7FXpuQJomcen7p6"},
+      "pricing": {"priceLevel": 5, "lunchKrw": null, "dinnerKrw": null, "averagePerPersonKrw": 250000, "priceNotes": "套餐與酒／無酒精 pairing 另計，以即時頁面為準。"},
+      "features": {"fineDining": true, "casual": false, "soloFriendly": false, "alcoholPairing": true, "traditionalLiquor": true, "photoFriendly": true, "englishFriendly": true, "vegetarianOptions": false},
+      "recommendation": {"hataroScore": 5, "priorityTier": "S", "worthDetour": true, "bestFor": ["現代韓式", "發酵風味", "安靜專注的套餐"], "eijiroComment": "比起炫技，更像把時間、發酵與調味控制放到桌上；很符合你重作品本身的標準。", "cautions": ["極難訂位", "價位高", "純素需求不適合"]},
+      "media": {"officialWebsite": null, "instagramUrl": "https://www.instagram.com/yunseoul.restaurant"},
+      "sources": [
+        {"label": "CATCHTABLE shop", "url": "https://www.catchtable.net/shop/yunseoul", "checkedAt": "2026-07-14", "supports": ["booking", "open-status"]},
+        {"label": "CATCHTABLE current guide", "url": "https://www.catchtable.net/discovery/culinary-class-war-chefs-restaurants-in-korea.html", "checkedAt": "2026-07-14", "supports": ["address", "booking-rules"]},
+        {"label": "Naver Maps", "url": "https://naver.me/FIfsMdk6", "checkedAt": "2026-07-14", "supports": ["map-link", "place-id"]}
+      ],
+      "tags": ["第一季", "白湯匙", "江南", "現代韓式", "發酵", "Fine Dining"]
+    },
+    {
+      "id": "choi-dot",
+      "name": {"zhTw": "CHOI.", "ko": "쵸이닷", "en": "CHOI. (Choi Dot)"},
+      "chef": {"nameZhTw": "崔鉉碩", "nameKo": "최현석", "nameEn": "Choi Hyun-seok", "season": 1, "team": "white-spoon", "showNickname": null, "affiliationStatus": "owner-chef", "affiliationNotes": null},
+      "restaurant": {
+        "status": "open", "cuisine": ["創意西餐", "義式基底", "精緻餐飲"],
+        "description": "以義式技法為底、加入韓國食材與戲劇化呈現的主廚套餐。",
+        "district": {"zhTw": "江南區", "ko": "강남구", "en": "Gangnam-gu"},
+        "neighborhood": {"zhTw": "清潭洞", "ko": "청담동", "en": "Cheongdam"},
+        "address": {"zhTw": "首爾江南區島山大路457，Angsdom 大樓3樓", "ko": "서울 강남구 도산대로 457 앙스돔빌딩 3층", "en": "3F Angsdom Building, 457 Dosan-daero, Gangnam-gu, Seoul"},
+        "coordinates": {"latitude": null, "longitude": null}
+      },
+      "booking": {"required": true, "catchTableAvailable": true, "catchTableUrl": "https://www.catchtable.net/shop/choidot", "bookingMode": ["reservation"], "bookingDifficulty": 4, "bookingNotes": "適合紀念日；過敏與慶祝文字服務需預先告知。"},
+      "maps": {"naverMapUrl": "https://naver.me/55rmarQu", "naverLinkType": "short-direct", "googleMapsUrl": "https://maps.app.goo.gl/QrPhXJnyuCjgSkko9"},
+      "pricing": {"priceLevel": 5, "lunchKrw": null, "dinnerKrw": null, "averagePerPersonKrw": 200000, "priceNotes": "套餐預算約值，酒搭另計。"},
+      "features": {"fineDining": true, "casual": false, "soloFriendly": false, "alcoholPairing": true, "traditionalLiquor": false, "photoFriendly": true, "englishFriendly": true, "vegetarianOptions": null},
+      "recommendation": {"hataroScore": 4, "priorityTier": "A", "worthDetour": true, "bestFor": ["慶生", "有舞台感的套餐", "節目菜色朝聖"], "eijiroComment": "主廚個人風格鮮明，適合想要一頓有娛樂性、又仍重視技術的晚餐。", "cautions": ["風格較張揚", "價位高"]},
+      "media": {"officialWebsite": null, "instagramUrl": "https://www.instagram.com/choidot_official/"},
+      "sources": [
+        {"label": "CATCHTABLE shop", "url": "https://www.catchtable.net/shop/choidot", "checkedAt": "2026-07-14", "supports": ["booking", "open-status"]},
+        {"label": "VISITKOREA", "url": "https://english.visitkorea.or.kr/svc/contents/infoHtmlView.do?vcontsId=214935", "checkedAt": "2026-07-14", "supports": ["address", "chef"]},
+        {"label": "Naver Maps", "url": "https://naver.me/55rmarQu", "checkedAt": "2026-07-14", "supports": ["map-link", "place-id"]}
+      ],
+      "tags": ["第一季", "白湯匙", "清潭", "創意西餐", "Fine Dining", "Choi Dot"]
+    },
+    {
+      "id": "negi-dining-lounge",
+      "name": {"zhTw": "NEGI Dining Lounge", "ko": "네기다이닝라운지", "en": "NEGI Dining Lounge"},
+      "chef": {"nameZhTw": "張皓俊", "nameKo": "장호준", "nameEn": "Jang Ho-joon", "season": 1, "team": "white-spoon", "showNickname": null, "affiliationStatus": "operator", "affiliationNotes": "NEGI 餐飲品牌旗下代表店之一。"},
+      "restaurant": {
+        "status": "open", "cuisine": ["現代日式", "餐酒館"],
+        "description": "季節海鮮、日式小盤與高球／清酒並重的時尚餐飲酒廊，可單點也可選套餐。",
+        "district": {"zhTw": "江南區", "ko": "강남구", "en": "Gangnam-gu"},
+        "neighborhood": {"zhTw": "新沙洞", "ko": "신사동", "en": "Sinsa"},
+        "address": {"zhTw": "首爾江南區島山大路15街18，4樓", "ko": "서울 강남구 도산대로15길 18 4층", "en": "4F, 18 Dosan-daero 15-gil, Gangnam-gu, Seoul"},
+        "coordinates": {"latitude": null, "longitude": null}
+      },
+      "booking": {"required": true, "catchTableAvailable": true, "catchTableUrl": "https://www.catchtable.net/shop/negitong", "bookingMode": ["reservation", "phone-for-groups"], "bookingDifficulty": 4, "bookingNotes": "近期規則為每位需點一杯飲料；5 人以上與包廂通常需電話確認。"},
+      "maps": {"naverMapUrl": "https://naver.me/GYC924Qg", "naverLinkType": "short-direct", "googleMapsUrl": "https://maps.app.goo.gl/ugpUnyakkTyNmhHr9"},
+      "pricing": {"priceLevel": 4, "lunchKrw": null, "dinnerKrw": 130000, "averagePerPersonKrw": 130000, "priceNotes": "VISITKOREA 曾列晚餐套餐 ₩130,000；單點與酒水另計，請以現況為準。"},
+      "features": {"fineDining": false, "casual": true, "soloFriendly": true, "alcoholPairing": true, "traditionalLiquor": false, "photoFriendly": true, "englishFriendly": true, "vegetarianOptions": null},
+      "recommendation": {"hataroScore": 4, "priorityTier": "A", "worthDetour": false, "bestFor": ["朋友晚餐", "日式小盤配酒", "較放鬆的節目朝聖"], "eijiroComment": "比正式套餐少一點拘束，菜與酒都能自己調整節奏，適合旅行中留一晚慢慢吃。", "cautions": ["需點飲料", "熱門時段可能有用餐時限"]},
+      "media": {"officialWebsite": null, "instagramUrl": "https://www.instagram.com/negi_dining_lounge"},
+      "sources": [
+        {"label": "CATCHTABLE shop", "url": "https://www.catchtable.net/shop/negitong", "checkedAt": "2026-07-14", "supports": ["booking", "open-status"]},
+        {"label": "VISITKOREA", "url": "https://english.visitkorea.or.kr/svc/contents/infoHtmlView.do?vcontsId=214935", "checkedAt": "2026-07-14", "supports": ["address", "price", "chef"]},
+        {"label": "Naver Maps", "url": "https://naver.me/GYC924Qg", "checkedAt": "2026-07-14", "supports": ["map-link"]}
+      ],
+      "tags": ["第一季", "白湯匙", "新沙", "日式", "餐酒館", "可單人"]
+    },
+    {
+      "id": "via-toledo-pasta-bar",
+      "name": {"zhTw": "VIA TOLEDO Pasta Bar", "ko": "비아 톨레도 파스타바", "en": "VIA TOLEDO Pasta Bar"},
+      "chef": {"nameZhTw": "權聖晙", "nameKo": "권성준", "nameEn": "Kwon Seong-jun", "season": 1, "team": "black-spoon", "showNickname": {"zhTw": "拿坡里美味黑手黨", "ko": "나폴리 맛피아", "en": "Napoli Matfia"}, "affiliationStatus": "owner-chef", "affiliationNotes": "第一季冠軍。"},
+      "restaurant": {
+        "status": "open", "cuisine": ["義大利料理", "手工義大利麵", "主廚套餐"],
+        "description": "小型吧台式季節套餐，以拿坡里靈感、手工麵與義大利酒款為核心。",
+        "district": {"zhTw": "龍山區", "ko": "용산구", "en": "Yongsan-gu"},
+        "neighborhood": {"zhTw": "元曉路", "ko": "원효로", "en": "Wonhyo-ro"},
+        "address": {"zhTw": "首爾龍山區元曉路83街7-2，1樓", "ko": "서울 용산구 원효로83길 7-2 1층", "en": "1F, 7-2 Wonhyo-ro 83-gil, Yongsan-gu, Seoul"},
+        "coordinates": {"latitude": null, "longitude": null}
+      },
+      "booking": {"required": true, "catchTableAvailable": true, "catchTableUrl": "https://www.catchtable.net/shop/viatoledo", "bookingMode": ["reservation", "instagram-announcement"], "bookingDifficulty": 5, "bookingNotes": "CatchTable 店家頁存在，但近期公開資訊曾註明預約暫停；以官方 Instagram 的開放公告為準。"},
+      "maps": {"naverMapUrl": "https://naver.me/xcnarJcM", "naverLinkType": "short-direct", "googleMapsUrl": "https://maps.app.goo.gl/1dCms99832XYj3Tc9"},
+      "pricing": {"priceLevel": 4, "lunchKrw": null, "dinnerKrw": null, "averagePerPersonKrw": 150000, "priceNotes": "季節套餐與酒水會變動；預算約值。"},
+      "features": {"fineDining": true, "casual": false, "soloFriendly": true, "alcoholPairing": true, "traditionalLiquor": false, "photoFriendly": true, "englishFriendly": null, "vegetarianOptions": null},
+      "recommendation": {"hataroScore": 4.5, "priorityTier": "S", "worthDetour": true, "bestFor": ["第一季冠軍朝聖", "手工義大利麵", "吧台套餐"], "eijiroComment": "名氣只是入口，真正值得的是小空間裡完整而有個性的義大利麵套餐。", "cautions": ["極難取得席位", "酒類可能為必要消費", "開放方式可能變動"]},
+      "media": {"officialWebsite": null, "instagramUrl": "https://www.instagram.com/viatoledo_official/"},
+      "sources": [
+        {"label": "CATCHTABLE shop", "url": "https://www.catchtable.net/shop/viatoledo", "checkedAt": "2026-07-14", "supports": ["listing", "booking-link"]},
+        {"label": "CATCHTABLE current guide", "url": "https://www.catchtable.net/discovery/the-restaurants-behind-culinary-class-war-chefs.html", "checkedAt": "2026-07-14", "supports": ["address", "booking-caution", "open-status"]},
+        {"label": "Naver Maps", "url": "https://naver.me/xcnarJcM", "checkedAt": "2026-07-14", "supports": ["map-link"]}
+      ],
+      "tags": ["第一季", "黑湯匙", "冠軍", "龍山", "義大利麵", "Fine Dining"]
+    },
+    {
+      "id": "trid",
+      "name": {"zhTw": "trid", "ko": "트리드", "en": "trid"},
+      "chef": {"nameZhTw": "姜勝元", "nameKo": "강승원", "nameEn": "Kang Seung-won", "season": 1, "team": "black-spoon", "showNickname": {"zhTw": "三星", "ko": "트리플 스타", "en": "Triple Star"}, "affiliationStatus": "owner-chef", "affiliationNotes": null},
+      "restaurant": {
+        "status": "open", "cuisine": ["當代料理", "精緻餐飲"],
+        "description": "技法精準、擺盤細緻的當代套餐，以國際 fine-dining 經驗轉化為首爾式餐桌。",
+        "district": {"zhTw": "江南區", "ko": "강남구", "en": "Gangnam-gu"},
+        "neighborhood": {"zhTw": "清潭洞", "ko": "청담동", "en": "Cheongdam"},
+        "address": {"zhTw": "首爾江南區宣陵路162街16，2樓", "ko": "서울 강남구 선릉로162길 16 2층", "en": "2F, 16 Seolleung-ro 162-gil, Gangnam-gu, Seoul"},
+        "coordinates": {"latitude": null, "longitude": null}
+      },
+      "booking": {"required": true, "catchTableAvailable": true, "catchTableUrl": "https://www.catchtable.net/shop/trid", "bookingMode": ["reservation"], "bookingDifficulty": 5, "bookingNotes": "座位少，建議掌握每月開放時間；取消與遲到規則嚴格。"},
+      "maps": {"naverMapUrl": "https://naver.me/5S9QJFdy", "naverLinkType": "short-direct", "googleMapsUrl": "https://maps.app.goo.gl/F1mgCFUAgZL2kqku8"},
+      "pricing": {"priceLevel": 5, "lunchKrw": null, "dinnerKrw": null, "averagePerPersonKrw": 250000, "priceNotes": "套餐預算約值；飲料另計。"},
+      "features": {"fineDining": true, "casual": false, "soloFriendly": false, "alcoholPairing": true, "traditionalLiquor": false, "photoFriendly": true, "englishFriendly": true, "vegetarianOptions": null},
+      "recommendation": {"hataroScore": 4, "priorityTier": "A", "worthDetour": true, "bestFor": ["技術型 Fine Dining", "精緻擺盤", "紀念餐"], "eijiroComment": "如果想看節目中的精準度如何落到正式套餐，這家最直接；但它不是輕鬆隨興的一餐。", "cautions": ["訂位極難", "價位高"]},
+      "media": {"officialWebsite": null, "instagramUrl": "https://www.instagram.com/tridseoul"},
+      "sources": [
+        {"label": "CATCHTABLE shop", "url": "https://www.catchtable.net/shop/trid", "checkedAt": "2026-07-14", "supports": ["booking", "open-status"]},
+        {"label": "CATCHTABLE current guide", "url": "https://www.catchtable.net/discovery/the-restaurants-behind-culinary-class-war-chefs.html", "checkedAt": "2026-07-14", "supports": ["address", "hours"]},
+        {"label": "Naver Maps", "url": "https://naver.me/5S9QJFdy", "checkedAt": "2026-07-14", "supports": ["map-link"]}
+      ],
+      "tags": ["第一季", "黑湯匙", "三星", "清潭", "Fine Dining"]
+    },
+    {
+      "id": "doryang",
+      "name": {"zhTw": "Doryang", "ko": "도량", "en": "Doryang"},
+      "chef": {"nameZhTw": "林泰勳", "nameKo": "임태훈", "nameEn": "Lim Tae-hoon", "season": 1, "team": "black-spoon", "showNickname": {"zhTw": "鐵包料理師", "ko": "철가방 요리사", "en": "Self-Made Chef"}, "affiliationStatus": "owner-chef", "affiliationNotes": null},
+      "restaurant": {
+        "status": "open", "cuisine": ["中華料理", "個人鍋"],
+        "description": "以紅、白、黃三種湯底的個人鍋為招牌，也供應東坡肉、孜然羊肉等中華菜。",
+        "district": {"zhTw": "鐘路區", "ko": "종로구", "en": "Jongno-gu"},
+        "neighborhood": {"zhTw": "西村／景福宮", "ko": "서촌·경복궁", "en": "Seochon/Gyeongbokgung"},
+        "address": {"zhTw": "首爾鐘路區紫霞門路6街6", "ko": "서울 종로구 자하문로6길 6", "en": "6 Jahamun-ro 6-gil, Jongno-gu, Seoul"},
+        "coordinates": {"latitude": null, "longitude": null}
+      },
+      "booking": {"required": false, "catchTableAvailable": true, "catchTableUrl": "https://www.catchtable.net/shop/dolyang", "bookingMode": ["reservation", "walk-in", "onsite-waitlist"], "bookingDifficulty": 4, "bookingNotes": "大廳多為 90 分鐘；包廂需預選湯底與肉，現場候位有固定登記時段。"},
+      "maps": {"naverMapUrl": "https://naver.me/FG7xdR6A", "naverLinkType": "short-direct", "googleMapsUrl": "https://maps.app.goo.gl/hS8Nt73e19Xd6Gm19"},
+      "pricing": {"priceLevel": 2, "lunchKrw": null, "dinnerKrw": null, "averagePerPersonKrw": 45000, "priceNotes": "依湯底、肉類與加點變動；為規劃預算約值。"},
+      "features": {"fineDining": false, "casual": true, "soloFriendly": true, "alcoholPairing": false, "traditionalLiquor": false, "photoFriendly": true, "englishFriendly": null, "vegetarianOptions": null},
+      "recommendation": {"hataroScore": 4.5, "priorityTier": "A", "worthDetour": true, "bestFor": ["西村行程", "較平價朝聖", "一人一鍋"], "eijiroComment": "比 fine dining 更容易排進旅行，也有清楚的招牌體驗；作品本身足以支持這趟繞路。", "cautions": ["熱門時段候位長", "包廂規則較多", "用餐時限"]},
+      "media": {"officialWebsite": null, "instagramUrl": "https://www.instagram.com/doryang_restaurant/"},
+      "sources": [
+        {"label": "CATCHTABLE shop", "url": "https://www.catchtable.net/shop/dolyang", "checkedAt": "2026-07-14", "supports": ["booking", "open-status"]},
+        {"label": "CATCHTABLE current Gwanghwamun guide", "url": "https://www.catchtable.net/discovery/koreas-famous-restaurants-in-gwanghwamun-seoul-with-catchtable-global-data.html", "checkedAt": "2026-07-14", "supports": ["address", "hours", "rules"]},
+        {"label": "Naver Maps", "url": "https://naver.me/FG7xdR6A", "checkedAt": "2026-07-14", "supports": ["map-link"]}
+      ],
+      "tags": ["第一季", "黑湯匙", "西村", "中華", "個人鍋", "可單人"]
+    },
+    {
+      "id": "chokwang201",
+      "name": {"zhTw": "ChoKwang201", "ko": "조광201", "en": "ChoKwang201"},
+      "chef": {"nameZhTw": "趙光孝", "nameKo": "조광효", "nameEn": "Cho Kwang-hyo", "season": 1, "team": "black-spoon", "showNickname": {"zhTw": "漫畫男", "ko": "만찢남", "en": "Comic Book Chef"}, "affiliationStatus": "owner-chef", "affiliationNotes": null},
+      "restaurant": {
+        "status": "open", "cuisine": ["四川料理", "創意中華"],
+        "description": "將漫畫中的中華菜靈感做成現實，招牌為限量東坡肉與四川風味菜。",
+        "district": {"zhTw": "松坡區", "ko": "송파구", "en": "Songpa-gu"},
+        "neighborhood": {"zhTw": "文井／長旨", "ko": "문정·장지", "en": "Munjeong/Jangji"},
+        "address": {"zhTw": "首爾松坡區新馬路8街13", "ko": "서울 송파구 새말로8길 13", "en": "13 Saemal-ro 8-gil, Songpa-gu, Seoul"},
+        "coordinates": {"latitude": null, "longitude": null}
+      },
+      "booking": {"required": true, "catchTableAvailable": true, "catchTableUrl": "https://www.catchtable.net/shop/cho__kwang", "bookingMode": ["reservation"], "bookingDifficulty": 5, "bookingNotes": "僅透過 CatchTable 預約；用餐約 100 分鐘，遲到可能視為 no-show，限量菜可能售罄。"},
+      "maps": {"naverMapUrl": "https://naver.me/5XJIY6zk", "naverLinkType": "short-direct", "googleMapsUrl": "https://maps.app.goo.gl/WWRCQcEiWp3fRWGZA"},
+      "pricing": {"priceLevel": 3, "lunchKrw": null, "dinnerKrw": null, "averagePerPersonKrw": 70000, "priceNotes": "依人數與點菜量變動；為規劃預算約值。"},
+      "features": {"fineDining": false, "casual": true, "soloFriendly": false, "alcoholPairing": false, "traditionalLiquor": false, "photoFriendly": true, "englishFriendly": null, "vegetarianOptions": null},
+      "recommendation": {"hataroScore": 4.5, "priorityTier": "A", "worthDetour": true, "bestFor": ["多人分享", "招牌東坡肉", "漫畫料理朝聖"], "eijiroComment": "概念有趣，但不是只有噱頭；若能吃到招牌東坡肉，專程去松坡才真正有意義。", "cautions": ["位置離主要觀光區較遠", "訂位極難", "招牌菜可能售罄"]},
+      "media": {"officialWebsite": null, "instagramUrl": "https://www.instagram.com/cho__kwang/"},
+      "sources": [
+        {"label": "CATCHTABLE shop", "url": "https://www.catchtable.net/shop/cho__kwang", "checkedAt": "2026-07-14", "supports": ["booking", "open-status"]},
+        {"label": "CATCHTABLE current chef guide", "url": "https://www.catchtable.net/discovery/top-tables-in-korea-by-culinary-class-war-chefs.html", "checkedAt": "2026-07-14", "supports": ["address", "hours", "rules"]},
+        {"label": "Naver Maps", "url": "https://naver.me/5XJIY6zk", "checkedAt": "2026-07-14", "supports": ["map-link"]}
+      ],
+      "tags": ["第一季", "黑湯匙", "松坡", "四川料理", "東坡肉", "多人"]
+    },
+    {
+      "id": "soul-dining",
+      "name": {"zhTw": "SOUL", "ko": "소울", "en": "SOUL"},
+      "chef": {"nameZhTw": "金熙恩", "nameKo": "김희은", "nameEn": "Kim Hee-eun", "season": 2, "team": "white-spoon", "showNickname": null, "affiliationStatus": "executive-chef", "affiliationNotes": null},
+      "restaurant": {
+        "status": "open", "cuisine": ["當代韓式", "精緻餐飲"],
+        "description": "以韓國記憶、季節食材與現代技法組成具故事性的套餐。",
+        "district": {"zhTw": "龍山區", "ko": "용산구", "en": "Yongsan-gu"},
+        "neighborhood": {"zhTw": "解放村", "ko": "해방촌", "en": "Haebangchon"},
+        "address": {"zhTw": "首爾龍山區新興路26街35，地下1樓", "ko": "서울 용산구 신흥로26길 35 지하1층", "en": "B1F, 35 Sinheung-ro 26-gil, Yongsan-gu, Seoul"},
+        "coordinates": {"latitude": null, "longitude": null}
+      },
+      "booking": {"required": true, "catchTableAvailable": true, "catchTableUrl": "https://www.catchtable.net/shop/souldining", "bookingMode": ["reservation"], "bookingDifficulty": 5, "bookingNotes": "小型 fine dining，座位有限；過敏與飲食限制應事前告知。"},
+      "maps": {"naverMapUrl": "https://naver.me/FdCxW0oV", "naverLinkType": "short-direct", "googleMapsUrl": "https://maps.app.goo.gl/ZiDiLHGjLazGkjKZ8"},
+      "pricing": {"priceLevel": 5, "lunchKrw": null, "dinnerKrw": null, "averagePerPersonKrw": 200000, "priceNotes": "套餐預算約值；飲料另計。"},
+      "features": {"fineDining": true, "casual": false, "soloFriendly": false, "alcoholPairing": true, "traditionalLiquor": true, "photoFriendly": true, "englishFriendly": true, "vegetarianOptions": null},
+      "recommendation": {"hataroScore": 4.5, "priorityTier": "S", "worthDetour": true, "bestFor": ["當代韓式", "故事型套餐", "解放村夜晚"], "eijiroComment": "餐廳自己的敘事與完成度足以獨立成立，不需要靠節目濾鏡。", "cautions": ["價位高", "訂位難"]},
+      "media": {"officialWebsite": null, "instagramUrl": "https://www.instagram.com/souldining_seoul/"},
+      "sources": [
+        {"label": "CATCHTABLE shop", "url": "https://www.catchtable.net/shop/souldining", "checkedAt": "2026-07-14", "supports": ["booking", "open-status"]},
+        {"label": "CATCHTABLE season 2 guide", "url": "https://www.catchtable.net/discovery/culinary-class-wars-2-restaurants-of-the-hottest-chefs-black-white-alliance-match-teams-of-two-2.html", "checkedAt": "2026-07-14", "supports": ["address", "hours", "chef"]},
+        {"label": "Naver Maps", "url": "https://naver.me/FdCxW0oV", "checkedAt": "2026-07-14", "supports": ["map-link"]}
+      ],
+      "tags": ["第二季", "白湯匙", "解放村", "當代韓式", "Fine Dining"]
+    },
+    {
+      "id": "eatanic-garden",
+      "name": {"zhTw": "Eatanic Garden", "ko": "이타닉 가든", "en": "Eatanic Garden"},
+      "chef": {"nameZhTw": "孫鍾元", "nameKo": "손종원", "nameEn": "Son Jong-won", "season": 2, "team": "white-spoon", "showNickname": null, "affiliationStatus": "executive-chef", "affiliationNotes": "同時領導 L’Amant Secret。"},
+      "restaurant": {
+        "status": "open", "cuisine": ["當代韓式", "精緻餐飲"],
+        "description": "在 Josun Palace 高樓層以韓國食材與植物意象打造藝術感強烈的套餐。",
+        "district": {"zhTw": "江南區", "ko": "강남구", "en": "Gangnam-gu"},
+        "neighborhood": {"zhTw": "驛三洞", "ko": "역삼동", "en": "Yeoksam"},
+        "address": {"zhTw": "首爾江南區德黑蘭路231，Josun Palace 36樓", "ko": "서울 강남구 테헤란로 231 조선 팰리스 36층", "en": "36F, Josun Palace, 231 Teheran-ro, Gangnam-gu, Seoul"},
+        "coordinates": {"latitude": null, "longitude": null}
+      },
+      "booking": {"required": true, "catchTableAvailable": true, "catchTableUrl": "https://www.catchtable.net/shop/eatanicgarden", "bookingMode": ["reservation", "phone-for-private-room"], "bookingDifficulty": 5, "bookingNotes": "一般訂位由 CatchTable 處理；包廂可能需電話或電郵聯繫。"},
+      "maps": {"naverMapUrl": "https://naver.me/GbDRmKbo", "naverLinkType": "short-direct", "googleMapsUrl": "https://maps.app.goo.gl/kTkaZWuwVfyyFDE37"},
+      "pricing": {"priceLevel": 5, "lunchKrw": null, "dinnerKrw": null, "averagePerPersonKrw": 300000, "priceNotes": "酒店 fine dining 套餐預算約值；飲料另計。"},
+      "features": {"fineDining": true, "casual": false, "soloFriendly": false, "alcoholPairing": true, "traditionalLiquor": true, "photoFriendly": true, "englishFriendly": true, "vegetarianOptions": null},
+      "recommendation": {"hataroScore": 4, "priorityTier": "A", "worthDetour": true, "bestFor": ["藝術型套餐", "景觀", "重要紀念日"], "eijiroComment": "視覺、空間與料理是一整套體驗；若你不想只為名氣花錢，先確認當季菜單是否真的打中你。", "cautions": ["預算很高", "酒店氛圍較正式", "訂位極難"]},
+      "media": {"officialWebsite": "https://jpg.josunhotel.com/dining/eatanicGarden.do", "instagramUrl": "https://www.instagram.com/eatanicgarden/"},
+      "sources": [
+        {"label": "CATCHTABLE shop", "url": "https://www.catchtable.net/shop/eatanicgarden", "checkedAt": "2026-07-14", "supports": ["booking", "open-status"]},
+        {"label": "CATCHTABLE season 2 guide", "url": "https://www.catchtable.net/discovery/culinary-class-wars-2-restaurants-of-the-hottest-chefs-black-white-alliance-match-teams-of-two-1.html", "checkedAt": "2026-07-14", "supports": ["address", "booking-policy", "chef"]},
+        {"label": "Naver Maps", "url": "https://naver.me/GbDRmKbo", "checkedAt": "2026-07-14", "supports": ["map-link"]}
+      ],
+      "tags": ["第二季", "白湯匙", "江南", "酒店", "當代韓式", "Fine Dining"]
+    },
+    {
+      "id": "soigne-seoul",
+      "name": {"zhTw": "Soigné", "ko": "스와니예", "en": "Soigné"},
+      "chef": {"nameZhTw": "李駿", "nameKo": "이준", "nameEn": "Jun Lee", "season": 2, "team": "white-spoon", "showNickname": null, "affiliationStatus": "owner-chef", "affiliationNotes": null},
+      "restaurant": {
+        "status": "open", "cuisine": ["Seoul Cuisine", "當代料理", "精緻餐飲"],
+        "description": "以 Episode 形式更換主題的 Seoul Cuisine 套餐，強調城市記憶與跨文化創作。",
+        "district": {"zhTw": "江南區", "ko": "강남구", "en": "Gangnam-gu"},
+        "neighborhood": {"zhTw": "新沙洞", "ko": "신사동", "en": "Sinsa"},
+        "address": {"zhTw": "首爾江南區江南大路652，Sinsa Square 2樓201號", "ko": "서울 강남구 강남대로 652 신사스퀘어 2층 201호", "en": "Unit 201, 2F Sinsa Square, 652 Gangnam-daero, Gangnam-gu, Seoul"},
+        "coordinates": {"latitude": null, "longitude": null}
+      },
+      "booking": {"required": true, "catchTableAvailable": true, "catchTableUrl": "https://www.catchtable.net/shop/soigneseoul", "bookingMode": ["reservation"], "bookingDifficulty": 5, "bookingNotes": "席位競爭極高；需依 CatchTable 公告掌握開放時間。"},
+      "maps": {"naverMapUrl": "https://naver.me/FCA8bpR6", "naverLinkType": "short-direct", "googleMapsUrl": "https://maps.app.goo.gl/m1H7k524phzpSC1b8"},
+      "pricing": {"priceLevel": 5, "lunchKrw": null, "dinnerKrw": null, "averagePerPersonKrw": 250000, "priceNotes": "Episode 套餐價格會調整；預算約值。"},
+      "features": {"fineDining": true, "casual": false, "soloFriendly": false, "alcoholPairing": true, "traditionalLiquor": true, "photoFriendly": true, "englishFriendly": true, "vegetarianOptions": null},
+      "recommendation": {"hataroScore": 5, "priorityTier": "S", "worthDetour": true, "bestFor": ["首爾代表性 Fine Dining", "主題套餐", "料理故事"], "eijiroComment": "如果只選一間高價位節目餐廳，這家最像一個完整作品，而不是名人餐廳。", "cautions": ["極難訂位", "價位高", "主題菜單可能影響喜好"]},
+      "media": {"officialWebsite": "https://soigneseoul.com/", "instagramUrl": "https://www.instagram.com/soigneseoul"},
+      "sources": [
+        {"label": "CATCHTABLE shop", "url": "https://www.catchtable.net/shop/soigneseoul", "checkedAt": "2026-07-14", "supports": ["booking", "open-status"]},
+        {"label": "AP reporting", "url": "https://apnews.com/article/1c1c0712ab15de28c676a28787a79ce2", "checkedAt": "2026-07-14", "supports": ["chef", "season", "booking-demand"]},
+        {"label": "Naver Maps", "url": "https://naver.me/FCA8bpR6", "checkedAt": "2026-07-14", "supports": ["map-link", "place-id"]}
+      ],
+      "tags": ["第二季", "白湯匙", "新沙", "Seoul Cuisine", "Fine Dining"]
+    },
+    {
+      "id": "cheonsang",
+      "name": {"zhTw": "CheonSang", "ko": "천상현의 천상", "en": "CheonSang by Cheon Sang-hyun"},
+      "chef": {"nameZhTw": "千尚鉉", "nameKo": "천상현", "nameEn": "Cheon Sang-hyun", "season": 2, "team": "white-spoon", "showNickname": null, "affiliationStatus": "owner-chef", "affiliationNotes": "曾任青瓦台總括主廚。"},
+      "restaurant": {
+        "status": "open", "cuisine": ["現代中華", "套餐"],
+        "description": "以清晰高湯、海鮮與細緻鑊氣呈現的現代中華料理。",
+        "district": {"zhTw": "瑞草區", "ko": "서초구", "en": "Seocho-gu"},
+        "neighborhood": {"zhTw": "良才洞", "ko": "양재동", "en": "Yangjae"},
+        "address": {"zhTw": "首爾瑞草區梅軒路16，High Brand La Cittadella Moda 6樓", "ko": "서울 서초구 매헌로 16 하이브랜드 6층", "en": "6F High Brand, 16 Maeheon-ro, Seocho-gu, Seoul"},
+        "coordinates": {"latitude": null, "longitude": null}
+      },
+      "booking": {"required": true, "catchTableAvailable": true, "catchTableUrl": "https://www.catchtable.net/shop/cheonsang", "bookingMode": ["reservation", "phone"], "bookingDifficulty": 3, "bookingNotes": "週末建議預約；大型團體或當日席位可電話確認。"},
+      "maps": {"naverMapUrl": "https://naver.me/5wWeZa75", "naverLinkType": "short-direct", "googleMapsUrl": "https://maps.app.goo.gl/T7aG95VE65K1LNcQA"},
+      "pricing": {"priceLevel": 3, "lunchKrw": null, "dinnerKrw": null, "averagePerPersonKrw": 80000, "priceNotes": "依單點或套餐變動；為規劃預算約值。"},
+      "features": {"fineDining": false, "casual": false, "soloFriendly": false, "alcoholPairing": false, "traditionalLiquor": false, "photoFriendly": true, "englishFriendly": null, "vegetarianOptions": null},
+      "recommendation": {"hataroScore": 3.5, "priorityTier": "B", "worthDetour": false, "bestFor": ["中華套餐", "家族聚餐", "較容易安排的白湯匙餐廳"], "eijiroComment": "履歷很有故事，菜路也穩；但若首爾餐數有限，我會先選更有城市獨特性的餐廳。", "cautions": ["離主要觀光區較遠", "商場型環境"]},
+      "media": {"officialWebsite": null, "instagramUrl": null},
+      "sources": [
+        {"label": "CATCHTABLE shop", "url": "https://www.catchtable.net/shop/cheonsang", "checkedAt": "2026-07-14", "supports": ["booking", "open-status"]},
+        {"label": "CATCHTABLE season 2 guide", "url": "https://www.catchtable.net/discovery/culinary-class-wars-2-restaurants-of-the-hottest-chefs-black-white-alliance-match-teams-of-two-1.html", "checkedAt": "2026-07-14", "supports": ["address", "hours", "chef"]},
+        {"label": "Naver Maps", "url": "https://naver.me/5wWeZa75", "checkedAt": "2026-07-14", "supports": ["map-link"]}
+      ],
+      "tags": ["第二季", "白湯匙", "良才", "中華料理", "青瓦台"]
+    },
+    {
+      "id": "haobin",
+      "name": {"zhTw": "Haobin", "ko": "호빈", "en": "Haobin"},
+      "chef": {"nameZhTw": "侯德竹", "nameKo": "후덕죽", "nameEn": "Hoo Deok-juk", "season": 2, "team": "white-spoon", "showNickname": null, "affiliationStatus": "executive-chef", "affiliationNotes": "位於 Ambassador Seoul Pullman。"},
+      "restaurant": {
+        "status": "open", "cuisine": ["粵菜", "精緻中華", "酒店餐飲"],
+        "description": "以清湯、海鮮與傳統粵菜技法見長的酒店中餐廳。",
+        "district": {"zhTw": "中區", "ko": "중구", "en": "Jung-gu"},
+        "neighborhood": {"zhTw": "獎忠洞", "ko": "장충동", "en": "Jangchung-dong"},
+        "address": {"zhTw": "首爾中區東湖路287，Ambassador Seoul Pullman 2樓", "ko": "서울 중구 동호로 287 앰배서더 서울 풀만 2층", "en": "2F, Ambassador Seoul Pullman, 287 Dongho-ro, Jung-gu, Seoul"},
+        "coordinates": {"latitude": null, "longitude": null}
+      },
+      "booking": {"required": true, "catchTableAvailable": true, "catchTableUrl": "https://www.catchtable.net/shop/theambassador_haobin", "bookingMode": ["reservation", "phone"], "bookingDifficulty": 4, "bookingNotes": "當日與 4 人以上訂位可能需致電；遵守飯店 smart-casual 規範。"},
+      "maps": {"naverMapUrl": "https://naver.me/x3jFmEYo", "naverLinkType": "short-direct", "googleMapsUrl": "https://maps.app.goo.gl/hbYMHusvkWnoHXg98"},
+      "pricing": {"priceLevel": 5, "lunchKrw": null, "dinnerKrw": null, "averagePerPersonKrw": 200000, "priceNotes": "酒店粵菜單點或套餐差異大；預算約值。"},
+      "features": {"fineDining": true, "casual": false, "soloFriendly": false, "alcoholPairing": true, "traditionalLiquor": false, "photoFriendly": true, "englishFriendly": true, "vegetarianOptions": null},
+      "recommendation": {"hataroScore": 4, "priorityTier": "A", "worthDetour": true, "bestFor": ["高水準粵菜", "正式聚餐", "酒店服務"], "eijiroComment": "如果想吃的是紮實粵菜，而不是節目同款，這家本身就有足夠理由成立。", "cautions": ["價位高", "較正式", "一人用餐不理想"]},
+      "media": {"officialWebsite": "https://www.ambatel.com/theambassador/seoul/en/dining/Haobin.do", "instagramUrl": "https://www.instagram.com/theambassador_haobin/"},
+      "sources": [
+        {"label": "CATCHTABLE shop", "url": "https://www.catchtable.net/shop/theambassador_haobin", "checkedAt": "2026-07-14", "supports": ["booking", "open-status"]},
+        {"label": "CATCHTABLE season 2 guide", "url": "https://www.catchtable.net/discovery/culinary-class-wars-2-restaurants-of-the-hottest-chefs-black-white-alliance-match-teams-of-two-1.html", "checkedAt": "2026-07-14", "supports": ["address", "hours", "chef"]},
+        {"label": "Naver Maps", "url": "https://naver.me/x3jFmEYo", "checkedAt": "2026-07-14", "supports": ["map-link"]}
+      ],
+      "tags": ["第二季", "白湯匙", "中區", "粵菜", "酒店", "Fine Dining"]
+    },
+    {
+      "id": "original-numbers",
+      "name": {"zhTw": "Original Numbers", "ko": "오리지널 넘버스", "en": "Original Numbers"},
+      "chef": {"nameZhTw": "李燦陽", "nameKo": "이찬양", "nameEn": "Lee Chan-yang", "season": 2, "team": "black-spoon", "showNickname": {"zhTw": "叛逆天才", "ko": "삐딱한 천재", "en": "Rebellious Genius"}, "affiliationStatus": "executive-chef", "affiliationNotes": null},
+      "restaurant": {
+        "status": "open", "cuisine": ["當代西餐", "精緻餐飲"],
+        "description": "以法式與紐約 fine-dining 經驗為背景的創意套餐。",
+        "district": {"zhTw": "江南區", "ko": "강남구", "en": "Gangnam-gu"},
+        "neighborhood": {"zhTw": "江南", "ko": "강남", "en": "Gangnam"},
+        "address": {"zhTw": null, "ko": null, "en": null},
+        "coordinates": {"latitude": null, "longitude": null}
+      },
+      "booking": {"required": true, "catchTableAvailable": true, "catchTableUrl": "https://www.catchtable.net/shop/original_numbers", "bookingMode": ["reservation"], "bookingDifficulty": 5, "bookingNotes": "以 CatchTable 與 Naver 店家頁顯示的最新地址、菜單與開放日為準。"},
+      "maps": {"naverMapUrl": "https://naver.me/GJTiSWqB", "naverLinkType": "short-direct", "googleMapsUrl": "https://maps.app.goo.gl/GJiy6nriViqC7QzD6"},
+      "pricing": {"priceLevel": 4, "lunchKrw": null, "dinnerKrw": null, "averagePerPersonKrw": 150000, "priceNotes": "預算約值；未取得可交叉核對的近期完整價目。"},
+      "features": {"fineDining": true, "casual": false, "soloFriendly": null, "alcoholPairing": true, "traditionalLiquor": false, "photoFriendly": true, "englishFriendly": true, "vegetarianOptions": null},
+      "recommendation": {"hataroScore": 4, "priorityTier": "A", "worthDetour": true, "bestFor": ["第二季黑湯匙", "創意套餐", "技術型料理"], "eijiroComment": "有明確主廚語言，值得看當季菜單再決定；目前資料完整度較低，不建議盲訂。", "cautions": ["地址需在出發前再確認", "訂位難", "近期價格未完整核實"]},
+      "media": {"officialWebsite": null, "instagramUrl": "https://www.instagram.com/original.numbers"},
+      "sources": [
+        {"label": "CATCHTABLE shop", "url": "https://www.catchtable.net/shop/original_numbers", "checkedAt": "2026-07-14", "supports": ["booking", "open-status"]},
+        {"label": "Season 2 cast guide", "url": "https://www.marieclaire.com/culture/tv-shows/culinary-class-wars-season-2-cast/", "checkedAt": "2026-07-14", "supports": ["chef", "nickname", "restaurant"]},
+        {"label": "Naver Maps", "url": "https://naver.me/GJTiSWqB", "checkedAt": "2026-07-14", "supports": ["map-link"]}
+      ],
+      "tags": ["第二季", "黑湯匙", "江南", "叛逆天才", "Fine Dining", "需再確認地址"]
+    },
+    {
+      "id": "superpan",
+      "name": {"zhTw": "SUPERPAN", "ko": "수퍼판", "en": "SUPERPAN"},
+      "chef": {"nameZhTw": "禹貞旭", "nameKo": "우정욱", "nameEn": "Woo Jung-wook", "season": 2, "team": "black-spoon", "showNickname": {"zhTw": "首爾媽媽", "ko": "서울 엄마", "en": "Seoul Mother"}, "affiliationStatus": "owner-chef", "affiliationNotes": null},
+      "restaurant": {
+        "status": "open", "cuisine": ["現代韓式", "Seoul Cuisine", "餐酒館"],
+        "description": "把熟悉的首爾家常味做成較俐落的現代韓式料理，強調與葡萄酒搭配。",
+        "district": {"zhTw": "江南區", "ko": "강남구", "en": "Gangnam-gu"},
+        "neighborhood": {"zhTw": "新沙／狎鷗亭", "ko": "신사·압구정", "en": "Sinsa/Apgujeong"},
+        "address": {"zhTw": "首爾江南區論峴路167街15，2樓", "ko": "서울 강남구 논현로167길 15 2층", "en": "2F, 15 Nonhyeon-ro 167-gil, Gangnam-gu, Seoul"},
+        "coordinates": {"latitude": null, "longitude": null}
+      },
+      "booking": {"required": true, "catchTableAvailable": true, "catchTableUrl": "https://www.catchtable.net/shop/superpan", "bookingMode": ["reservation"], "bookingDifficulty": 4, "bookingNotes": "熱門晚餐建議提前預約；適合多人分食。"},
+      "maps": {"naverMapUrl": "https://naver.me/57VZyhQT", "naverLinkType": "short-direct", "googleMapsUrl": "https://maps.app.goo.gl/ZZiPKJqh8UwFNYk99"},
+      "pricing": {"priceLevel": 3, "lunchKrw": null, "dinnerKrw": null, "averagePerPersonKrw": 80000, "priceNotes": "依分享菜與酒水差異大；為不含大量酒水的預算約值。"},
+      "features": {"fineDining": false, "casual": true, "soloFriendly": false, "alcoholPairing": true, "traditionalLiquor": true, "photoFriendly": true, "englishFriendly": null, "vegetarianOptions": true},
+      "recommendation": {"hataroScore": 4.5, "priorityTier": "S", "worthDetour": true, "bestFor": ["現代首爾料理", "朋友分食", "葡萄酒搭餐"], "eijiroComment": "比正式 tasting menu 更像會想再回去的餐廳；有韓國味，也保留放鬆聊天的空間。", "cautions": ["一人用餐較不划算", "酒水會明顯拉高預算"]},
+      "media": {"officialWebsite": "https://www.superpan.kr/", "instagramUrl": "https://www.instagram.com/superpan_seoul"},
+      "sources": [
+        {"label": "Official website", "url": "https://www.superpan.kr/", "checkedAt": "2026-07-14", "supports": ["address", "chef", "concept", "open-status"]},
+        {"label": "CATCHTABLE shop", "url": "https://www.catchtable.net/shop/superpan", "checkedAt": "2026-07-14", "supports": ["booking"]},
+        {"label": "Naver Maps", "url": "https://naver.me/57VZyhQT", "checkedAt": "2026-07-14", "supports": ["map-link"]}
+      ],
+      "tags": ["第二季", "黑湯匙", "首爾媽媽", "現代韓式", "餐酒館", "多人"]
+    },
+    {
+      "id": "yunjudang",
+      "name": {"zhTw": "YUNJUDANG", "ko": "윤주당", "en": "YUNJUDANG"},
+      "chef": {"nameZhTw": "尹奈羅", "nameKo": "윤나라", "nameEn": "Nara Yoon", "season": 2, "team": "black-spoon", "showNickname": {"zhTw": "釀酒尹酒母", "ko": "술 빚는 윤주모", "en": "Brewmaster Yun"}, "affiliationStatus": "owner-chef", "affiliationNotes": null},
+      "restaurant": {
+        "status": "open", "cuisine": ["韓式下酒菜", "傳統酒", "餐酒館"],
+        "description": "以自釀或精選傳統酒搭配韓式小菜與一桌料理，氛圍親密而有手作感。",
+        "district": {"zhTw": "龍山區", "ko": "용산구", "en": "Yongsan-gu"},
+        "neighborhood": {"zhTw": "解放村", "ko": "해방촌", "en": "Haebangchon"},
+        "address": {"zhTw": "首爾龍山區新興路81-1，1樓", "ko": "서울 용산구 신흥로 81-1 1층", "en": "1F, 81-1 Sinheung-ro, Yongsan-gu, Seoul"},
+        "coordinates": {"latitude": null, "longitude": null}
+      },
+      "booking": {"required": true, "catchTableAvailable": true, "catchTableUrl": "https://www.catchtable.net/shop/yunjudang_", "bookingMode": ["reservation", "phone-for-groups"], "bookingDifficulty": 5, "bookingNotes": "熱門且席位少；每桌需至少點一杯酒，6–16 人團體宜電話詢問，遲到規則嚴格。"},
+      "maps": {"naverMapUrl": "https://naver.me/GipBdym3", "naverLinkType": "short-direct", "googleMapsUrl": "https://maps.app.goo.gl/ocpxEzd9oKpx2fBZ9"},
+      "pricing": {"priceLevel": 2, "lunchKrw": null, "dinnerKrw": null, "averagePerPersonKrw": 50000, "priceNotes": "依套餐、加點與酒量變動；為中等飲酒量的預算約值。"},
+      "features": {"fineDining": false, "casual": true, "soloFriendly": false, "alcoholPairing": true, "traditionalLiquor": true, "photoFriendly": true, "englishFriendly": null, "vegetarianOptions": null},
+      "recommendation": {"hataroScore": 5, "priorityTier": "S", "worthDetour": true, "bestFor": ["韓國傳統酒", "有故事的小店", "解放村晚餐"], "eijiroComment": "這家最符合你說的『作品本身要有共鳴』：料理、釀酒與空間是一體，不只是去看主廚。", "cautions": ["必須飲酒或點指定飲料", "訂位極難", "不適合完全不喝酒者"]},
+      "media": {"officialWebsite": null, "instagramUrl": "https://www.instagram.com/yunjudang"},
+      "sources": [
+        {"label": "CATCHTABLE shop", "url": "https://www.catchtable.net/shop/yunjudang_", "checkedAt": "2026-07-14", "supports": ["booking", "open-status"]},
+        {"label": "CATCHTABLE season 2 guide", "url": "https://www.catchtable.net/discovery/culinary-class-wars-2-restaurants-of-the-hottest-chefs-black-white-alliance-match-teams-of-two-1.html", "checkedAt": "2026-07-14", "supports": ["address", "hours", "rules", "chef"]},
+        {"label": "Naver Maps", "url": "https://naver.me/GipBdym3", "checkedAt": "2026-07-14", "supports": ["map-link"]}
+      ],
+      "tags": ["第二季", "黑湯匙", "解放村", "傳統酒", "餐酒館", "釀酒"]
+    },
+    {
+      "id": "okdongsik-seoul",
+      "name": {"zhTw": "Okdongsik", "ko": "옥동식", "en": "Okdongsik Seoul"},
+      "chef": {"nameZhTw": "屋同植", "nameKo": "옥동식", "nameEn": "Ok Dong-sik", "season": 2, "team": "black-spoon", "showNickname": {"zhTw": "去紐約的豬肉湯飯", "ko": "뉴욕에 간 돼지곰탕", "en": "Dweji-Gomtang in NY"}, "affiliationStatus": "owner-chef", "affiliationNotes": null},
+      "restaurant": {
+        "status": "open", "cuisine": ["豬肉湯飯", "韓式湯品", "Bib Gourmand"],
+        "description": "以清澈豬肉高湯、薄切韓國黑豬肉與土廉式熱湯拌飯聞名的十席小店。",
+        "district": {"zhTw": "麻浦區", "ko": "마포구", "en": "Mapo-gu"},
+        "neighborhood": {"zhTw": "西橋洞／合井", "ko": "서교동·합정", "en": "Seogyo/Hapjeong"},
+        "address": {"zhTw": "首爾麻浦區楊花路7街44-10", "ko": "서울 마포구 양화로7길 44-10", "en": "44-10 Yanghwa-ro 7-gil, Mapo-gu, Seoul"},
+        "coordinates": {"latitude": null, "longitude": null}
+      },
+      "booking": {"required": false, "catchTableAvailable": true, "catchTableUrl": "https://www.catchtable.net/shop/okdongsik", "bookingMode": ["remote-waitlist", "walk-in"], "bookingDifficulty": 4, "bookingNotes": "主要是遠端候位而非傳統預約；約 10 席、每日約 100 碗，售完可能提早結束。"},
+      "maps": {"naverMapUrl": "https://naver.me/GOPeFGkr", "naverLinkType": "short-direct", "googleMapsUrl": "https://maps.app.goo.gl/i8yDfzAH3qhNGTdG7"},
+      "pricing": {"priceLevel": 1, "lunchKrw": 14000, "dinnerKrw": 14000, "averagePerPersonKrw": 18000, "priceNotes": "近期公開資料：普通豬肉湯飯約 ₩14,000、特份約 ₩16,000；加點另計。"},
+      "features": {"fineDining": false, "casual": true, "soloFriendly": true, "alcoholPairing": false, "traditionalLiquor": false, "photoFriendly": false, "englishFriendly": null, "vegetarianOptions": false},
+      "recommendation": {"hataroScore": 5, "priorityTier": "S", "worthDetour": true, "bestFor": ["一個人用餐", "高 CP 值", "韓國限定感"], "eijiroComment": "價格不高，菜色單純卻有清楚個性；這種靠一碗湯本身成立的店，很適合你的作品派標準。", "cautions": ["座位很少", "排隊時間不穩定", "每日限量"]},
+      "media": {"officialWebsite": "https://www.okdongsik.net/seoul", "instagramUrl": "https://www.instagram.com/okdongsik"},
+      "sources": [
+        {"label": "Official website", "url": "https://www.okdongsik.net/seoul", "checkedAt": "2026-07-14", "supports": ["address", "hours", "open-status"]},
+        {"label": "Michelin Guide", "url": "https://guide.michelin.com/en/seoul-capital-area/kr-seoul/restaurant/okdongsik", "checkedAt": "2026-07-14", "supports": ["address", "cuisine", "seat-count"]},
+        {"label": "CATCHTABLE shop", "url": "https://www.catchtable.net/shop/okdongsik", "checkedAt": "2026-07-14", "supports": ["waitlist"]},
+        {"label": "Naver Maps", "url": "https://naver.me/GOPeFGkr", "checkedAt": "2026-07-14", "supports": ["map-link"]}
+      ],
+      "tags": ["第二季", "黑湯匙", "麻浦", "豬肉湯飯", "Bib Gourmand", "可單人", "平價"]
+    },
+    {
+      "id": "neo-choi-kang-rok",
+      "name": {"zhTw": "Neo（歷史）", "ko": "식당 네오", "en": "Neo (historical)"},
+      "chef": {"nameZhTw": "崔康祿", "nameKo": "최강록", "nameEn": "Choi Kang-rok", "season": 2, "team": "white-spoon", "showNickname": null, "affiliationStatus": "historical", "affiliationNotes": "第二季冠軍；餐廳已於 2024 年歇業。"},
+      "restaurant": {
+        "status": "closed", "cuisine": ["創意日式", "居酒屋套餐"],
+        "description": "崔康祿曾經營的創意日式套餐店；保留作節目與首爾餐飲史資料，不可造訪或預約。",
+        "district": {"zhTw": "松坡區", "ko": "송파구", "en": "Songpa-gu"},
+        "neighborhood": {"zhTw": "三田洞", "ko": "삼전동", "en": "Samjeon-dong"},
+        "address": {"zhTw": "原址：首爾松坡區三田路12街4，1樓", "ko": "옛 주소: 서울 송파구 삼전로12길 4 1층", "en": "Former address: 1F, 4 Samjeon-ro 12-gil, Songpa-gu, Seoul"},
+        "coordinates": {"latitude": null, "longitude": null}
+      },
+      "booking": {"required": false, "catchTableAvailable": false, "catchTableUrl": null, "bookingMode": [], "bookingDifficulty": 5, "bookingNotes": "已歇業；崔康祿於 2026 年受訪時表示近期沒有重開餐廳計畫。"},
+      "maps": {"naverMapUrl": null, "naverLinkType": "missing", "googleMapsUrl": null},
+      "pricing": {"priceLevel": 4, "lunchKrw": null, "dinnerKrw": 77000, "averagePerPersonKrw": 77000, "priceNotes": "歷史價格，僅供資料保存。"},
+      "features": {"fineDining": false, "casual": false, "soloFriendly": null, "alcoholPairing": true, "traditionalLiquor": false, "photoFriendly": null, "englishFriendly": null, "vegetarianOptions": null},
+      "recommendation": {"hataroScore": 4, "priorityTier": "C", "worthDetour": false, "bestFor": ["歷史資訊"], "eijiroComment": "冠軍的重要背景，但已不能列入實際行程；Web App 應預設隱藏。", "cautions": ["已於 2024 年歇業", "不可預約", "原址可能已由其他店家使用"]},
+      "media": {"officialWebsite": null, "instagramUrl": null},
+      "sources": [
+        {"label": "SBS English interview", "url": "https://news.sbs.co.kr/english/article.do?news_id=N1008407752", "checkedAt": "2026-07-14", "supports": ["closed-status", "no-reopening-plan"]},
+        {"label": "Sports Kyunghyang interview", "url": "https://sports.khan.co.kr/article/202601161556107/", "checkedAt": "2026-07-14", "supports": ["closure-reason", "closed-status"]},
+        {"label": "NOL World historical listing", "url": "https://world.nol.com/en/content/pois/9a999c4f-a0d7-4f8b-9296-b4a52dc55856", "checkedAt": "2026-07-14", "supports": ["former-address", "closed-status"]}
+      ],
+      "tags": ["第二季", "白湯匙", "冠軍", "松坡", "已歇業", "歷史資料"]
+    }
+  ]
+}
