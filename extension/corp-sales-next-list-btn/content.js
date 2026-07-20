@@ -133,6 +133,13 @@
       // 防止點擊 checkbox 觸發列表的其他點擊事件
       checkbox.addEventListener('click', e => e.stopPropagation());
 
+      // 自動模式已處理過的學生：Turbo 重繪會把 checkbox 洗掉重注入，
+      // 這裡比對 _autoProcessedStudentIds 補勾，維持畫面上的跳過標記
+      const studentIdMatch = frame.id.match(/^potential_student_(\d+)_log$/);
+      if (studentIdMatch && _autoProcessedStudentIds.has(studentIdMatch[1])) {
+        checkbox.checked = true;
+      }
+
       small.insertBefore(checkbox, small.firstChild);
       small.appendChild(document.createElement('br'));
     });
@@ -332,6 +339,9 @@
           const studentIdMatch = scrollTarget.id.match(/^potential_student_(\d+)_log$/);
           if (studentIdMatch) _autoProcessedStudentIds.add(studentIdMatch[1]);
           actionBtn.click();
+          // 送出後立即勾選同筆的跳過 checkbox，讓畫面上看得出此筆已處理
+          const skipCheckbox = scrollTarget.querySelector('.next-list-checkbox');
+          if (skipCheckbox) skipCheckbox.checked = true;
           scheduleNextAutoTick();
         }
       } else if (actionBtn) {
