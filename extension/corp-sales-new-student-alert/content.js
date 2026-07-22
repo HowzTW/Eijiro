@@ -56,7 +56,7 @@
     document.body.appendChild(fab);
 
     const style = document.createElement('style');
-    style.textContent = '#all_students { margin-bottom: 170px !important; }';
+    style.textContent = '#all_students { margin-bottom: 270px !important; }';
     document.head.appendChild(style);
   }
 
