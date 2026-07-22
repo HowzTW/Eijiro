@@ -113,8 +113,8 @@
     row.appendChild(statusLight);
     row.appendChild(btn);
 
-    container.appendChild(row);
     container.appendChild(toggle);
+    container.appendChild(row);
     document.body.appendChild(container);
   }
 
