@@ -2,6 +2,9 @@
   // 目前模式：'dial'（撥打）、'missed'（未接聽）或 'auto'（自動）
   let _mode = 'dial';
 
+  // FAB 容器是否已收合到畫面右側（純視覺狀態，不影響模式/自動排程邏輯）
+  let _isCollapsed = false;
+
   // 模式選項按鈕（mode -> element），由 injectFAB 建立
   let _modeOpts = {};
 
@@ -116,6 +119,24 @@
     container.appendChild(toggle);
     container.appendChild(row);
     document.body.appendChild(container);
+
+    // 收合／展開把手：獨立於 container 之外（手足元素，非子元素），
+    // 因為 container 收合時會套用 transform，子元素若也用 position:fixed
+    // 會被迫以 container 為新的 containing block、跟著一起被移出畫面，
+    // 導致收合後找不到把手可以再點開。
+    const handle = document.createElement('button');
+    handle.className = 'next-list-collapse-handle';
+    handle.type = 'button';
+    handle.title = '收合';
+    handle.innerHTML = '<span class="material-icons">chevron_right</span>';
+    handle.addEventListener('click', () => {
+      _isCollapsed = !_isCollapsed;
+      container.classList.toggle('is-collapsed', _isCollapsed);
+      handle.classList.toggle('is-collapsed', _isCollapsed);
+      handle.querySelector('.material-icons').textContent = _isCollapsed ? 'chevron_left' : 'chevron_right';
+      handle.title = _isCollapsed ? '展開' : '收合';
+    });
+    document.body.appendChild(handle);
   }
 
   // 注入 checkbox 到所有符合條件的 <small> 元件
