@@ -26,18 +26,21 @@
    *
    * @param {string} studentId   - 從 turbo-frame id 取出的潛在學生 ID
    * @param {string} commentValue - 備註內容
+   * @param {boolean} isAnswered - potential_student_log[is_answered]
+   * @param {boolean} isPitched  - potential_student_log[is_pitched]
+   * @returns {Promise<boolean>} 是否送出成功
    */
-  async function submitLogDirect(studentId, commentValue) {
+  async function submitLogDirect(studentId, commentValue, isAnswered = false, isPitched = false) {
     const token = document.querySelector('meta[name="csrf-token"]')?.content;
     if (!token) {
       console.error('[OA NoAnswer] 找不到 CSRF token，送出失敗');
-      return;
+      return false;
     }
 
     const body = new URLSearchParams({
       'authenticity_token':                  token,
-      'potential_student_log[is_answered]':  'false',
-      'potential_student_log[is_pitched]':   'false',
+      'potential_student_log[is_answered]':  String(isAnswered),
+      'potential_student_log[is_pitched]':   String(isPitched),
       'potential_student_log[content]':      commentValue,
       'commit':                              '確認送出'
     });
@@ -52,13 +55,16 @@
       if (resp.ok) {
         console.log(`[OA NoAnswer] 送出成功 (student: ${studentId}, content: "${commentValue}")`);
         await resp.text();
+        return true;
       } else {
         console.error(`[OA NoAnswer] 送出失敗，HTTP ${resp.status}`);
         recentlySubmitted.delete(studentId);
+        return false;
       }
     } catch (err) {
       console.error('[OA NoAnswer] 網路錯誤:', err);
       recentlySubmitted.delete(studentId);
+      return false;
     }
   }
 
@@ -96,6 +102,40 @@
 
       const value = typeof commentValue === 'function' ? await commentValue() : commentValue;
       submitLogDirect(studentId, value);
+    });
+
+    return btn;
+  }
+
+  /**
+   * 建立紫色快捷按鈕（注入於年級欄，is_answered/is_pitched 皆為 true）
+   * 年級欄的 <td> 不會被 Turbo 替換，因此不需要 recentlySubmitted 冷卻機制，
+   * 失敗時直接原地恢復按鈕即可重試。
+   * @param {string} label        - 按鈕文字
+   * @param {string} icon         - Material Icon 名稱
+   * @param {string} commentValue - 自動填寫的備註內容
+   * @param {string} studentId    - 潛在學生 ID
+   */
+  function createGradeAreaButton(label, icon, commentValue, studentId) {
+    const btn = document.createElement('button');
+    btn.className = 'oa-noanswer-btn oa-purple-btn';
+    btn.innerHTML = `<span class="material-icons oa-icon">${icon}</span><span class="oa-label">${label}</span>`;
+    btn.type = 'button';
+
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      btn.disabled = true;
+      btn.querySelector('.oa-label').textContent = '處理中...';
+
+      const value = typeof commentValue === 'function' ? await commentValue() : commentValue;
+      const ok = await submitLogDirect(studentId, value, true, true);
+
+      if (!ok) {
+        btn.disabled = false;
+        btn.querySelector('.oa-label').textContent = label;
+      }
     });
 
     return btn;
@@ -155,6 +195,21 @@
       frame.appendChild(pasteBtn);
 
       frame.dataset.oaNoAnswerProcessed = 'true';
+
+      // 在左側年級欄注入 3 顆紫色按鈕（is_answered/is_pitched 皆為 true）
+      const gradeTd = frame.closest('tr')?.querySelector('td[data-kind="grade"]');
+      if (gradeTd && gradeTd.dataset.oaGradeBtnProcessed !== 'true') {
+        const missedBtn    = createGradeAreaButton('未接', 'phone_missed', '未接聽：',           studentId);
+        const gradeTransferBtn = createGradeAreaButton('直轉', 'forward',      '直轉',              studentId);
+        const ringTransferBtn  = createGradeAreaButton('響轉', 'voicemail',    '響一聲轉語音信箱', studentId);
+
+        gradeTd.appendChild(document.createElement('br'));
+        gradeTd.appendChild(missedBtn);
+        gradeTd.appendChild(gradeTransferBtn);
+        gradeTd.appendChild(ringTransferBtn);
+
+        gradeTd.dataset.oaGradeBtnProcessed = 'true';
+      }
     });
   }
 
