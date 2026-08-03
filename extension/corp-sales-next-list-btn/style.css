@@ -70,19 +70,15 @@
   flex-shrink: 0;
 }
 
-.next-list-status-light .material-icons,
 .next-list-status-light .material-icons-outlined {
   font-size: 56px;
   line-height: 1;
-}
-
-.next-list-status-light .material-icons {
-  color: #00c851;
-  filter: drop-shadow(0 0 7px rgba(0, 200, 81, 0.85));
-}
-
-.next-list-status-light .material-icons-outlined {
   color: #bbb;
+}
+
+.next-list-status-light.is-hidden,
+.next-list-fab.is-hidden {
+  display: none;
 }
 
 .next-list-fab {

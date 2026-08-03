@@ -59,13 +59,17 @@
   ensureMaterialIconFont('Material+Icons+Outlined');
 
   let _statusLightEl = null;
+  let _fabBtnEl = null;
   let _focusListenersAdded = false;
 
+  // 視窗失焦時顯示狀態燈（空心灰）、隱藏 FAB；聚焦時反過來。
+  // 用 visibility 切換（而非攔截 click 事件），失焦時 FAB 不會被 hit-test 到，
+  // 點在該位置只會讓視窗聚焦，不會觸發按鈕本身的動作。
   function updateStatusLight() {
-    if (!_statusLightEl) return;
+    if (!_statusLightEl || !_fabBtnEl) return;
     const focused = document.hasFocus() && document.visibilityState === 'visible';
-    _statusLightEl.innerHTML = '<span>wb_sunny</span>';
-    _statusLightEl.firstElementChild.className = focused ? 'material-icons' : 'material-icons-outlined';
+    _statusLightEl.classList.toggle('is-hidden', focused);
+    _fabBtnEl.classList.toggle('is-hidden', !focused);
   }
 
   // 建立並注入 FAB 按鈕與模式切換 toggle
@@ -77,15 +81,8 @@
 
     const statusLight = document.createElement('div');
     statusLight.className = 'next-list-status-light';
+    statusLight.innerHTML = '<span class="material-icons-outlined">wb_sunny</span>';
     _statusLightEl = statusLight;
-
-    if (!_focusListenersAdded) {
-      window.addEventListener('focus', updateStatusLight);
-      window.addEventListener('blur', updateStatusLight);
-      document.addEventListener('visibilitychange', updateStatusLight);
-      _focusListenersAdded = true;
-    }
-    updateStatusLight();
 
     const btn = document.createElement('button');
     btn.className = 'next-list-fab';
@@ -96,6 +93,15 @@
       </svg>
     `;
     btn.addEventListener('click', findNextAndScroll);
+    _fabBtnEl = btn;
+
+    if (!_focusListenersAdded) {
+      window.addEventListener('focus', updateStatusLight);
+      window.addEventListener('blur', updateStatusLight);
+      document.addEventListener('visibilitychange', updateStatusLight);
+      _focusListenersAdded = true;
+    }
+    updateStatusLight();
 
     const toggle = document.createElement('div');
     toggle.className = 'next-list-mode-toggle';
