@@ -74,6 +74,13 @@
             "price": "28500"
         },
         {
+            "name": "麥塊 Python",
+            "abbr": "MC-PY",
+            "full": "線上體驗課_Minecraft 麥塊 Python",
+            "prefix": "線上麥塊",
+            "price": "28500"
+        },
+        {
             "name": "Roblox AI遊戲設計",
             "abbr": "RX",
             "full": "線上體驗課_Roblox",
