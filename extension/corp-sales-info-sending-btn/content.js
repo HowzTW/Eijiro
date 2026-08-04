@@ -15,13 +15,14 @@
   }
 
   const BUTTONS = [
-    { label: '麥思',   menuIndex: 26 },
-    { label: '艾伯特', menuIndex: 27 },
+    { label: '麥思',   menuIndex: 27 },
+    { label: '艾伯特', menuIndex: 28 },
     { label: 'MC',     menuIndex: 22 },
-    { label: 'RX',     menuIndex: 23 },
-    { label: 'SC',     menuIndex: 30 },
-    { label: 'PY',     menuIndex: 24 },
-    { label: 'Steam',  menuIndex: 28 },
+    { label: 'MC-PY',  menuIndex: 23 },
+    { label: 'RX',     menuIndex: 24 },
+    { label: 'SC',     menuIndex: 31 },
+    { label: 'PY',     menuIndex: 25 },
+    { label: 'Steam',  menuIndex: 29 },
   ];
 
   function injectButtons() {
