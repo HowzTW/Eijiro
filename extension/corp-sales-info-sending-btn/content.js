@@ -15,14 +15,14 @@
   }
 
   const BUTTONS = [
-    { label: '麥思',   menuIndex: 27 },
-    { label: '艾伯特', menuIndex: 28 },
-    { label: 'MC',     menuIndex: 22 },
-    { label: 'MC-PY',  menuIndex: 23 },
-    { label: 'RX',     menuIndex: 24 },
-    { label: 'SC',     menuIndex: 31 },
-    { label: 'PY',     menuIndex: 25 },
-    { label: 'Steam',  menuIndex: 29 },
+    { label: '麥思',   keyword: '橘蘋麥思數學課程' },
+    { label: '艾伯特', keyword: '頑皮艾伯特課程' },
+    { label: 'MC',     keyword: 'Minecraft 麥塊程式班' },
+    { label: 'MC-PY',  keyword: 'Minecraft 麥塊 Python' },
+    { label: 'RX',     keyword: 'Roblox' },
+    { label: 'SC',     keyword: 'Scratch 實戰班' },
+    { label: 'PY',     keyword: 'Python程式開發班' },
+    { label: 'Steam',  keyword: 'STEAM' },
   ];
 
   function injectButtons() {
@@ -47,8 +47,8 @@
       const wrapper = document.createElement('span');
       wrapper.className = WRAPPER_CLASS;
 
-      BUTTONS.forEach(({ label, menuIndex }) => {
-        const item = menuItems[menuIndex];
+      BUTTONS.forEach(({ label, keyword }) => {
+        const item = menuItems.find(el => el.textContent.includes(keyword));
         if (!item) return;
 
         const btn = document.createElement('button');
