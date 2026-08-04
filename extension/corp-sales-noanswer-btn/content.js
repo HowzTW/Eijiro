@@ -196,19 +196,20 @@
 
       frame.dataset.oaNoAnswerProcessed = 'true';
 
-      // 在左側年級欄注入 3 顆紫色按鈕（is_answered/is_pitched 皆為 true）
+      // 在據點欄（年級欄左邊那一格）注入 3 顆紫色按鈕（is_answered/is_pitched 皆為 true）
       const gradeTd = frame.closest('tr')?.querySelector('td[data-kind="grade"]');
-      if (gradeTd && gradeTd.dataset.oaGradeBtnProcessed !== 'true') {
+      const branchTd = gradeTd?.previousElementSibling;
+      if (branchTd && branchTd.dataset.oaBranchBtnProcessed !== 'true') {
         const missedBtn    = createGradeAreaButton('未接', 'phone_missed', '未接聽：',           studentId);
         const gradeTransferBtn = createGradeAreaButton('直轉', 'forward',      '直轉',              studentId);
         const ringTransferBtn  = createGradeAreaButton('響轉', 'voicemail',    '響一聲轉語音信箱', studentId);
 
-        gradeTd.appendChild(document.createElement('br'));
-        gradeTd.appendChild(missedBtn);
-        gradeTd.appendChild(gradeTransferBtn);
-        gradeTd.appendChild(ringTransferBtn);
+        branchTd.appendChild(document.createElement('br'));
+        branchTd.appendChild(missedBtn);
+        branchTd.appendChild(gradeTransferBtn);
+        branchTd.appendChild(ringTransferBtn);
 
-        gradeTd.dataset.oaGradeBtnProcessed = 'true';
+        branchTd.dataset.oaBranchBtnProcessed = 'true';
       }
     });
   }
