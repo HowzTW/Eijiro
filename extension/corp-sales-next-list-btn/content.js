@@ -145,13 +145,15 @@
     document.body.appendChild(handle);
   }
 
-  // 注入 checkbox 到所有符合條件的 <small> 元件
+  // 注入 checkbox 到 turbo-frame 所在 <td> 的最前面（frame 之外），
+  // 不論該筆是否已有通話紀錄都適用；插在 frame 外層也讓 Turbo 局部重繪
+  // frame 內容時 checkbox 不會被沖掉，勾選狀態能保留。
   function injectCheckboxes() {
     const frames = document.querySelectorAll('turbo-frame[id^="potential_student_"][id$="_log"]');
     frames.forEach(frame => {
-      const small = frame.querySelector('small');
-      // 若找不到 small，或已經注入過，則跳過
-      if (!small || small.querySelector('.next-list-checkbox')) return;
+      const td = frame.parentElement;
+      // 找不到 td，或已經注入過，則跳過
+      if (!td || td.querySelector('.next-list-checkbox')) return;
 
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
@@ -160,15 +162,13 @@
       // 防止點擊 checkbox 觸發列表的其他點擊事件
       checkbox.addEventListener('click', e => e.stopPropagation());
 
-      // 自動模式已處理過的學生：Turbo 重繪會把 checkbox 洗掉重注入，
-      // 這裡比對 _autoProcessedStudentIds 補勾，維持畫面上的跳過標記
+      // 自動模式已處理過的學生：補勾，維持畫面上的跳過標記
       const studentIdMatch = frame.id.match(/^potential_student_(\d+)_log$/);
       if (studentIdMatch && _autoProcessedStudentIds.has(studentIdMatch[1])) {
         checkbox.checked = true;
       }
 
-      small.insertBefore(checkbox, small.firstChild);
-      small.appendChild(document.createElement('br'));
+      td.insertBefore(checkbox, frame);
     });
   }
 
@@ -193,6 +193,32 @@
     nowTruncated.setSeconds(0, 0);
     const threeH59mInMs = (3 * 60 + 59) * 60 * 1000;
 
+    // 邏輯 1: 從未撥打過（無通話紀錄，frame 內無 <small>）— 最優先
+    const neverCalledList = frames.map(frame => {
+      const studentIdMatch = frame.id.match(/^potential_student_(\d+)_log$/);
+      if (studentIdMatch && _autoProcessedStudentIds.has(studentIdMatch[1])) return null;
+
+      if (frame.querySelector('small')) return null; // 已有通話紀錄，交給邏輯 2/3 處理
+
+      // 跳過已勾選的項目
+      const checkbox = frame.parentElement.querySelector('.next-list-checkbox');
+      if (checkbox && checkbox.checked) return null;
+
+      // 無通話紀錄時 frame 內顯示「新增紀錄」連結，以此做為捲動定位與高亮目標
+      const link = frame.querySelector('a.show-comment');
+      if (!link) return null;
+
+      const rect = link.getBoundingClientRect();
+      if (rect.width === 0 && rect.height === 0) return null;
+
+      return { element: frame, highlightElement: link };
+    }).filter(item => item !== null);
+
+    if (neverCalledList.length > 0) {
+      scrollToElement(neverCalledList[0].element, neverCalledList[0].highlightElement, '下一筆在此');
+      return;
+    }
+
     const recordList = frames.map(frame => {
       // 跳過自動模式已處理過的學生（不依賴頁面畫面是否已更新）
       const studentIdMatch = frame.id.match(/^potential_student_(\d+)_log$/);
@@ -202,7 +228,7 @@
       if (!small) return null;
 
       // 跳過已勾選的項目
-      const checkbox = small.querySelector('.next-list-checkbox');
+      const checkbox = frame.parentElement.querySelector('.next-list-checkbox');
       if (checkbox && checkbox.checked) return null;
 
       // 排除隱藏元素（折疊列、display:none 等）
@@ -367,7 +393,7 @@
           if (studentIdMatch) _autoProcessedStudentIds.add(studentIdMatch[1]);
           actionBtn.click();
           // 送出後立即勾選同筆的跳過 checkbox，讓畫面上看得出此筆已處理
-          const skipCheckbox = scrollTarget.querySelector('.next-list-checkbox');
+          const skipCheckbox = scrollTarget.parentElement.querySelector('.next-list-checkbox');
           if (skipCheckbox) skipCheckbox.checked = true;
           scheduleNextAutoTick();
         }
