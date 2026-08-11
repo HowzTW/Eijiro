@@ -11,7 +11,7 @@
     <link rel="apple-touch-icon" href="icon.png">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/hls.js@1.6.17"></script>
     <style>
         :root {
             --primary: #f59e0b;
@@ -637,9 +637,17 @@
             const userBtn = document.getElementById('userBtn');
             userBtn.querySelector('span:last-child').innerText = currentUser.userName;
             
-            // 同步載入資料
-            await Promise.all([syncGlobalList(), syncUserLibrary()]);
+            // 先進首頁（快取內容已由 syncFromCache 備妥），不必空等雲端回應
+            const grid = document.getElementById('myDramaGrid');
+            if (!grid.innerHTML.trim()) {
+                grid.innerHTML = '<div class="loading"><div class="spinner"></div>正在載入您的追劇清單...</div>';
+            }
             showView('homeView');
+
+            // 背景更新；兩邊資料都到齊後再渲染一次，避免 GAS-1 較慢時查不到封面與片名
+            await Promise.all([syncGlobalList(), syncUserLibrary()]);
+            renderHome();
+            renderLibrary();
         }
 
         async function syncGlobalList() {
@@ -789,28 +797,45 @@
 
         // --- 管理邏輯 ---
         async function toggleFollow(dramaId, skipHomeRefresh = false) {
-            const btn = document.getElementById(`btn-follow-${dramaId}`);
-            if (btn) btn.disabled = true;
+            // 樂觀更新：先改本地狀態並立即重繪，不讓使用者空等雲端往返
+            const prevLibrary = userLibrary;
+            const prevProgress = userProgress;
+            const isFollowed = userLibrary.some(item => item.dramaId.toString() === dramaId.toString());
+
+            if (isFollowed) {
+                userLibrary = userLibrary.filter(item => item.dramaId.toString() !== dramaId.toString());
+                // 後端取消追蹤時會一併刪除進度，本地比照處理
+                userProgress = userProgress.filter(p => p.dramaId.toString() !== dramaId.toString());
+            } else {
+                userLibrary = [...userLibrary, { userId: currentUser.userId, dramaId: dramaId, addedDate: new Date().toISOString(), lastWatchedDate: '' }];
+            }
+            applyLibraryChange(skipHomeRefresh);
 
             try {
                 const res = await fetch(GAS_2, {
                     method: 'POST',
-                    body: JSON.stringify({ 
-                        action: 'toggle_follow', 
-                        userId: currentUser.userId, 
-                        dramaId: dramaId 
+                    body: JSON.stringify({
+                        action: 'toggle_follow',
+                        userId: currentUser.userId,
+                        dramaId: dramaId
                     })
                 });
                 const result = await res.json();
-                if (result.success) {
-                    await syncUserLibrary(skipHomeRefresh); // 根據來源決定是否重整首頁
-                }
-            } catch (e) { 
+                if (!result.success) throw new Error(result.error || '雲端回報失敗');
+            } catch (e) {
                 console.error("Toggle follow failed", e);
-                // 這裡不彈出 alert，以免跟 confirmUntrack 衝突，交由調用者處理
-            } finally {
-                if (btn) btn.disabled = false;
+                // 寫入雲端失敗，回滾本地狀態以免與雲端不一致
+                userLibrary = prevLibrary;
+                userProgress = prevProgress;
+                applyLibraryChange(skipHomeRefresh);
+                alert('連線失敗，剛才的變更沒有存到雲端，請稍後再試一次。');
             }
+        }
+
+        function applyLibraryChange(skipHomeRefresh) {
+            localStorage.setItem(`cache_user_data_${currentUser.userId}`, JSON.stringify({library: userLibrary, progress: userProgress}));
+            if (!skipHomeRefresh) renderHome();
+            renderLibrary();
         }
 
         async function confirmUntrack(event, dramaId, dramaName, skipHomeRefresh = false) {
