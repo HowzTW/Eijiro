@@ -145,9 +145,14 @@
     document.body.appendChild(handle);
   }
 
-  // 注入 checkbox 到 turbo-frame 所在 <td> 的最前面（frame 之外），
-  // 不論該筆是否已有通話紀錄都適用；插在 frame 外層也讓 Turbo 局部重繪
-  // frame 內容時 checkbox 不會被沖掉，勾選狀態能保留。
+  // 注入 <br> + checkbox 到 turbo-frame 之後（frame 外，不受 Turbo 局部重繪影響）。
+  // 固定插在 frame 後面、不依賴紅色按鈕（corp-sales-noanswer-btn）是否已注入，
+  // 兩邊注入順序因此不影響最終位置：紅色按鈕一律 append 在 td 尾端，
+  // <br>+checkbox 一律緊接在 frame 後面，結構上永遠排在紅色按鈕之前。
+  // 這裡補的 <br> 是刻意的：frame 自己的內容（例如時間戳記 <small>）是 inline，
+  // 後面沒有東西會強制換行，checkbox 若直接接在 frame 後面會被拉到跟時間戳記同一行；
+  // 加這個 <br> 讓 checkbox+紅色按鈕確定另起一行，checkbox 跟按鈕之間則不用再加，
+  // 靠欄寬有限會自然換行。
   function injectCheckboxes() {
     const frames = document.querySelectorAll('turbo-frame[id^="potential_student_"][id$="_log"]');
     frames.forEach(frame => {
@@ -168,7 +173,7 @@
         checkbox.checked = true;
       }
 
-      td.insertBefore(checkbox, frame);
+      frame.after(document.createElement('br'), checkbox);
     });
   }
 

@@ -111,8 +111,12 @@
   }
 
   function injectButtonForFrame(frame) {
-    if (frame.querySelector('.oa-dt-quick-btn')) return;
-    if (!frame.querySelector('.oa-noanswer-btn')) return;
+    // 紅色按鈕（corp-sales-noanswer-btn）現在注入在 frame 所在的 <td>，不在 frame 內部，
+    // 「已注入」判斷與「等紅色按鈕就緒」判斷都要比照掃 td，不能再掃 frame。
+    const td = frame.closest('td');
+    if (!td) return;
+    if (td.querySelector('.oa-dt-quick-btn')) return;
+    if (!td.querySelector('.oa-noanswer-btn')) return;
 
     const row = frame.closest('tr.potential-student');
     if (!row) return;
@@ -136,8 +140,10 @@
       waitForModalAndFill();
     });
 
-    frame.appendChild(sep);
-    frame.appendChild(btn);
+    // append 到 td 尾端：紅色按鈕已經在 td 裡（上面的 guard 已確認），
+    // 所以這裡一定會排在紅色按鈕之後，維持原本的視覺順序。
+    td.appendChild(sep);
+    td.appendChild(btn);
   }
 
   function injectAllButtons() {

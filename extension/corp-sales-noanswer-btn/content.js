@@ -13,16 +13,9 @@
     document.head.appendChild(link);
   }
 
-  // 記錄最近送出的學生；value: { expiry: timestamp, icon: string }
-  const recentlySubmitted = new Map();
-
   /**
    * 直接 POST 送出聯絡紀錄，不開 modal。
    * 避免原本透過 MutationObserver 等待 #remote_modal 的競爭條件問題。
-   *
-   * 送出後，ActionCable 廣播會讓頁面 Turbo 立即替換 turbo-frame（含按鈕），
-   * 因此改以 recentlySubmitted Map 記錄已送出的學生，
-   * 讓 injectNoAnswerButtons 重新注入時直接建立 disabled 狀態的按鈕。
    *
    * @param {string} studentId   - 從 turbo-frame id 取出的潛在學生 ID
    * @param {string} commentValue - 備註內容
@@ -58,12 +51,10 @@
         return true;
       } else {
         console.error(`[OA NoAnswer] 送出失敗，HTTP ${resp.status}`);
-        recentlySubmitted.delete(studentId);
         return false;
       }
     } catch (err) {
       console.error('[OA NoAnswer] 網路錯誤:', err);
-      recentlySubmitted.delete(studentId);
       return false;
     }
   }
@@ -74,20 +65,12 @@
    * @param {string} icon         - Material Icon 名稱
    * @param {string} commentValue - 自動填寫的備註內容
    * @param {string} studentId    - 潛在學生 ID
-   * @param {boolean} startDisabled - 是否建立時就 disabled（學生剛送出過）
    */
-  function createQuickButton(label, icon, commentValue, studentId, startDisabled) {
+  function createQuickButton(label, icon, commentValue, studentId) {
     const btn = document.createElement('button');
     btn.className = 'oa-noanswer-btn';
     btn.innerHTML = `<span class="material-icons oa-icon">${icon}</span><span class="oa-label">${label}</span>`;
     btn.type = 'button';
-
-    btn._originalLabel = label;
-
-    if (startDisabled) {
-      btn.disabled = true;
-      btn.querySelector('.oa-label').textContent = '處理中...';
-    }
 
     btn.addEventListener('click', async (e) => {
       e.preventDefault();
@@ -96,12 +79,20 @@
       btn.disabled = true;
       btn.querySelector('.oa-label').textContent = '處理中...';
 
-      // 記錄此學生已送出，並記下是哪個 icon，3 秒內重新注入時只 disable 同一顆按鈕
-      recentlySubmitted.set(studentId, { expiry: Date.now() + 3000, icon });
-      setTimeout(() => recentlySubmitted.delete(studentId), 3000);
-
       const value = typeof commentValue === 'function' ? await commentValue() : commentValue;
-      submitLogDirect(studentId, value);
+      const ok = await submitLogDirect(studentId, value);
+
+      if (ok) {
+        // 送出成功：維持 3 秒冷卻顯示，避免重複點擊
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.querySelector('.oa-label').textContent = label;
+        }, 3000);
+      } else {
+        // 送出失敗：立即恢復，允許重試
+        btn.disabled = false;
+        btn.querySelector('.oa-label').textContent = label;
+      }
     });
 
     return btn;
@@ -109,12 +100,19 @@
 
   /**
    * 搜尋並注入按鈕
+   *
+   * 按鈕注入在 turbo-frame 所在的 <td> 上，而不是 frame 內部：
+   * 送出後 ActionCable 廣播會讓 Turbo 把整個 turbo-frame 節點換掉（實測證實，
+   * 不只是清空內部 HTML），按鈕若在 frame 內會被連根拔起。注入到 td 層級後
+   * 按鈕不受影響，「已注入」的標記也要打在 td 上而非 frame 上，
+   * 否則 frame 換了新節點、標記跟著消失，會被誤判成「還沒注入」而重複疊加。
    */
   function injectNoAnswerButtons() {
     const logFrames = document.querySelectorAll('turbo-frame[id^="potential_student_"][id$="_log"]');
 
     logFrames.forEach(frame => {
-      if (frame.dataset.oaNoAnswerProcessed === 'true') return;
+      const td = frame.closest('td');
+      if (!td || td.dataset.oaNoAnswerProcessed === 'true') return;
 
       const link = frame.querySelector('a.show-comment[data-turbo-frame="remote_modal"]');
       if (!link) return;
@@ -124,43 +122,25 @@
       if (!match) return;
       const studentId = match[1];
 
-      // 若此學生剛送出過（3 秒內），找到對應 icon 的按鈕直接以 disabled 狀態顯示
-      const record = recentlySubmitted.get(studentId);
-      const coolingIcon = (record && Date.now() < record.expiry) ? record.icon : null;
+      const noAnswerBtn  = createQuickButton('未接聽', 'phone_missed',       '',                                    studentId);
+      const transferBtn  = createQuickButton('直轉',   'forward',             '直轉',                                studentId);
+      const introHangBtn = createQuickButton('自介掛', 'record_voice_over',   '自介掛',                              studentId);
+      const aiVoiceBtn   = createQuickButton('AI語音', 'smart_toy',           '轉AI語音，自介後仍不接聽。',          studentId);
+      const hangupBtn    = createQuickButton('接掛',   'call_end',            '接掛',                                studentId);
+      const emptyNumBtn  = createQuickButton('空號',   'phone_disabled',      '空號',                                studentId);
+      const suspendBtn   = createQuickButton('暫停使用', 'pause_circle',      '暫停使用',                            studentId);
+      const pasteBtn     = createQuickButton('貼上',   'content_paste',       () => navigator.clipboard.readText(), studentId);
 
-      const noAnswerBtn  = createQuickButton('未接聽', 'phone_missed',       '',                                    studentId, coolingIcon === 'phone_missed');
-      const transferBtn  = createQuickButton('直轉',   'forward',             '直轉',                                studentId, coolingIcon === 'forward');
-      const introHangBtn = createQuickButton('自介掛', 'record_voice_over',   '自介掛',                              studentId, coolingIcon === 'record_voice_over');
-      const aiVoiceBtn   = createQuickButton('AI語音', 'smart_toy',           '轉AI語音，自介後仍不接聽。',          studentId, coolingIcon === 'smart_toy');
-      const hangupBtn    = createQuickButton('接掛',   'call_end',            '接掛',                                studentId, coolingIcon === 'call_end');
-      const emptyNumBtn  = createQuickButton('空號',   'phone_disabled',      '空號',                                studentId, coolingIcon === 'phone_disabled');
-      const suspendBtn   = createQuickButton('暫停使用', 'pause_circle',      '暫停使用',                            studentId, coolingIcon === 'pause_circle');
-      const pasteBtn     = createQuickButton('貼上',   'content_paste',       () => navigator.clipboard.readText(), studentId, coolingIcon === 'content_paste');
+      td.appendChild(noAnswerBtn);
+      td.appendChild(transferBtn);
+      td.appendChild(introHangBtn);
+      td.appendChild(aiVoiceBtn);
+      td.appendChild(hangupBtn);
+      td.appendChild(emptyNumBtn);
+      td.appendChild(suspendBtn);
+      td.appendChild(pasteBtn);
 
-      // 若有剩餘冷卻時間，設定 timer 在到期後恢復被 disabled 的那顆按鈕
-      if (coolingIcon) {
-        const remaining = record.expiry - Date.now();
-        const disabledBtn = [noAnswerBtn, transferBtn, introHangBtn, aiVoiceBtn, hangupBtn, emptyNumBtn, suspendBtn, pasteBtn]
-          .find(b => b.querySelector('.oa-icon')?.textContent === coolingIcon);
-        if (disabledBtn) {
-          setTimeout(() => {
-            disabledBtn.disabled = false;
-            disabledBtn.querySelector('.oa-label').textContent = disabledBtn._originalLabel;
-          }, remaining);
-        }
-      }
-
-      frame.appendChild(document.createElement('br'));
-      frame.appendChild(noAnswerBtn);
-      frame.appendChild(transferBtn);
-      frame.appendChild(introHangBtn);
-      frame.appendChild(aiVoiceBtn);
-      frame.appendChild(hangupBtn);
-      frame.appendChild(emptyNumBtn);
-      frame.appendChild(suspendBtn);
-      frame.appendChild(pasteBtn);
-
-      frame.dataset.oaNoAnswerProcessed = 'true';
+      td.dataset.oaNoAnswerProcessed = 'true';
     });
   }
 
