@@ -652,10 +652,30 @@
 
         async function syncGlobalList() {
             try {
-                const res = await fetch(GAS_1);
+                // 輕量模式：不含線路資料，回應由約 900 KB 降到約 90 KB
+                const res = await fetch(`${GAS_1}?type=light`);
                 globalDramaList = await res.json();
                 localStorage.setItem('cache_global_list', JSON.stringify(globalDramaList));
             } catch (e) { console.error("Global sync failed", e); }
+        }
+
+        // 線路資料體積大，改為點進播放頁時才抓該劇的，並在記憶體中留存
+        const dramaDetailCache = {};
+
+        async function loadDramaDetail(listItem) {
+            const key = listItem.id.toString();
+            if (dramaDetailCache[key]) return dramaDetailCache[key];
+            // 舊快取或 GAS 尚未更新時，清單本身就含線路資料，直接沿用
+            if (listItem.sources) {
+                dramaDetailCache[key] = listItem;
+                return listItem;
+            }
+            const res = await fetch(`${GAS_1}?id=${encodeURIComponent(key)}`);
+            const data = await res.json();
+            // GAS 若尚未部署單劇模式會回傳整份清單，此時自行挑出該劇
+            const detail = Array.isArray(data) ? data.find(d => d.id.toString() === key) : data;
+            if (detail) dramaDetailCache[key] = detail;
+            return detail;
         }
 
         async function syncUserLibrary(skipHomeRefresh = false) {
@@ -900,28 +920,57 @@
         }
 
         // --- 播放邏輯 ---
-        function openPlayer(dramaId) {
-            currentDrama = globalDramaList.find(d => d.id.toString() === dramaId.toString());
+        async function openPlayer(dramaId) {
+            const listItem = globalDramaList.find(d => d.id.toString() === dramaId.toString());
+            if (!listItem) return;
+            currentDrama = listItem;
             const progress = userProgress.find(p => p.dramaId.toString() === dramaId.toString());
-            
+
+            // 清掉上一部的影片，避免載入期間殘留前一部的畫面
+            const video = document.getElementById('videoPlayer');
+            if (window.currentHls) { window.currentHls.destroy(); window.currentHls = null; }
+            video.removeAttribute('src');
+            video.load();
+
+            // 先把輕量清單已有的資訊畫出來並進入頁面，不必等線路資料
             const playerCover = document.getElementById('playerCover');
             playerCover.style.display = ''; // 恢復顯示，避免前一部圖破掉被隱藏
-            playerCover.src = currentDrama.cover_image;
-            document.getElementById('playerTitle').innerText = currentDrama.name;
-            document.getElementById('playerIntro').innerText = currentDrama.introduction;
-            
-            const lines = JSON.parse(currentDrama.sources);
+            playerCover.src = listItem.cover_image;
+            document.getElementById('playerTitle').innerText = listItem.name;
+            document.getElementById('playerIntro').innerText = listItem.introduction;
+            document.getElementById('playerProgress').innerText = progress ? `上次觀看：${progress.lineName} - ${progress.episodeName}` : '';
+            document.getElementById('lineSelector').innerHTML = '';
+            document.getElementById('episodeGrid').innerHTML = '<div class="loading"><div class="spinner"></div>正在載入播放線路...</div>';
+            setPlayerControlsEnabled(false);
+            showView('playerView');
+
+            const detail = await loadDramaDetail(listItem);
+            // 載入期間若使用者已改看其他劇集，捨棄這次結果
+            if (!currentDrama || currentDrama.id.toString() !== dramaId.toString()) return;
+            if (!detail || !detail.sources) {
+                document.getElementById('episodeGrid').innerHTML = '<div class="loading">播放線路載入失敗，請返回後再試一次。</div>';
+                return;
+            }
+            currentDrama = detail;
+
+            const lines = JSON.parse(detail.sources);
             renderLines(lines, progress);
-            
+            setPlayerControlsEnabled(true);
+
             // 預載：自動讀取進度對應的集數，但不播放
-            const lIdx = progress ? lines.findIndex(l => l.line_name === progress.lineName) : 0;
+            let lIdx = progress ? lines.findIndex(l => l.line_name === progress.lineName) : 0;
+            if (lIdx === -1) lIdx = 0; // 線路可能已改名或移除，退回第一條（renderLines 也是這樣處理）
             const episodeName = progress ? progress.episodeName : (lines[0] && lines[0].episodes[0] ? lines[0].episodes[0].name : null);
             if (episodeName) {
                 const eIdx = lines[lIdx].episodes.findIndex(e => e.name === episodeName);
                 if (eIdx !== -1) playVideo(lIdx, eIdx, false); // false 代表不自動播放
             }
+        }
 
-            showView('playerView');
+        function setPlayerControlsEnabled(enabled) {
+            ['resumeBtn', 'prevBtn', 'nextBtn'].forEach(id => {
+                document.getElementById(id).disabled = !enabled;
+            });
         }
 
         function renderLines(lines, progress) {

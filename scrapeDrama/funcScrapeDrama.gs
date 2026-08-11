@@ -1,6 +1,7 @@
 function doGet(e) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var type = (e && e.parameter && e.parameter.type) ? e.parameter.type : "";
+  var id = (e && e.parameter && e.parameter.id) ? e.parameter.id.toString() : "";
 
   if (type === "deleted") {
     var sheet = ss.getSheetByName("deleted");
@@ -18,12 +19,44 @@ function doGet(e) {
   }
 
   var sheet = ss.getActiveSheet();
+  var headers = ["id", "name", "introduction", "cover_image", "update_time", "sources"];
+
+  // 單劇模式（?id=xxx）：只回傳該劇一列，供播放頁取用線路資料
+  if (id) {
+    var lastRowForId = sheet.getLastRow();
+    if (lastRowForId <= 1) return jsonOut(null);
+    var idColumn = sheet.getRange(2, 1, lastRowForId - 1, 1).getValues();
+    for (var n = 0; n < idColumn.length; n++) {
+      if (idColumn[n][0].toString() === id) {
+        var oneRow = sheet.getRange(n + 2, 1, 1, headers.length).getValues()[0];
+        var oneObj = {};
+        headers.forEach(function(header, i) { oneObj[header] = oneRow[i]; });
+        return jsonOut(oneObj);
+      }
+    }
+    return jsonOut(null);
+  }
+
+  // 輕量模式（?type=light）：只讀前 5 欄，略過體積最大的 sources 欄
+  // 首頁與劇庫只需要片名與封面，可將回應由約 900 KB 降到約 90 KB
+  if (type === "light") {
+    var lightHeaders = headers.slice(0, 5);
+    var lastRowLight = sheet.getLastRow();
+    if (lastRowLight <= 1) return jsonOut([]);
+    var lightRows = sheet.getRange(2, 1, lastRowLight - 1, lightHeaders.length).getValues();
+    return jsonOut(lightRows.map(function(row) {
+      var obj = {};
+      lightHeaders.forEach(function(header, i) { obj[header] = row[i]; });
+      return obj;
+    }));
+  }
+
+  // 預設：回傳完整資料（維持原行為，抓劇小幫手前端仍在使用）
   var data = sheet.getDataRange().getValues();
   if (data.length <= 1) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
 
-  var headers = ["id", "name", "introduction", "cover_image", "update_time", "sources"];
   var rows = data.slice(1);
-  
+
   var result = rows.map(function(row) {
     var obj = {};
     headers.forEach(function(header, i) {
@@ -31,8 +64,13 @@ function doGet(e) {
     });
     return obj;
   });
-  
+
   return ContentService.createTextOutput(JSON.stringify(result))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function jsonOut(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
