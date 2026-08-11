@@ -44,12 +44,3 @@
   transform: none !important;
   box-shadow: none !important;
 }
-
-/* 年級欄快捷按鈕 - 紫色版本 */
-.oa-purple-btn {
-  background-color: #8e44ad !important;
-}
-
-.oa-purple-btn:hover {
-  background-color: #732d91 !important;
-}

@@ -108,40 +108,6 @@
   }
 
   /**
-   * 建立紫色快捷按鈕（注入於年級欄，is_answered/is_pitched 皆為 true）
-   * 年級欄的 <td> 不會被 Turbo 替換，因此不需要 recentlySubmitted 冷卻機制，
-   * 失敗時直接原地恢復按鈕即可重試。
-   * @param {string} label        - 按鈕文字
-   * @param {string} icon         - Material Icon 名稱
-   * @param {string} commentValue - 自動填寫的備註內容
-   * @param {string} studentId    - 潛在學生 ID
-   */
-  function createGradeAreaButton(label, icon, commentValue, studentId) {
-    const btn = document.createElement('button');
-    btn.className = 'oa-noanswer-btn oa-purple-btn';
-    btn.innerHTML = `<span class="material-icons oa-icon">${icon}</span><span class="oa-label">${label}</span>`;
-    btn.type = 'button';
-
-    btn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      btn.disabled = true;
-      btn.querySelector('.oa-label').textContent = '處理中...';
-
-      const value = typeof commentValue === 'function' ? await commentValue() : commentValue;
-      const ok = await submitLogDirect(studentId, value, true, true);
-
-      if (!ok) {
-        btn.disabled = false;
-        btn.querySelector('.oa-label').textContent = label;
-      }
-    });
-
-    return btn;
-  }
-
-  /**
    * 搜尋並注入按鈕
    */
   function injectNoAnswerButtons() {
@@ -195,22 +161,6 @@
       frame.appendChild(pasteBtn);
 
       frame.dataset.oaNoAnswerProcessed = 'true';
-
-      // 在據點欄（年級欄左邊那一格）注入 3 顆紫色按鈕（is_answered/is_pitched 皆為 true）
-      const gradeTd = frame.closest('tr')?.querySelector('td[data-kind="grade"]');
-      const branchTd = gradeTd?.previousElementSibling;
-      if (branchTd && branchTd.dataset.oaBranchBtnProcessed !== 'true') {
-        const missedBtn    = createGradeAreaButton('未接', 'phone_missed', '未接聽：',           studentId);
-        const gradeTransferBtn = createGradeAreaButton('直轉', 'forward',      '直轉',              studentId);
-        const ringTransferBtn  = createGradeAreaButton('響轉', 'voicemail',    '響一聲轉語音信箱', studentId);
-
-        branchTd.appendChild(document.createElement('br'));
-        branchTd.appendChild(missedBtn);
-        branchTd.appendChild(gradeTransferBtn);
-        branchTd.appendChild(ringTransferBtn);
-
-        branchTd.dataset.oaBranchBtnProcessed = 'true';
-      }
     });
   }
 
