@@ -20,10 +20,11 @@
   transform: translateX(calc(100% + 40px));
 }
 
-/* 收合／展開把手：貼在容器左側中央，隨容器一起滑動的獨立元件 */
+/* 收合／展開把手：貼在容器左側中央，隨容器一起滑動的獨立元件。
+   bottom 值需與 .next-list-fab-row 的 margin-top 連動（見該處註解）。 */
 .next-list-collapse-handle {
   position: fixed;
-  bottom: 114px;
+  bottom: 126px;
   right: 106px;
   width: 22px;
   height: 52px;
@@ -54,11 +55,16 @@
   right: 4px;
 }
 
+/* margin-top 是刻意拉開與上方 toggle 的距離：「自動」原本只離 FAB 11px，
+   要按 FAB 時手往上偏一點就會誤按到「自動」而直接送出未接聽紀錄。
+   容器是 bottom 定位、往上生長，這個 margin 會把 toggle 往上推 12px，
+   因此下面 .next-list-collapse-handle 的 bottom 也一起加 12px 才維持對齊。 */
 .next-list-fab-row {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
+  margin-top: 12px;
 }
 
 .next-list-status-light {

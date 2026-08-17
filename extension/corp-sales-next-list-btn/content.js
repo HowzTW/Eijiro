@@ -14,6 +14,16 @@
   // 因此改為自己記住已處理過的學生 ID，選取名單時主動排除，不依賴頁面畫面是否已更新。
   const _autoProcessedStudentIds = new Set();
 
+  // 「自動」在版面上緊貼 FAB，容易誤按，而按下後約半秒就會送出一筆未接聽紀錄，
+  // 因此進入自動模式前先確認。確認攔在模式按鈕的 click handler、setMode 之前，
+  // 不放進 setMode 內部：自動模式的三處停止路徑也會呼叫 setMode('dial')，
+  // 那些是程式自行切回，不該經過使用者確認。攔在 handler 也讓「取消」等於
+  // 完全沒有狀態變化——_mode 未被指派、toggle 亮的仍是原本那個、不會排任何 alarm。
+  const AUTO_CONFIRM_MSG =
+    '確定要開始自動模式嗎？\n\n' +
+    '按下「確定」後會立刻找出下一筆名單並送出「未接聽」紀錄，' +
+    '之後每 35~45 秒自動重複一次。';
+
   function setMode(mode) {
     const prev = _mode;
     _mode = mode;
@@ -112,7 +122,11 @@
       opt.className = 'next-list-mode-opt' + (mode === _mode ? ' active' : '');
       opt.type = 'button';
       opt.textContent = label;
-      opt.addEventListener('click', () => setMode(mode));
+      // 已在自動模式時再點「自動」，setMode 本來就會空轉，不必多跳一次確認
+      opt.addEventListener('click', () => {
+        if (mode === 'auto' && _mode !== 'auto' && !confirm(AUTO_CONFIRM_MSG)) return;
+        setMode(mode);
+      });
       _modeOpts[mode] = opt;
       toggle.appendChild(opt);
     });
