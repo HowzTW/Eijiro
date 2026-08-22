@@ -118,6 +118,17 @@
     _fabBtnEl.classList.toggle('is-hidden', !focused);
   }
 
+  // 依 _isCollapsed 套用收合的視覺狀態（容器位移、把手位置、箭頭方向、提示文字）。
+  // 建立 FAB 與點擊把手共用同一段邏輯：injectFAB 建出來的元件一律是展開的預設值，
+  // Turbo 抽換 body 後重建時若不補套用，_isCollapsed 仍是 true 但畫面已是展開，
+  // 第一次點把手只會把四個項目設回它們本來就有的值，看起來像沒反應。
+  function applyCollapsedState(container, handle) {
+    container.classList.toggle('is-collapsed', _isCollapsed);
+    handle.classList.toggle('is-collapsed', _isCollapsed);
+    handle.querySelector('.material-icons').textContent = _isCollapsed ? 'chevron_left' : 'chevron_right';
+    handle.title = _isCollapsed ? '展開' : '收合';
+  }
+
   // 建立並注入 FAB 按鈕與模式切換 toggle
   function injectFAB() {
     if (document.querySelector('.next-list-fab-container')) return;
@@ -183,16 +194,17 @@
     const handle = document.createElement('button');
     handle.className = 'next-list-collapse-handle';
     handle.type = 'button';
-    handle.title = '收合';
+    // 這裡的箭頭只是先把 <span> 建出來讓 applyCollapsedState 有東西可改，
+    // 實際方向與 title 一律由下方的 applyCollapsedState 決定。
     handle.innerHTML = '<span class="material-icons">chevron_right</span>';
     handle.addEventListener('click', () => {
       _isCollapsed = !_isCollapsed;
-      container.classList.toggle('is-collapsed', _isCollapsed);
-      handle.classList.toggle('is-collapsed', _isCollapsed);
-      handle.querySelector('.material-icons').textContent = _isCollapsed ? 'chevron_left' : 'chevron_right';
-      handle.title = _isCollapsed ? '展開' : '收合';
+      applyCollapsedState(container, handle);
     });
     document.body.appendChild(handle);
+
+    // 重建時（Turbo 抽換 body 後）把畫面補成 _isCollapsed 該有的樣子
+    applyCollapsedState(container, handle);
   }
 
   // 注入 <br> + checkbox 到 turbo-frame 之後（frame 外，不受 Turbo 局部重繪影響）。
