@@ -14,9 +14,13 @@
   // 因此改為自己記住已處理過的學生 ID，選取名單時主動排除，不依賴頁面畫面是否已更新。
   const _autoProcessedStudentIds = new Set();
 
+  // 進入自動模式當下的「名單情境」快照（見 currentContext）。每輪執行前比對，
+  // 情境變了就停止，避免自動流程跨越到使用者換過的名單上。非自動模式時為 null。
+  let _autoContext = null;
+
   // 「自動」在版面上緊貼 FAB，容易誤按，而按下後約半秒就會送出一筆未接聽紀錄，
   // 因此進入自動模式前先確認。確認攔在模式按鈕的 click handler、setMode 之前，
-  // 不放進 setMode 內部：自動模式的三處停止路徑也會呼叫 setMode('dial')，
+  // 不放進 setMode 內部：自動模式的四處停止路徑也會呼叫 setMode('dial')，
   // 那些是程式自行切回，不該經過使用者確認。攔在 handler 也讓「取消」等於
   // 完全沒有狀態變化——_mode 未被指派、toggle 亮的仍是原本那個、不會排任何 alarm。
   const AUTO_CONFIRM_MSG =
@@ -30,18 +34,50 @@
     Object.entries(_modeOpts).forEach(([m, btn]) => {
       btn.classList.toggle('active', m === mode);
     });
-    // 離開自動模式：取消 background 的 alarm 排程
+    // 離開自動模式：取消 background 的 alarm 排程，並清掉只在自動模式期間才有意義的狀態。
+    // 已處理清單一定要在這裡清（而不是只靠 turbo:load）：實測 host 頁面按「篩選」
+    // 不保證會觸發 Turbo 導航，若把清除掛在事件上，使用者停掉自動模式後重新篩選，
+    // injectCheckboxes 仍會依殘留的 ID 把新結果補勾成跳過。
     if (prev === 'auto' && mode !== 'auto') {
       chrome.runtime.sendMessage({ type: 'auto-cancel' }).catch(() => {});
+      _autoContext = null;
+      _autoProcessedStudentIds.clear();
     }
-    // 切入自動模式：立即執行第一輪，之後每輪結束時才排下一次 alarm
+    // 切入自動模式：先拍下情境快照（runAutoCycle 會拿它比對），再執行第一輪，
+    // 之後每輪結束時才排下一次 alarm
     if (mode === 'auto' && prev !== 'auto') {
+      _autoContext = currentContext();
       runAutoCycle();
     }
   }
 
+  // 目前所在的「名單情境」識別。host 頁面換名單的兩種方式都不會重新載入 document，
+  // content script 不會重跑，模組狀態（_mode、_autoProcessedStudentIds、background 的
+  // alarm）會整份留著，因此必須自己辨識情境是否已變：
+  //   1. 按「篩選」  → Turbo Drive 換頁，改條件時 location.search 會變，但頁籤不變
+  //   2. 切名單頁籤 → 純 AJAX 把新名單塞進另一個 tab-pane 並切換 display，
+  //                   URL 完全不變、body 不換、連 turbo:load 都不會觸發，只有可見的
+  //                   pane 會變（舊名單仍留在 DOM 裡，只是被 display:none）
+  // 兩者各自只動其中一個維度，所以要複合起來看，單用任一個都會漏掉另一種情境。
+  function currentContext() {
+    const visibleFrame = Array.from(
+      document.querySelectorAll('turbo-frame[id^="potential_student_"][id$="_log"]')
+    ).find(f => {
+      const rect = f.getBoundingClientRect();
+      return rect.width > 0 || rect.height > 0;
+    });
+    return location.search + '|' + (visibleFrame?.closest('.tab-pane')?.id ?? '');
+  }
+
   function runAutoCycle() {
     if (_mode !== 'auto') return;
+    // 情境驗證擺在這裡而非靠事件監聽：切名單頁籤沒有任何可攔截的導航事件，
+    // 每輪執行前主動比對是唯一對兩種換名單方式都有效的防線。
+    if (currentContext() !== _autoContext) {
+      console.log('[NextList] 自動模式停止：名單情境已變更（重新篩選或切換名單頁籤）');
+      setMode('dial'); // 已處理清單由 setMode 一併清除
+      return;
+    }
     findNextAndScroll();
   }
 
@@ -513,8 +549,29 @@
   });
   observer.observe(document.documentElement, { childList: true, subtree: true });
 
-  // 處理 Turbolinks/Turbo 頁面切換 (如果有的話)
+  // 處理 Turbo 頁面切換。Turbo Drive 只抽換 <body>，document 未重建，content script
+  // 不會重新執行，模組狀態會整份帶到新的篩選結果上，因此這裡主動重置。
+  //
+  // 這是「加速停止」而非主防線，實測在此站大多不會觸發，原因有二：
+  //   ・切名單頁籤走純 AJAX，本來就不產生 Turbo 導航
+  //   ・按「篩選」雖走 Turbo Drive，但 host 頁面的 <body> 內有一段 inline script 以
+  //     `let isButtonClickable` 在頂層宣告，Turbo 抽換 body 時會重新求值該 script，
+  //     撞上「已宣告」而拋 SyntaxError（Failed to execute 'replaceWith' on 'Element'），
+  //     replaceBody 中斷 → body 沒換成、turbo:load 也不會觸發。此為 host 頁面既有問題，
+  //     非本擴充功能造成，修正需由該系統端處理（改 var／包 IIFE／data-turbo-eval="false"）。
+  // 因此真正的保證在 runAutoCycle 的情境驗證與 setMode 的狀態清除，兩者都不依賴事件。
+  // 保留此處是為了在 Turbo 導航確實成功時能「立刻」停下，不必等下一次 alarm（最長 45 秒）。
+  //
+  // 注意不能用 setMode('dial')：此刻 _modeOpts 還指向舊 body 裡已被抽換掉的按鈕，
+  // 對它們改 class 沒有意義。直接指派 _mode，由下方 injectFAB() 依 _mode 重畫高亮。
   document.addEventListener('turbo:load', () => {
+    if (_mode === 'auto') {
+      chrome.runtime.sendMessage({ type: 'auto-cancel' }).catch(() => {});
+    }
+    _mode = 'dial';
+    _autoContext = null;
+    _autoProcessedStudentIds.clear();
+
     injectFAB();
     injectCheckboxes();
   });
