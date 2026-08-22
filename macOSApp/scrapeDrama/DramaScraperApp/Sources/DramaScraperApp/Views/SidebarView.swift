@@ -52,7 +52,7 @@ struct SidebarView: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
-                    if let url = URL(string: "https://gimyplus.com") {
+                    if let url = URL(string: "https://gimyai.tw") {
                         NSWorkspace.shared.open(url)
                     }
                 } label: {

@@ -78,6 +78,10 @@ class ScraperEngine {
                         }
                     }
 
+                    if rawSourcesArr.isEmpty {
+                        throw NSError(domain: "ScraperEngine", code: -1, userInfo: [NSLocalizedDescriptionKey: "找不到任何播放線路，網站結構可能已再次改版"])
+                    }
+
                     continuation.yield(.processing(message: "找到 \(rawSourcesArr.count) 條線路，準備抓取影片串流位址..."))
 
                     var processedCount = 0
@@ -157,7 +161,7 @@ class ScraperEngine {
                 do {
                     continuation.yield(.processing(message: "🚀 任務啟動：串接 Gimy+ ID \(id)"))
 
-                    let targetURL = "https://gimyplus.com/vod/\(id).html"
+                    let targetURL = "https://gimyai.tw/detail/\(id).html"
                     guard let url = URL(string: targetURL) else { throw URLError(.badURL) }
 
                     continuation.yield(.processing(message: "正在取得網頁原始碼..."))
@@ -189,24 +193,30 @@ class ScraperEngine {
                     }
                     coverImageURL = normalizeURL(coverImageURL)
 
-                    let introduction = try document.select(".desc-block").first()?.text().trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                    let introduction = try document.select("#desc .desc").first()?.text().trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
 
                     var rawSourcesArr: [(lineName: String, episodes: [(name: String, playPageUrl: String)])] = []
-                    let playlistBlocks = try document.select("div.playlist-block")
+                    // 網站改版後：線路名稱在 .route-title，集數容器 .episodes-route 是它的下一個兄弟節點
+                    let routeBlocks = try document.select(".episodes-route")
                     var totalEpisodesToFetch = 0
 
-                    for block in playlistBlocks.array() {
-                        let lineName = try block.select(".playlist-block__title").first()?.text().trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                    for block in routeBlocks.array() {
+                        guard let titleEl = try block.previousElementSibling(), titleEl.hasClass("route-title") else { continue }
+                        let lineName = try titleEl.text().trimmingCharacters(in: .whitespacesAndNewlines)
                         if lineName.isEmpty { continue }
 
                         var episodesList: [(name: String, playPageUrl: String)] = []
-                        for el in try block.select(".playlist-grid a").array() {
+                        for el in try block.select("a.ep").array() {
                             episodesList.append((name: try el.text().trimmingCharacters(in: .whitespacesAndNewlines), playPageUrl: try el.attr("href")))
                             totalEpisodesToFetch += 1
                         }
                         if !episodesList.isEmpty {
                             rawSourcesArr.append((lineName: lineName, episodes: episodesList))
                         }
+                    }
+
+                    if rawSourcesArr.isEmpty {
+                        throw NSError(domain: "ScraperEngine", code: -1, userInfo: [NSLocalizedDescriptionKey: "找不到任何播放線路，網站結構可能已再次改版"])
                     }
 
                     continuation.yield(.processing(message: "找到 \(rawSourcesArr.count) 條線路，準備抓取影片串流位址..."))
@@ -226,7 +236,7 @@ class ScraperEngine {
 
                             let fullPlayPageUrl: String
                             if rawEp.playPageUrl.hasPrefix("/") {
-                                fullPlayPageUrl = "https://gimyplus.com" + rawEp.playPageUrl
+                                fullPlayPageUrl = "https://gimyai.tw" + rawEp.playPageUrl
                             } else {
                                 fullPlayPageUrl = rawEp.playPageUrl
                             }
