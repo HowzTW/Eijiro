@@ -74,7 +74,6 @@
     // 情境驗證擺在這裡而非靠事件監聽：切名單頁籤沒有任何可攔截的導航事件，
     // 每輪執行前主動比對是唯一對兩種換名單方式都有效的防線。
     if (currentContext() !== _autoContext) {
-      console.log('[NextList] 自動模式停止：名單情境已變更（重新篩選或切換名單頁籤）');
       setMode('dial'); // 已處理清單由 setMode 一併清除
       return;
     }
@@ -244,7 +243,6 @@
     if (frames.length === 0) {
       if (_mode === 'auto') {
         // 自動模式：無資料即停止自動，切回預設「撥打」（不彈窗）
-        console.log('[NextList] 自動模式停止：頁面上找不到通話記錄元件');
         setMode('dial');
         return;
       }
@@ -343,7 +341,6 @@
     // 如果都沒有符合條件
     if (_mode === 'auto') {
       // 自動模式：沒有可撥打名單即停止自動，切回預設「撥打」（不彈窗）
-      console.log('[NextList] 自動模式停止：目前沒有符合撥打條件的名單');
       setMode('dial');
       return;
     }
@@ -448,11 +445,9 @@
       if (_mode === 'auto') {
         if (!actionBtn) {
           // 找不到未接聽按鈕（noanswer extension 未載入等）→ 停止自動，避免空轉
-          console.log('[NextList] 自動模式停止：目標列上找不到未接聽按鈕');
           setMode('dial');
         } else if (actionBtn.disabled) {
           // 按鈕冷卻中（剛被處理過還沒恢復）→ 跳過本輪，等下一輪重新選取
-          console.log('[NextList] 自動模式本輪跳過：未接聽按鈕冷卻中');
           scheduleNextAutoTick();
         } else {
           // 已定位到目標才按下未接聽；記住此學生已處理，避免頁面畫面未即時更新時重複選中

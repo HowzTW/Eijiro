@@ -46,7 +46,6 @@
       });
 
       if (resp.ok) {
-        console.log(`[OA NoAnswer] 送出成功 (student: ${studentId}, content: "${commentValue}")`);
         await resp.text();
         return true;
       } else {
@@ -159,6 +158,4 @@
     childList: true,
     subtree: true
   });
-
-  console.log('[OA NoAnswer Extension] 載入成功');
 })();
