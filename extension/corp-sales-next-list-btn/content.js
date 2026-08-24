@@ -18,6 +18,17 @@
   // 情境變了就停止，避免自動流程跨越到使用者換過的名單上。非自動模式時為 null。
   let _autoContext = null;
 
+  // 自動模式診斷輸出。排程鏈跨 content script 與 background（排程請求 → 建立 alarm →
+  // alarm 觸發 → 送回分頁 → 執行本輪），中間任一環節斷掉原本都是完全靜默的，
+  // 追偶發異常時無從判斷斷在哪裡，因此每個環節各留一條紀錄。
+  // 只有自動模式相關流程會輸出，平時不使用自動模式時 console 仍是安靜的。
+  // 注意：background.js 的對應訊息不會出現在頁面 console，
+  // 要到 chrome://extensions 開該擴充功能的「Service Worker」檢視器才看得到。
+  function log(...args) {
+    const t = new Date().toLocaleTimeString('zh-TW', { hour12: false });
+    console.log(`[NextList ${t}]`, ...args);
+  }
+
   // 「自動」在版面上緊貼 FAB，容易誤按，而按下後約半秒就會送出一筆未接聽紀錄，
   // 因此進入自動模式前先確認。確認攔在模式按鈕的 click handler、setMode 之前，
   // 不放進 setMode 內部：自動模式的四處停止路徑也會呼叫 setMode('dial')，
@@ -39,6 +50,7 @@
     // 不保證會觸發 Turbo 導航，若把清除掛在事件上，使用者停掉自動模式後重新篩選，
     // injectCheckboxes 仍會依殘留的 ID 把新結果補勾成跳過。
     if (prev === 'auto' && mode !== 'auto') {
+      log(`離開自動模式 → ${mode}，取消 alarm 排程並清除已處理清單`);
       chrome.runtime.sendMessage({ type: 'auto-cancel' }).catch(() => {});
       _autoContext = null;
       _autoProcessedStudentIds.clear();
@@ -47,6 +59,7 @@
     // 之後每輪結束時才排下一次 alarm
     if (mode === 'auto' && prev !== 'auto') {
       _autoContext = currentContext();
+      log(`進入自動模式，情境快照 = "${_autoContext}"`);
       runAutoCycle();
     }
   }
@@ -70,25 +83,42 @@
   }
 
   function runAutoCycle() {
-    if (_mode !== 'auto') return;
+    if (_mode !== 'auto') {
+      log(`本輪不執行：目前模式為 ${_mode}，非自動模式（殘留 alarm 可安全忽略）`);
+      return;
+    }
     // 情境驗證擺在這裡而非靠事件監聽：切名單頁籤沒有任何可攔截的導航事件，
     // 每輪執行前主動比對是唯一對兩種換名單方式都有效的防線。
-    if (currentContext() !== _autoContext) {
+    const ctx = currentContext();
+    if (ctx !== _autoContext) {
+      log('自動模式停止：名單情境已變更（重新篩選或切換名單頁籤）');
+      log(`  快照 = "${_autoContext}"`);
+      log(`  現在 = "${ctx}"`);
       setMode('dial'); // 已處理清單由 setMode 一併清除
       return;
     }
+    const visible = Array.from(
+      document.querySelectorAll('turbo-frame[id^="potential_student_"][id$="_log"]')
+    ).filter(f => { const r = f.getBoundingClientRect(); return r.width > 0 || r.height > 0; }).length;
+    log(`本輪開始（可見名單 ${visible} 筆，已處理 ${_autoProcessedStudentIds.size} 筆，` +
+        `分頁狀態 ${document.visibilityState}）`);
     findNextAndScroll();
   }
 
   // 請 background service worker 排下一次 40~50 秒隨機的 alarm
   function scheduleNextAutoTick() {
-    chrome.runtime.sendMessage({ type: 'auto-schedule' }).catch(() => {});
+    log('已送出排程請求，等待 background 建立 alarm');
+    chrome.runtime.sendMessage({ type: 'auto-schedule' })
+      .catch(err => log('排程請求送出失敗：', err?.message ?? err));
   }
 
   // 接收 background 的 alarm 觸發（頁面重新載入後 _mode 會重設，
   // runAutoCycle 的模式檢查可安全忽略殘留的 alarm）
   chrome.runtime.onMessage.addListener((msg) => {
-    if (msg && msg.type === 'auto-tick') runAutoCycle();
+    if (msg && msg.type === 'auto-tick') {
+      log('收到 background 的 alarm 觸發');
+      runAutoCycle();
+    }
   });
 
   // 注入 Google Material Icons 字型（實心／線框兩種樣式）
@@ -243,6 +273,7 @@
     if (frames.length === 0) {
       if (_mode === 'auto') {
         // 自動模式：無資料即停止自動，切回預設「撥打」（不彈窗）
+        log('自動模式停止：頁面上找不到通話記錄元件');
         setMode('dial');
         return;
       }
@@ -341,6 +372,7 @@
     // 如果都沒有符合條件
     if (_mode === 'auto') {
       // 自動模式：沒有可撥打名單即停止自動，切回預設「撥打」（不彈窗）
+      log('自動模式停止：目前沒有符合撥打條件的名單（全部處理過、已勾選跳過，或皆為 4 小時內之今日通話）');
       setMode('dial');
       return;
     }
@@ -445,14 +477,17 @@
       if (_mode === 'auto') {
         if (!actionBtn) {
           // 找不到未接聽按鈕（noanswer extension 未載入等）→ 停止自動，避免空轉
+          log('自動模式停止：目標列上找不到未接聽按鈕（noanswer 擴充功能未載入或按鈕文字已變動）');
           setMode('dial');
         } else if (actionBtn.disabled) {
           // 按鈕冷卻中（剛被處理過還沒恢復）→ 跳過本輪，等下一輪重新選取
+          log('自動模式本輪跳過：未接聽按鈕冷卻中');
           scheduleNextAutoTick();
         } else {
           // 已定位到目標才按下未接聽；記住此學生已處理，避免頁面畫面未即時更新時重複選中
           const studentIdMatch = scrollTarget.id.match(/^potential_student_(\d+)_log$/);
           if (studentIdMatch) _autoProcessedStudentIds.add(studentIdMatch[1]);
+          log(`送出未接聽：student=${studentIdMatch ? studentIdMatch[1] : '(未知)'}`);
           actionBtn.click();
           // 送出後立即勾選同筆的跳過 checkbox，讓畫面上看得出此筆已處理
           const skipCheckbox = scrollTarget.parentElement.querySelector('.next-list-checkbox');
@@ -573,6 +608,7 @@
   // 對它們改 class 沒有意義。直接指派 _mode，由下方 injectFAB() 依 _mode 重畫高亮。
   document.addEventListener('turbo:load', () => {
     if (_mode === 'auto') {
+      log('turbo:load 觸發，自動模式被重置為撥打並取消 alarm 排程');
       chrome.runtime.sendMessage({ type: 'auto-cancel' }).catch(() => {});
     }
     _mode = 'dial';
