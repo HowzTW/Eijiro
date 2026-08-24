@@ -268,6 +268,24 @@
     });
   }
 
+  // 判斷該列的電話是否為有效台灣手機號碼（移除所有非數字字元後為 09 開頭、共 10 碼）。
+  // 只在自動模式套用：自動模式無人看畫面就送出未接聽，必須先擋掉非手機號碼；
+  // 手動模式（撥打／未接聽）由使用者自行判斷，維持現狀不受影響。
+  //
+  // td.phone_number 內的號碼有兩種既有 DOM 形狀：純文字節點，或包在 <a> 連結裡
+  // （重複號碼查詢連結）；兩種形狀後面都緊接 dial-btn 擴充功能注入的
+  // <a class="evox-dial-btn">。若直接用 querySelector('a') 取號碼會誤取到那顆
+  // 按鈕本身的文字「call撥打」，因此改用複製節點、移除該按鈕後再取文字，
+  // 對兩種形狀都能正確取出號碼。
+  function isAutoDialablePhone(tr) {
+    const td = tr?.querySelector('td.phone_number');
+    if (!td) return false;
+    const clone = td.cloneNode(true);
+    clone.querySelectorAll('.evox-dial-btn').forEach(el => el.remove());
+    const digits = clone.textContent.replace(/\D/g, '');
+    return /^09\d{8}$/.test(digits);
+  }
+
   function findNextAndScroll() {
     const frames = Array.from(document.querySelectorAll('turbo-frame[id^="potential_student_"][id$="_log"]'));
     if (frames.length === 0) {
@@ -300,6 +318,9 @@
       const checkbox = frame.parentElement.querySelector('.next-list-checkbox');
       if (checkbox && checkbox.checked) return null;
 
+      // 自動模式排除非手機號碼（市話等），避免無人值守時對這類號碼送出未接聽
+      if (_mode === 'auto' && !isAutoDialablePhone(frame.closest('tr'))) return null;
+
       // 無通話紀錄時 frame 內顯示「新增紀錄」連結，以此做為捲動定位與高亮目標
       const link = frame.querySelector('a.show-comment');
       if (!link) return null;
@@ -326,6 +347,9 @@
       // 跳過已勾選的項目
       const checkbox = frame.parentElement.querySelector('.next-list-checkbox');
       if (checkbox && checkbox.checked) return null;
+
+      // 自動模式排除非手機號碼（市話等），避免無人值守時對這類號碼送出未接聽
+      if (_mode === 'auto' && !isAutoDialablePhone(frame.closest('tr'))) return null;
 
       // 排除隱藏元素（折疊列、display:none 等）
       // 隱藏元素的 getBoundingClientRect 會回傳 width:0, height:0
@@ -372,7 +396,7 @@
     // 如果都沒有符合條件
     if (_mode === 'auto') {
       // 自動模式：沒有可撥打名單即停止自動，切回預設「撥打」（不彈窗）
-      log('自動模式停止：目前沒有符合撥打條件的名單（全部處理過、已勾選跳過，或皆為 4 小時內之今日通話）');
+      log('自動模式停止：目前沒有符合撥打條件的名單（全部處理過、已勾選跳過、電話非有效手機號碼，或皆為 4 小時內之今日通話）');
       setMode('dial');
       return;
     }
