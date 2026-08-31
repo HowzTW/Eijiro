@@ -39,6 +39,10 @@
     '按下「確定」後會立刻找出下一筆名單並送出「未接聽」紀錄，' +
     '之後每 35~45 秒自動重複一次。';
 
+  // 自動模式「都選不到名單」時的續跑判斷門檻：只要有名單在這段時間內會達到
+  // 邏輯 2 的時間門檻，就不停止自動模式，讓既有的 35~45 秒排程繼續等它達標。
+  const AUTO_LOOKAHEAD_MS = 30 * 60 * 1000;
+
   function setMode(mode) {
     const prev = _mode;
     _mode = mode;
@@ -396,8 +400,25 @@
 
     // 如果都沒有符合條件
     if (_mode === 'auto') {
-      // 自動模式：沒有可撥打名單即停止自動，切回預設「撥打」（不彈窗）
-      log('自動模式停止：目前沒有符合撥打條件的名單（全部處理過、已勾選跳過、電話非有效手機號碼，或皆為 4 小時內之今日通話）');
+      // 續跑判斷：recordList 走到這裡必然只剩「今日、其他條件皆通過、只差時間
+      // 門檻未到」的名單（非今日的已被邏輯 3 選走、已達門檻的已被邏輯 2 選走）。
+      // 逐筆算出距離達標還差多少毫秒，取最小值；只要有人 30 分鐘內會達標，
+      // 就不停止，讓既有的 35~45 秒排程繼續等，避免無人值守時錯過即將可撥打的名單。
+      const remainingList = recordList.map(item => {
+        const recordTruncated = new Date(item.date);
+        recordTruncated.setSeconds(0, 0);
+        return sameDayThresholdMs - (nowTruncated - recordTruncated);
+      });
+      const minRemainingMs = remainingList.length > 0 ? Math.min(...remainingList) : Infinity;
+
+      if (minRemainingMs <= AUTO_LOOKAHEAD_MS) {
+        log(`自動模式本輪跳過：目前沒有符合撥打條件的名單，但約 ${(minRemainingMs / 60000).toFixed(1)} 分鐘後有名單將達標，繼續等待`);
+        scheduleNextAutoTick();
+        return;
+      }
+
+      // 沒有可撥打名單，且 30 分鐘內也無名單即將達標，才停止自動並切回預設「撥打」（不彈窗）
+      log('自動模式停止：目前沒有符合撥打條件的名單，且 30 分鐘內也無名單將達標（全部處理過、已勾選跳過、電話非有效手機號碼，或皆為 4 小時內之今日通話）');
       setMode('dial');
       return;
     }
