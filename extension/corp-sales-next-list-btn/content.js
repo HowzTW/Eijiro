@@ -305,7 +305,8 @@
     // 截斷到分鐘（秒與毫秒歸零），讓比較不受秒數影響
     const nowTruncated = new Date(now);
     nowTruncated.setSeconds(0, 0);
-    const threeH59mInMs = (3 * 60 + 59) * 60 * 1000;
+    // 自動模式門檻抓整 4 小時；其他模式維持 3 小時 59 分（提早 1 分鐘的緩衝）
+    const sameDayThresholdMs = (_mode === 'auto' ? 4 * 60 : 3 * 60 + 59) * 60 * 1000;
 
     // 邏輯 1: 從未撥打過（無通話紀錄，frame 內無 <small>）— 最優先
     const neverCalledList = frames.map(frame => {
@@ -369,12 +370,12 @@
       };
     }).filter(item => item !== null && !isNaN(item.date.getTime()));
 
-    // 邏輯 2: 同日且（截斷到分鐘後）距現在 ≥ 3小時59分
+    // 邏輯 2: 同日且（截斷到分鐘後）距現在 ≥ 門檻（自動模式 4 小時，其他模式 3 小時59分）
     const sameDayPotentials = recordList.filter(item => {
       if (item.dateStr !== todayStr) return false;
       const recordTruncated = new Date(item.date);
       recordTruncated.setSeconds(0, 0);
-      return (nowTruncated - recordTruncated) >= threeH59mInMs;
+      return (nowTruncated - recordTruncated) >= sameDayThresholdMs;
     });
 
     if (sameDayPotentials.length > 0) {
