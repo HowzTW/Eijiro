@@ -91,22 +91,31 @@
       log(`本輪不執行：目前模式為 ${_mode}，非自動模式（殘留 alarm 可安全忽略）`);
       return;
     }
-    // 情境驗證擺在這裡而非靠事件監聽：切名單頁籤沒有任何可攔截的導航事件，
-    // 每輪執行前主動比對是唯一對兩種換名單方式都有效的防線。
-    const ctx = currentContext();
-    if (ctx !== _autoContext) {
-      log('自動模式停止：名單情境已變更（重新篩選或切換名單頁籤）');
-      log(`  快照 = "${_autoContext}"`);
-      log(`  現在 = "${ctx}"`);
-      setMode('dial'); // 已處理清單由 setMode 一併清除
-      return;
+    // 包一層 try/catch：本輪執行中若發生任何未預期例外（例如擴充功能被重新載入導致
+    // chrome.runtime.* 呼叫同步丟出 Extension context invalidated），沒有這層防護的話
+    // 例外會直接中斷本輪、且不會排下一次 alarm，自動模式就會無聲卡死在「自動」，
+    // 不會像其他設計好的停止路徑一樣至少切回「撥打」給使用者一個訊號。
+    try {
+      // 情境驗證擺在這裡而非靠事件監聽：切名單頁籤沒有任何可攔截的導航事件，
+      // 每輪執行前主動比對是唯一對兩種換名單方式都有效的防線。
+      const ctx = currentContext();
+      if (ctx !== _autoContext) {
+        log('自動模式停止：名單情境已變更（重新篩選或切換名單頁籤）');
+        log(`  快照 = "${_autoContext}"`);
+        log(`  現在 = "${ctx}"`);
+        setMode('dial'); // 已處理清單由 setMode 一併清除
+        return;
+      }
+      const visible = Array.from(
+        document.querySelectorAll('turbo-frame[id^="potential_student_"][id$="_log"]')
+      ).filter(f => { const r = f.getBoundingClientRect(); return r.width > 0 || r.height > 0; }).length;
+      log(`本輪開始（可見名單 ${visible} 筆，已處理 ${_autoProcessedStudentIds.size} 筆，` +
+          `分頁狀態 ${document.visibilityState}）`);
+      findNextAndScroll();
+    } catch (err) {
+      log(`自動模式停止：本輪發生未預期錯誤，已安全切回撥打（${err?.message ?? err}）`);
+      if (_mode === 'auto') setMode('dial');
     }
-    const visible = Array.from(
-      document.querySelectorAll('turbo-frame[id^="potential_student_"][id$="_log"]')
-    ).filter(f => { const r = f.getBoundingClientRect(); return r.width > 0 || r.height > 0; }).length;
-    log(`本輪開始（可見名單 ${visible} 筆，已處理 ${_autoProcessedStudentIds.size} 筆，` +
-        `分頁狀態 ${document.visibilityState}）`);
-    findNextAndScroll();
   }
 
   // 請 background service worker 排下一次 40~50 秒隨機的 alarm
@@ -521,24 +530,34 @@
       }
 
       if (_mode === 'auto') {
-        if (!actionBtn) {
-          // 找不到未接聽按鈕（noanswer extension 未載入等）→ 停止自動，避免空轉
-          log('自動模式停止：目標列上找不到未接聽按鈕（noanswer 擴充功能未載入或按鈕文字已變動）');
-          setMode('dial');
-        } else if (actionBtn.disabled) {
-          // 按鈕冷卻中（剛被處理過還沒恢復）→ 跳過本輪，等下一輪重新選取
-          log('自動模式本輪跳過：未接聽按鈕冷卻中');
-          scheduleNextAutoTick();
-        } else {
-          // 已定位到目標才按下未接聽；記住此學生已處理，避免頁面畫面未即時更新時重複選中
-          const studentIdMatch = scrollTarget.id.match(/^potential_student_(\d+)_log$/);
-          if (studentIdMatch) _autoProcessedStudentIds.add(studentIdMatch[1]);
-          log(`送出未接聽：student=${studentIdMatch ? studentIdMatch[1] : '(未知)'}`);
-          actionBtn.click();
-          // 送出後立即勾選同筆的跳過 checkbox，讓畫面上看得出此筆已處理
-          const skipCheckbox = scrollTarget.parentElement.querySelector('.next-list-checkbox');
-          if (skipCheckbox) skipCheckbox.checked = true;
-          scheduleNextAutoTick();
+        // 這段是透過 setTimeout 延遲執行的（見 triggerDelayedShow），跑在 runAutoCycle
+        // 呼叫堆疊之外，runAutoCycle 的 try/catch 攔不到這裡的例外，因此另包一層：
+        // 例如擴充功能被重新載入導致 scheduleNextAutoTick 內的 chrome.runtime.sendMessage
+        // 同步丟出 Extension context invalidated，沒有這層防護就會無聲卡死在「自動」，
+        // 後面排下一輪的動作也不會執行。
+        try {
+          if (!actionBtn) {
+            // 找不到未接聽按鈕（noanswer extension 未載入等）→ 停止自動，避免空轉
+            log('自動模式停止：目標列上找不到未接聽按鈕（noanswer 擴充功能未載入或按鈕文字已變動）');
+            setMode('dial');
+          } else if (actionBtn.disabled) {
+            // 按鈕冷卻中（剛被處理過還沒恢復）→ 跳過本輪，等下一輪重新選取
+            log('自動模式本輪跳過：未接聽按鈕冷卻中');
+            scheduleNextAutoTick();
+          } else {
+            // 已定位到目標才按下未接聽；記住此學生已處理，避免頁面畫面未即時更新時重複選中
+            const studentIdMatch = scrollTarget.id.match(/^potential_student_(\d+)_log$/);
+            if (studentIdMatch) _autoProcessedStudentIds.add(studentIdMatch[1]);
+            log(`送出未接聽：student=${studentIdMatch ? studentIdMatch[1] : '(未知)'}`);
+            actionBtn.click();
+            // 送出後立即勾選同筆的跳過 checkbox，讓畫面上看得出此筆已處理
+            const skipCheckbox = scrollTarget.parentElement.querySelector('.next-list-checkbox');
+            if (skipCheckbox) skipCheckbox.checked = true;
+            scheduleNextAutoTick();
+          }
+        } catch (err) {
+          log(`自動模式停止：處理本輪動作時發生未預期錯誤，已安全切回撥打（${err?.message ?? err}）`);
+          if (_mode === 'auto') setMode('dial');
         }
       } else if (actionBtn) {
         actionBtn.setAttribute('tabindex', '0');
