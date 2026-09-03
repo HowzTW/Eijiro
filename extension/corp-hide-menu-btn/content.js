@@ -9,6 +9,12 @@
   const CLOCK_ID    = 'oa-hide-menu-clock';
   const STYLE_ID    = 'oa-hide-menu-style';
   const STORAGE_KEY = 'oa-menu-collapsed';
+  const EARLY_STYLE_ID = 'oa-early-hide-style';
+
+  // early-hide.js 在 document_start 階段的暫時隱藏樣式已完成階段性任務，
+  // 從這裡開始由下方的 class 機制（body.oa-menu-collapsed）接手控制，
+  // 同步移除不會造成畫面閃爍。
+  document.getElementById(EARLY_STYLE_ID)?.remove();
 
   // ── Material Icons ────────────────────────────────────────────────────────
   if (!document.querySelector('link[href*="Material+Icons"]')) {
@@ -241,7 +247,9 @@
   let formParent      = null;
   let formNextSibling = null;
 
-  const isCollapsed = () => sessionStorage.getItem(STORAGE_KEY) === '1';
+  // 預設收合：只有使用者在本次分頁 session 中明確按過展開（存值 '0'）才視為展開，
+  // 其餘情況（含尚未操作過）一律視為收合，避免每次載入都要手動點一次。
+  const isCollapsed = () => sessionStorage.getItem(STORAGE_KEY) !== '0';
 
   function getSearchForm() {
     return document.getElementById('search_students');
@@ -455,7 +463,7 @@
       formNextSibling = null;
     }
     document.body.classList.remove('oa-menu-collapsed');
-    sessionStorage.removeItem(STORAGE_KEY);
+    sessionStorage.setItem(STORAGE_KEY, '0');
     const icon = btn.querySelector('.material-icons');
     if (icon) icon.textContent = 'menu_open';
   }
