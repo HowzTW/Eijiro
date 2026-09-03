@@ -34,7 +34,7 @@
         "桌電和耳麥",
         "有桌電沒有耳麥",
         "平板",
-        "平板 iPad",
+        "Apple iPad",
         "沒有電腦",
         "其他"
     ],
@@ -50,7 +50,7 @@
         "Windows（有確認在Win10以上）",
         "Windows（家長不確定Win版本，但有提醒要在Win10以上）",
         "Mac",
-        "Apple",
+        "Apple iOS",
         "其他"
     ],
     "trialCourses": [
