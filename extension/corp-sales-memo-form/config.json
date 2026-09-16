@@ -102,6 +102,13 @@
             "full": "線上體驗課_Python",
             "prefix": "遠距教學_",
             "price": "32000"
+        },
+        {
+            "name": "財商素養",
+            "abbr": "財商",
+            "full": "線上財商體驗課",
+            "prefix": "線上財商體驗課＿",
+            "price": "20000"
         }
     ],
     "timeSlots": [
