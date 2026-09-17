@@ -1,8 +1,20 @@
 {
   "manifest_version": 3,
   "name": "Google Chat：訊息泡泡快速回覆「收」",
-  "version": "1.0",
-  "description": "(gchat-msg-quick-reply-hint) 點擊 Google Chat 討論串訊息泡泡，確認寄件者與內容後，於該訊息的討論串中快速回覆「收」",
+  "version": "1.3",
+  "description": "(gchat-msg-quick-reply-hint) 點擊 Google Chat 討論串訊息泡泡，或按 Cmd+T 鎖定主對話串最新一則，確認寄件者與內容後，於該訊息的討論串中快速回覆「收」",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "quick-reply-received": {
+      "suggested_key": {
+        "default": "Ctrl+T",
+        "mac": "Command+T"
+      },
+      "description": "在主對話串最新一則訊息快速回覆「收」"
+    }
+  },
   "content_scripts": [
     {
       "matches": ["https://chat.google.com/*"],

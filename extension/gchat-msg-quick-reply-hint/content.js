@@ -10,6 +10,9 @@
   const MESSAGE_TEXT_SELECTOR = '[jsname="bgckF"]';
   const HIGHLIGHT_OUTLINE = '3px solid #1a73e8';
   const HIGHLIGHT_OFFSET = '2px';
+  const THREAD_DETAIL_VIEW_SELECTOR = '[data-is-detailed-thread-view="true"]';
+  const HOVER_TARGET_SELECTOR = '[jsname="o7uNDd"]';
+  const HOVER_WAIT_TIMEOUT_MS = 1500;
 
   function isInsideInteractiveElement(target, boundary) {
     let node = target;
@@ -126,15 +129,51 @@
     box.dispatchEvent(enterEvent);
   }
 
-  document.addEventListener(
-    'click',
-    function (event) {
-      const bubble = event.target.closest(BUBBLE_SELECTOR);
-      if (!bubble) return;
+  // 訊息泡泡的工具列（在討論串中回覆、新增回應…）只有滑鼠真的 hover 上去時，
+  // Google Chat 才會動態把按鈕插入 DOM（不是 CSS 隱藏，是根本還沒渲染）。
+  // 滑鼠點擊會自然先觸發 hover 才點到；快捷鍵是直接操作 DOM，沒有經過真的
+  // hover，所以要先模擬一次 hover 事件，逼 Chat 把按鈕生出來。
+  function triggerHover(bubble) {
+    const target = bubble.querySelector(HOVER_TARGET_SELECTOR) || bubble;
+    const commonInit = {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+      relatedTarget: document.body,
+    };
+    target.dispatchEvent(new MouseEvent('mouseover', commonInit));
+    target.dispatchEvent(new MouseEvent('mouseenter', { ...commonInit, bubbles: false }));
+  }
 
-      if (isInsideInteractiveElement(event.target, bubble)) return;
+  function waitForThreadButton(bubble, timeoutMs) {
+    return new Promise((resolve) => {
+      const existing = bubble.querySelector(THREAD_REPLY_BUTTON_SELECTOR);
+      if (existing) {
+        resolve(existing);
+        return;
+      }
 
-      const threadButton = bubble.querySelector(THREAD_REPLY_BUTTON_SELECTOR);
+      const observer = new MutationObserver(() => {
+        const btn = bubble.querySelector(THREAD_REPLY_BUTTON_SELECTOR);
+        if (btn) {
+          observer.disconnect();
+          clearTimeout(timer);
+          resolve(btn);
+        }
+      });
+      observer.observe(bubble, { childList: true, subtree: true });
+
+      const timer = setTimeout(() => {
+        observer.disconnect();
+        resolve(bubble.querySelector(THREAD_REPLY_BUTTON_SELECTOR));
+      }, timeoutMs);
+    });
+  }
+
+  function activateBubble(bubble) {
+    triggerHover(bubble);
+
+    waitForThreadButton(bubble, HOVER_WAIT_TIMEOUT_MS).then((threadButton) => {
       if (!threadButton) return;
 
       const confirmMessage = buildConfirmMessage(bubble);
@@ -160,7 +199,42 @@
           });
         });
       });
+    });
+  }
+
+  // 討論串詳細面板裡也會渲染一份根訊息的 .iKCcE，要排除掉，
+  // 才能正確抓到主對話串最下方（最新）的那一則。
+  function findLastMainStreamBubble() {
+    const bubbles = document.querySelectorAll(BUBBLE_SELECTOR);
+    for (let i = bubbles.length - 1; i >= 0; i--) {
+      if (!bubbles[i].closest(THREAD_DETAIL_VIEW_SELECTOR)) {
+        return bubbles[i];
+      }
+    }
+    return null;
+  }
+
+  document.addEventListener(
+    'click',
+    function (event) {
+      const bubble = event.target.closest(BUBBLE_SELECTOR);
+      if (!bubble) return;
+
+      if (isInsideInteractiveElement(event.target, bubble)) return;
+
+      activateBubble(bubble);
     },
     true
   );
+
+  // 快捷鍵改由 background.js 透過 chrome.commands 註冊在瀏覽器層級（見該檔案），
+  // 不依賴網頁內容是否已取得鍵盤 focus；這裡只負責接收轉發訊息、執行同一套邏輯。
+  chrome.runtime.onMessage.addListener(function (message) {
+    if (!message || message.type !== 'QUICK_REPLY_SHORTCUT') return;
+
+    const bubble = findLastMainStreamBubble();
+    if (!bubble) return;
+
+    activateBubble(bubble);
+  });
 })();
