@@ -15,14 +15,15 @@
   }
 
   const BUTTONS = [
-    { label: '麥思',   keyword: '橘蘋麥思數學課程' },
-    { label: '艾伯特', keyword: '頑皮艾伯特課程' },
-    { label: 'MC',     keyword: 'Minecraft 麥塊程式班' },
-    { label: 'MC-PY',  keyword: 'Minecraft 麥塊 Python' },
-    { label: 'RX',     keyword: 'Roblox' },
-    { label: 'SC',     keyword: 'Scratch 實戰班' },
-    { label: 'PY',     keyword: 'Python程式開發班' },
-    { label: 'Steam',  keyword: 'STEAM' },
+    { label: '財商',   keyword: '橘蘋財商素養課程（線上）' },
+    { label: '麥思',   keyword: '橘蘋麥思數學（線上）' },
+    { label: '艾伯特', keyword: '頑皮艾伯特不在家基礎程式班（線上）' },
+    { label: 'MC',     keyword: 'Minecraft 麥塊程式班（線上）' },
+    { label: 'MC-PY',  keyword: '麥塊 Python（線上）' },
+    { label: 'RX',     keyword: 'Roblox AI 遊戲設計班（線上）' },
+    { label: 'SC',     keyword: 'Scratch菁英課程（線上）' },
+    { label: 'PY',     keyword: 'Python 程式開發班（線上）' },
+    { label: 'Steam',  keyword: 'STEAM 創意機械積木班（實體）' },
   ];
 
   function injectButtons() {
