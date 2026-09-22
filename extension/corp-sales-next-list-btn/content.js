@@ -29,11 +29,12 @@
     console.log(`[NextList ${t}]`, ...args);
   }
 
-  // 「自動」在版面上緊貼 FAB，容易誤按，而按下後約半秒就會送出一筆未接聽紀錄，
-  // 因此進入自動模式前先確認。確認攔在模式按鈕的 click handler、setMode 之前，
-  // 不放進 setMode 內部：自動模式的四處停止路徑也會呼叫 setMode('dial')，
-  // 那些是程式自行切回，不該經過使用者確認。攔在 handler 也讓「取消」等於
-  // 完全沒有狀態變化——_mode 未被指派、toggle 亮的仍是原本那個、不會排任何 alarm。
+  // 模式切換與 FAB 之間只隔著防呆間距（見 style.css 的 container gap），仍可能誤按
+  // 到「自動」，而按下後約半秒就會送出一筆未接聽紀錄，因此進入自動模式前先確認。
+  // 確認攔在模式按鈕的 click handler、setMode 之前，不放進 setMode 內部：自動模式
+  // 的四處停止路徑也會呼叫 setMode('dial')，那些是程式自行切回，不該經過使用者確認。
+  // 攔在 handler 也讓「取消」等於完全沒有狀態變化——_mode 未被指派、toggle 亮的仍是
+  // 原本那個、不會排任何 alarm。
   const AUTO_CONFIRM_MSG =
     '確定要開始自動模式嗎？\n\n' +
     '按下「確定」後會立刻找出下一筆名單並送出「未接聽」紀錄，' +
@@ -171,6 +172,18 @@
     handle.title = _isCollapsed ? '展開' : '收合';
   }
 
+  // 讓收合把手與外層容器（毛玻璃圓角卡片）垂直置中對齊。container 內部固定只有
+  // row、toggle 兩個子元素，尺寸皆為寫死的 px 值，高度不會隨模式切換或內容變動，
+  // 故只需在建立當下量測一次；不像 applyCollapsedState 需要在收合/展開時重算——
+  // 收合只對 container 做水平 transform，不影響其高度或垂直位置。
+  function alignHandleToContainer(container, handle) {
+    const containerRect = container.getBoundingClientRect();
+    const handleHeight = handle.getBoundingClientRect().height;
+    const containerBottomOffset = window.innerHeight - containerRect.bottom; // 換算成實際 px 的 container bottom 值
+    const centerFromBottom = containerBottomOffset + containerRect.height / 2;
+    handle.style.bottom = `${centerFromBottom - handleHeight / 2}px`;
+  }
+
   // 建立並注入 FAB 按鈕與模式切換 toggle
   function injectFAB() {
     if (document.querySelector('.next-list-fab-container')) return;
@@ -225,8 +238,8 @@
     row.appendChild(statusLight);
     row.appendChild(btn);
 
-    container.appendChild(toggle);
     container.appendChild(row);
+    container.appendChild(toggle);
     document.body.appendChild(container);
 
     // 收合／展開把手：獨立於 container 之外（手足元素，非子元素），
@@ -244,6 +257,7 @@
       applyCollapsedState(container, handle);
     });
     document.body.appendChild(handle);
+    alignHandleToContainer(container, handle);
 
     // 重建時（Turbo 抽換 body 後）把畫面補成 _isCollapsed 該有的樣子
     applyCollapsedState(container, handle);

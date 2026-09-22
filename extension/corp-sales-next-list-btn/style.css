@@ -5,7 +5,10 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 8px;
+  /* 8px 基礎間距 + 12px 防呆間距：容器內只有 toggle、row 兩個子元素，
+     這個 gap 就是兩者之間唯一的間距，不管哪個在上都會套用，避免手往上
+     偏一點就從 FAB 誤按到旁邊的模式按鈕（尤其是會立刻送出未接聽的「自動」）。 */
+  gap: 20px;
   padding: 10px;
   border-radius: 20px;
   background: rgba(20, 20, 20, 0.55);
@@ -21,7 +24,9 @@
 }
 
 /* 收合／展開把手：貼在容器左側中央，隨容器一起滑動的獨立元件。
-   bottom 值需與 .next-list-fab-row 的 margin-top 連動（見該處註解）。 */
+   bottom 這裡只是 JS 量測完成前的暫定值，實際位置由 content.js 的
+   alignHandleToContainer() 在注入時量測並覆寫，讓把手與 .next-list-fab-container
+   垂直置中對齊。 */
 .next-list-collapse-handle {
   position: fixed;
   bottom: 126px;
@@ -55,16 +60,11 @@
   right: 4px;
 }
 
-/* margin-top 是刻意拉開與上方 toggle 的距離：「自動」原本只離 FAB 11px，
-   要按 FAB 時手往上偏一點就會誤按到「自動」而直接送出未接聽紀錄。
-   容器是 bottom 定位、往上生長，這個 margin 會把 toggle 往上推 12px，
-   因此下面 .next-list-collapse-handle 的 bottom 也一起加 12px 才維持對齊。 */
 .next-list-fab-row {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  margin-top: 12px;
 }
 
 .next-list-status-light {
