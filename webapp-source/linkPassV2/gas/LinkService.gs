@@ -26,6 +26,7 @@ function listLinks_(request) {
 function createLink_(request) {
   var url = normalizeUrl_(request.url);
   var label = normalizeLabel_(request.label);
+  if (!label) label = fetchPageTitle_(url);
   var clientRequestId = validateId_(request.clientRequestId, 'client_request_id');
   var lock = LockService.getScriptLock();
 

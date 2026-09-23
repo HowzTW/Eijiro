@@ -21,7 +21,7 @@ npm run gas:push
 - `SHEET_NAME`：選填，預設為 `links`。
 - `ACCESS_KEY_SHA256`：選填；建議不要手動計算，改在 Apps Script 編輯器執行 `setAccessKey('你的裝置密碼')`。
 
-接著在編輯器手動執行一次 `setupLinkPass()`，授權並建立表頭。
+接著在編輯器手動執行一次 `authorizeLinkPass()`，授權試算表與外部網頁讀取權限；若只需要建立或修復表頭，也可執行 `setupLinkPass()`。
 
 ## 4. 部署 Web App
 
@@ -51,7 +51,7 @@ npm run gas:push
 | `created_at` | ISO 8601 UTC 時間 |
 | `created_at_ms` | 排序用毫秒時間戳 |
 | `url` | 完整網址 |
-| `label` | 選填名稱 |
+| `label` | 選填名稱；留空時會優先擷取目標網頁的 `<title>`，擷取不到則由前端顯示網域名稱 |
 | `client_request_id` | 新增請求的冪等識別碼 |
 
-API 只支援 `list`、`create`、`delete`。所有資料修改都由 `LockService` 保護，避免並行寫入互相衝突。
+API 只支援 `list`、`create`、`delete`。所有資料修改都由 `LockService` 保護，避免並行寫入互相衝突。自動擷取網頁標題使用 `UrlFetchApp`，私人網路與本機位址不會被請求。

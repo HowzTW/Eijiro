@@ -1,4 +1,4 @@
-var LINKPASS_API_VERSION = '2.0.0';
+var LINKPASS_API_VERSION = '2.1.0';
 var LINKPASS_SPREADSHEET_ID = '1TINrZuNCdq6jaOS8JtgduawqqMD2CBLCUvfbVUSUz8A';
 
 function doGet() {
@@ -46,5 +46,17 @@ function setupLinkPass() {
     spreadsheetId: sheet.getParent().getId(),
     sheetName: sheet.getName(),
     apiVersion: LINKPASS_API_VERSION
+  };
+}
+
+function authorizeLinkPass() {
+  var authorizationProbe = UrlFetchApp.fetch('https://example.com/', {
+    muteHttpExceptions: true,
+    validateHttpsCertificates: true
+  });
+  return {
+    spreadsheetId: getLinksSheet_().getParent().getId(),
+    externalRequestStatus: authorizationProbe.getResponseCode(),
+    fetchedTitle: fetchPageTitle_('https://example.com/')
   };
 }
