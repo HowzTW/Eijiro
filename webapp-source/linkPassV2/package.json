@@ -1,0 +1,28 @@
+{
+  "name": "link-pass-v2",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "gas:login": "cd gas && clasp login",
+    "gas:push": "cd gas && clasp push",
+    "gas:open": "cd gas && clasp open-script"
+  },
+  "dependencies": {
+    "lucide-preact": "^0.468.0",
+    "preact": "^10.25.4"
+  },
+  "devDependencies": {
+    "@google/clasp": "^3.0.6-alpha",
+    "@preact/preset-vite": "^2.9.3",
+    "@types/node": "^24.0.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7",
+    "vitest": "^5.0.1"
+  }
+}

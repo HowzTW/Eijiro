@@ -1,0 +1,18 @@
+{
+  "name": "Hatarō LinkPass",
+  "short_name": "LinkPass",
+  "description": "把手機上的連結，送到大螢幕。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f3ec",
+  "theme_color": "#f26a3d",
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
