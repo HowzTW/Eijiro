@@ -18,6 +18,7 @@
         "ayuOrder",
         "nextTrip2026",
         "linkPass",
+        "linkPassV2",
         "promptGen",
         "primeSeeker",
         "uiPalette",
@@ -100,6 +101,13 @@
             "title": "連結通行證",
             "description": "快速跳轉至受保護的連結與常用工具。",
             "stats": "Utility"
+        },
+        "linkPassV2": {
+            "href": "linkPassV2/index.html",
+            "icon": "link",
+            "title": "連結通行證 V2",
+            "description": "為手機、電視與觸控操作重新設計的跨裝置連結收發工具。",
+            "stats": "New Utility"
         },
         "promptGen": {
             "href": "promptGen/index.html",
