@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "OA Corp：殘留遮罩清除按鈕",
+  "version": "1.0",
+  "description": "(corp-orphan-backdrop-closer-btn) 偵測 Bootstrap modal 關閉後未被移除的孤兒遮罩，於畫面右側中央注入一鍵清除按鈕，恢復頁面操作",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://corp.orangeapple.co/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
