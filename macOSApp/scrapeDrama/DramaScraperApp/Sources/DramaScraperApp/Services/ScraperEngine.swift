@@ -93,6 +93,7 @@ class ScraperEngine {
                     for rawLine in rawSourcesArr {
                         if hitLimit { break }
                         var resolvedEpisodes: [DramaEpisode] = []
+                        var skipLine = false
                         for rawEp in rawLine.episodes {
                             processedCount += 1
                             continuation.yield(.parsing(message: "正在抓取", current: processedCount, total: totalEpisodesToFetch, line: rawLine.lineName, episode: rawEp.name))
@@ -116,10 +117,17 @@ class ScraperEngine {
                             }
 
                             let finalPlayUrl = await fetchPlayUrl(from: fullPlayPageUrlString)
+                            if !finalPlayUrl.isEmpty && !isDirectMediaURL(finalPlayUrl) {
+                                skipLine = true
+                                processedCount += rawLine.episodes.count - resolvedEpisodes.count - 1
+                                continuation.yield(.processing(message: "⏭️ 線路「\(rawLine.lineName)」不是可直接播放的影片網址（\(finalPlayUrl.prefix(40))…），已跳過此線路"))
+                                break
+                            }
 
                             resolvedEpisodes.append(DramaEpisode(name: rawEp.name, playPageUrl: formattedPlayPageUrl, play_url: finalPlayUrl))
                             try await Task.sleep(nanoseconds: 200_000_000)
                         }
+                        if skipLine { continue }
                         let resolvedLine = DramaLine(line_name: rawLine.lineName, episodes: resolvedEpisodes)
                         let lineJsonChars = (try? JSONEncoder().encode(resolvedLine)).flatMap { String(data: $0, encoding: .utf8) }?.count ?? 0
                         if totalSourcesJsonChars + lineJsonChars + 200 > sourcesJsonLimit {
@@ -230,6 +238,7 @@ class ScraperEngine {
                     for rawLine in rawSourcesArr {
                         if hitLimit { break }
                         var resolvedEpisodes: [DramaEpisode] = []
+                        var skipLine = false
                         for rawEp in rawLine.episodes {
                             processedCount += 1
                             continuation.yield(.parsing(message: "正在抓取", current: processedCount, total: totalEpisodesToFetch, line: rawLine.lineName, episode: rawEp.name))
@@ -242,10 +251,17 @@ class ScraperEngine {
                             }
 
                             let finalPlayUrl = await fetchPlayUrl(from: fullPlayPageUrl)
+                            if !finalPlayUrl.isEmpty && !isDirectMediaURL(finalPlayUrl) {
+                                skipLine = true
+                                processedCount += rawLine.episodes.count - resolvedEpisodes.count - 1
+                                continuation.yield(.processing(message: "⏭️ 線路「\(rawLine.lineName)」不是可直接播放的影片網址（\(finalPlayUrl.prefix(40))…），已跳過此線路"))
+                                break
+                            }
 
                             resolvedEpisodes.append(DramaEpisode(name: rawEp.name, playPageUrl: rawEp.playPageUrl, play_url: finalPlayUrl))
                             try await Task.sleep(nanoseconds: 200_000_000)
                         }
+                        if skipLine { continue }
                         let resolvedLine = DramaLine(line_name: rawLine.lineName, episodes: resolvedEpisodes)
                         let lineJsonChars = (try? JSONEncoder().encode(resolvedLine)).flatMap { String(data: $0, encoding: .utf8) }?.count ?? 0
                         if totalSourcesJsonChars + lineJsonChars + 200 > sourcesJsonLimit {
@@ -312,6 +328,13 @@ class ScraperEngine {
             }
         }
         return ""
+    }
+
+    // 只接受可直接播放的影片網址；HD 線路的代號（qsvip-、JD-）與網頁型網址（v.qq.com 等）皆不符合
+    private func isDirectMediaURL(_ url: String) -> Bool {
+        let lower = url.lowercased()
+        return (lower.hasPrefix("http://") || lower.hasPrefix("https://"))
+            && (lower.contains(".m3u8") || lower.contains(".mp4"))
     }
 
     private func normalizeURL(_ url: String) -> String {
