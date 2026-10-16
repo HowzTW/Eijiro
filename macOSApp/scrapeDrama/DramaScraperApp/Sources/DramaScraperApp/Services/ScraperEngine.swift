@@ -289,7 +289,8 @@ class ScraperEngine {
         guard let (playData, _) = try? await URLSession.shared.data(for: req),
               let playHtml = String(data: playData, encoding: .utf8) else { return "" }
 
-        guard let range = playHtml.range(of: "var player_data=") ?? playHtml.range(of: "var MacPlayer=") else { return "" }
+        // 變數名稱會隨網站改版變動（777TV: player_data；Gimy+: player_aaaa），以 player_ 前綴比對
+        guard let range = playHtml.range(of: #"var\s+player_\w+\s*="#, options: .regularExpression) ?? playHtml.range(of: "var MacPlayer=") else { return "" }
 
         if let openBraceIndex = playHtml[range.upperBound...].firstIndex(of: "{") {
             var braceCount = 0
