@@ -1,0 +1,14 @@
+interface:
+  display_name: 查找 Naver Maps 地點
+  short_description: 由社群貼文或文字線索核對地點，提供介紹、網址、雙語暱稱、45字備註及AI暫存清單指令
+  default_prompt: 使用 $find-naver-map-place 根據這則貼文或文字線索查找正確地點，介紹店家並提供可點擊與可複製的 Naver
+    Maps 網址、可複製的雙語地點暱稱及45字內備註，最後附上加入「AI暫存清單」的完整可複製指令。
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
