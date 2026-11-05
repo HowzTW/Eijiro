@@ -77,7 +77,7 @@
         "bloodStatus": {
             "href": "bloodStatus/index.html",
             "icon": "bloodtype",
-            "title": "血脂狀態",
+            "title": "血壓狀態",
             "description": "健康數據可視化，守護每一天的身體平衡。",
             "stats": "Health"
         },
