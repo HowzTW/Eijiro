@@ -204,14 +204,34 @@ class ScraperEngine {
                     let introduction = try document.select("#desc .desc").first()?.text().trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
 
                     var rawSourcesArr: [(lineName: String, episodes: [(name: String, playPageUrl: String)])] = []
-                    // 網站改版後：線路名稱在 .route-title，集數容器 .episodes-route 是它的下一個兄弟節點
+                    // Gimy+ 目前有兩種版型並存：
+                    // 1. 線路名稱在 .route-title，集數容器 .episodes-route 是它的下一個兄弟節點
+                    // 2. 線路名稱在上方分頁 [data-route-switch=N]，對應集數容器的 data-route-sid=N
                     let routeBlocks = try document.select(".episodes-route")
+                    var routeTabNames: [String: String] = [:]
+                    for tab in try document.select("[data-route-switch]").array() {
+                        let sid = try tab.attr("data-route-switch")
+                        let name = try tab.text().trimmingCharacters(in: .whitespacesAndNewlines)
+                        if !sid.isEmpty && !name.isEmpty && routeTabNames[sid] == nil {
+                            routeTabNames[sid] = name
+                        }
+                    }
+                    var seenRouteSids = Set<String>()
                     var totalEpisodesToFetch = 0
 
                     for block in routeBlocks.array() {
-                        guard let titleEl = try block.previousElementSibling(), titleEl.hasClass("route-title") else { continue }
-                        let lineName = try titleEl.text().trimmingCharacters(in: .whitespacesAndNewlines)
+                        let sid = try block.attr("data-route-sid")
+                        var lineName = ""
+                        if let titleEl = try block.previousElementSibling(), titleEl.hasClass("route-title") {
+                            lineName = try titleEl.text().trimmingCharacters(in: .whitespacesAndNewlines)
+                        } else if let tabName = routeTabNames[sid] {
+                            lineName = tabName
+                        }
                         if lineName.isEmpty { continue }
+                        if !sid.isEmpty {
+                            if seenRouteSids.contains(sid) { continue }
+                            seenRouteSids.insert(sid)
+                        }
 
                         var episodesList: [(name: String, playPageUrl: String)] = []
                         for el in try block.select("a.ep").array() {
